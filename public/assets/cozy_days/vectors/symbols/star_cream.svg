@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='utf-8'?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128" role="img" aria-label="star_cream">
+  <title>star cream</title>
+  <desc>Hand traced from Cozy Days watercolor reference. Actual vector paths; no bitmap.</desc>
+  <path d="M60 12 C65 8 70 18 76 29 L86 45 C96 48 111 47 118 54 C122 61 107 72 99 81 C96 89 102 106 97 114 C92 120 75 108 63 104 C51 108 36 120 30 114 C26 107 31 91 31 81 C23 73 8 64 10 57 C12 49 32 48 43 44 C49 31 53 18 60 12 Z" fill="#ffeab4" stroke="#382f2b" stroke-width="4.6" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M63 20 C67 20 70 28 75 38 C66 32 59 40 55 48 C43 51 28 56 21 57 C22 52 35 49 44 48 C51 38 55 23 63 20 Z" fill="#fff9e9" opacity="0.65" />
+  <path d="M32 81 C43 86 48 94 64 93 C78 91 86 88 96 82 L95 108 C83 109 73 101 63 100 L34 111 Z" fill="#f4cb74" opacity="0.26" />
+  <path d="M75 51 C83 54 92 52 103 56 C93 60 89 67 82 66 C75 66 71 61 75 51 Z" fill="#fff9ed" opacity="0.21" />
+</svg>

@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='utf-8'?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128" role="img" aria-label="heart_pink_outline">
+  <title>heart pink outline</title>
+  <desc>Hand traced from Cozy Days watercolor reference. Actual vector paths; no bitmap.</desc>
+  <path d="M63 36 C53 13 32 13 19 27 C-1 51 24 82 44 99 L64 115 C80 103 110 78 116 53 C123 26 104 11 87 20 C77 24 70 30 63 36 Z" fill="none" stroke="#ef91b2" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M20 32 C11 50 28 74 42 87" fill="none" stroke="#ffbdd2" stroke-width="3.1" stroke-linecap="round" stroke-linejoin="round" opacity="0.75" />
+  <path d="M83 26 C94 19 107 23 111 35" fill="none" stroke="#ffd0df" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" opacity="0.75" />
+</svg>

@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='utf-8'?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128" role="img" aria-label="sparkle_gold">
+  <title>sparkle gold</title>
+  <desc>Hand traced from Cozy Days watercolor reference. Actual vector paths; no bitmap.</desc>
+  <path d="M63 9 C67 7 69 28 76 44 C80 50 101 56 116 62 C120 65 101 72 82 79 C75 83 70 104 65 119 C61 122 56 100 49 83 C45 77 23 72 10 66 C6 63 26 55 43 48 C50 42 56 20 60 11 Z" fill="#ffe6a0" stroke="#d99c3f" stroke-width="3.7" stroke-linecap="round" stroke-linejoin="round" />
+  <path d="M63 20 C66 39 69 47 75 53 C85 58 96 60 106 64 C91 68 82 71 75 77 C69 85 66 98 64 108 C60 94 57 84 51 77 C42 72 29 68 20 65 C34 60 47 56 53 50 C58 42 61 28 63 20 Z" fill="#fff9dc" />
+  <path d="M60 20 C57 35 53 45 48 49 L21 62" fill="none" stroke="#fff5c7" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" opacity="0.54" />
+  <path d="M79 79 C74 87 71 102 66 115" fill="none" stroke="#e9b752" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" opacity="0.45" />
+</svg>

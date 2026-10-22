@@ -21,6 +21,9 @@ for (const [width, height] of [[360, 740], [393, 852], [430, 932]]) {
     await page.getByRole('button', { name: '新增待办', exact: true }).click();
     await page.getByRole('textbox', { name: '想做些什么？' }).fill('阅读一本新书');
     await page.getByRole('button', { name: '保存', exact: true }).click();
+    // Wait for the IndexedDB save and modal dismissal before testing a reload.
+    await expect(page.getByRole('dialog')).not.toBeVisible();
+    await expect(page.getByTestId('todo-card')).toHaveCount(1);
     await page.reload();
     await expect(page.getByTestId('todo-card')).toHaveCount(1);
     await page.getByRole('button', { name: '编辑：阅读一本新书', exact: true }).click();

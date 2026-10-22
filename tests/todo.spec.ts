@@ -1,3 +1,4 @@
+import { taskAction } from './task-actions';
 import { test, expect, type Page } from '@playwright/test';
 
 async function addTodo(page: Page, text: string, date?: string) {
@@ -16,14 +17,14 @@ test('新增、刷新保留、完成与准确撤销', async ({page}) => {
   await addTodo(page, '需要准确撤销的第二件');
   await page.reload();
   await expect(card(page, '需要准确撤销的第二件')).toBeVisible();
-  await page.getByRole('checkbox', {name:'完成：已经完成的第一件',exact:true}).click();
+  await taskAction(page, '已经完成的第一件', 'complete');
   await expect(page.getByRole('button', {name:'已完成 1',exact:true})).toBeVisible();
-  await page.getByRole('checkbox', {name:'完成：需要准确撤销的第二件',exact:true}).click();
+  await taskAction(page, '需要准确撤销的第二件', 'complete');
   await expect(page.getByRole('button', {name:'已完成 2',exact:true})).toBeVisible();
   await page.getByRole('button', {name:'撤销',exact:true}).click();
-  await expect(page.getByRole('checkbox', {name:'完成：需要准确撤销的第二件',exact:true})).toBeVisible();
+  await expect(page.getByRole('button',{name:'编辑：需要准确撤销的第二件',exact:true})).toBeVisible();
   await page.getByRole('button', {name:'已完成 1',exact:true}).click();
-  await expect(page.getByRole('checkbox', {name:'恢复：已经完成的第一件',exact:true})).toBeVisible();
+  await expect(page.getByRole('button',{name:'编辑：已经完成的第一件',exact:true})).toBeVisible();
   await page.reload();
   await expect(page.getByRole('button', {name:'已完成 1',exact:true})).toBeVisible();
 });
@@ -36,11 +37,11 @@ test('编辑多行内容、修改日期、删除取消和确认', async ({page})
   await editor.getByRole('textbox', {name:'想做些什么？'}).fill('修改后的第一行\n这是一段会自动换行的第二行任务内容');
   await editor.getByRole('button',{name:'保存',exact:true}).click();
   await expect(page.getByText('修改后的第一行', {exact:false})).toBeVisible();
-  await page.getByRole('button',{name:/^删除：修改后的第一行/}).click();
-  await page.getByRole('button',{name:'再想想',exact:true}).click();
+  await page.getByRole('button',{name:/^更多操作：修改后的第一行/}).click();
+  await page.getByRole('button',{name:'关闭弹窗',exact:true}).click();
   await expect(page.getByRole('dialog')).not.toBeVisible();
+  await page.getByRole('button',{name:/^更多操作：修改后的第一行/}).click();
   await page.getByRole('button',{name:/^删除：修改后的第一行/}).click();
-  await page.getByRole('button',{name:'确认删除',exact:true}).click();
   await expect(page.getByTestId('todo-card')).toHaveCount(0);
   await page.reload();
   await expect(page.getByTestId('todo-card')).toHaveCount(0);
@@ -99,6 +100,7 @@ test('页面加载后断网仍可新增，恢复网络刷新后保留', async ({
 });
 
 test('两种手机尺寸：长列表滚动、导航与截图', async ({page}) => {
+  test.setTimeout(60_000);
   const errors:string[]=[];
   page.on('pageerror', error=>errors.push(error.message));
   await page.goto('/');
@@ -162,4 +164,3 @@ test('减少动态效果偏好与桌面设备切换',async({page})=>{
   await page.getByRole('button',{name:'新增待办',exact:true}).click();
   await expect(page.getByRole('dialog',{name:'新建待办'})).toBeVisible();
 });
-

@@ -43,8 +43,9 @@ test('正式素材、三种安卓视口、长文本与安全区', async ({ page 
     await page.getByRole('button',{name:'保存',exact:true}).click();
     const content = page.locator('.task-content').last();
     expect(await content.evaluate(e=>e.scrollWidth<=e.clientWidth)).toBe(true);
+    await page.getByRole('button',{name:`更多操作：${longText}`,exact:true}).click();
     await page.getByRole('button',{name:`删除：${longText}`,exact:true}).click();
-    await page.getByRole('button',{name:'确认删除',exact:true}).click();
+    await expect(page.getByTestId('todo-card')).toHaveCount(4);
     // Synthetic bottom inset checks CSS reservation; device bars still require a real Android device.
     await page.addStyleTag({content:'.bottom-nav {height:calc(var(--nav-height) + 34px);padding-bottom:39px}.fab {bottom:calc(var(--nav-height) + 55px)}'});
     await expect(page.getByRole('button',{name:'纪念日',exact:true})).toBeInViewport();
@@ -58,7 +59,7 @@ test('正式素材、三种安卓视口、长文本与安全区', async ({ page 
     // Delete fixture todos through the UI to preserve the application's normal data path.
     for (let remaining = 4; remaining > 0; remaining--) {
       await page.locator('.task-actions button').last().click();
-      await page.getByRole('button',{name:'确认删除',exact:true}).click();
+      await page.getByRole('button',{name:/^删除：/}).click();
       await expect(page.getByTestId('todo-card')).toHaveCount(remaining - 1);
     }
   }

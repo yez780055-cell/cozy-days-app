@@ -1,0 +1,27 @@
+.task-list { gap: 0; }
+.swipe-shell { position: relative; flex: none; overflow: hidden; padding-bottom: 11px; }
+.swipe-shell .task-card { margin-bottom: 0; touch-action: pan-y; user-select: none; transform: translate3d(0,0,0); }
+.swipe-shell[data-phase="dragging"] .task-card, .swipe-shell[data-phase="exiting"] .task-card { will-change: transform, opacity; }
+.swipe-shell .task-content:active { transform: none; }
+.swipe-shell .task-card { padding-left: 17px; gap: 10px; }
+.task-favorite { width: 23px; height: auto; flex: none; transform: rotate(9deg); }
+.swipe-rail { position: absolute; inset: 0 0 11px; border-radius: 21px 19px 22px 18px; display: flex; align-items: stretch; pointer-events: none; }
+.swipe-rail--complete { background: #b3c7a1; color: #384f32; opacity: var(--complete-reveal,0); justify-content: flex-start; }
+.swipe-rail--delete { background: #df7b83; color: #fffaf0; opacity: var(--delete-reveal,0); justify-content: flex-end; }
+.swipe-action { pointer-events: auto; width: 80px; min-height: 44px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; border: 0; color: inherit; background: transparent; font-size: 11px; touch-action: manipulation; padding: 8px; }
+.swipe-action:disabled { opacity: 1; pointer-events: none; }
+.card-menu-copy { font-size: 12px; line-height: 1.8; color: #947861; margin: 0 0 15px; }
+.card-menu-actions { display: grid; gap: 10px; }
+.card-menu-actions .button { width: 100%; }
+.favorite-control { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; margin: -8px 0 15px; padding: 6px 12px; font-size: 12px; color: #927057; border: 1px dashed #dfcab2; border-radius: 12px; background: #fff9ef; }
+.favorite-control .asset { width: 23px; height: 23px; }
+.favorite-control[aria-pressed="true"] { border-style: solid; border-color: #e8c692; background: #fff0d2; }
+.undo-toast { position: absolute; left: 16px; right: 16px; bottom: calc(var(--nav-height) + 15px + env(safe-area-inset-bottom)); z-index: 7; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 4px 15px 8px; min-height: 58px; background: #fff5df; background-image: var(--paper-texture); background-size: 320px 320px; border: 1px solid #e4cdb2; border-radius: 17px 15px 16px 18px; color: #7c5e49; box-shadow: 0 5px 18px #735c4020; font-size: 12px; overflow: hidden; animation: toast-enter 300ms ease-out; }
+.undo-toast button { border: 0; background: transparent; min-height: 44px; min-width: 44px; padding: 8px 0; color: #bd6683; font-weight: 600; }
+.undo-toast--leaving { animation: toast-exit 300ms ease-out forwards; pointer-events: none; }
+.undo-progress { position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: #eddcc9; }
+.undo-progress i { display: block; height: 100%; background: #ed9fb3; transform-origin: left; animation: undo-countdown 5s linear forwards; }
+@keyframes undo-countdown { from {transform: scaleX(1);} to {transform: scaleX(0);} }
+@keyframes toast-enter { from {transform: translateY(14px);opacity: 0;} to {transform: translateY(0);opacity: 1;} }
+@keyframes toast-exit { from {transform: translateY(0);opacity: 1;} to {transform: translateY(14px);opacity: 0;} }
+@media (prefers-reduced-motion: reduce) { .undo-progress i { animation-duration: 5s !important; } }

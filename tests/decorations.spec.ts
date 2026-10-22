@@ -1,3 +1,4 @@
+import { taskAction } from './task-actions';
 import { test, expect, type Page } from '@playwright/test';
 import fs from 'node:fs';
 import crypto from 'node:crypto';
@@ -87,18 +88,17 @@ test('新任务保存装饰，编辑重匹配，手动贴纸/配色持久化且�
   await expect(card.locator('.task-art')).toHaveAttribute('data-sticker','cherries');
   expect((await records(page))[0].decoration).toEqual(changed.decoration);
   // Cancel decoration edits without changing the saved appearance.
-  await page.getByRole('button',{name:'修改：晚上慢跑之后拉伸',exact:true}).click();
+  await page.getByRole('button',{name:'编辑：晚上慢跑之后拉伸',exact:true}).click();
   await page.getByText('贴纸与卡片配色',{exact:true}).click();
   await page.getByRole('button',{name:'奶油',exact:true}).click();
   await page.getByRole('button',{name:'关闭弹窗',exact:true}).click();
   await expect(page.getByRole('dialog')).not.toBeVisible();
   expect((await records(page))[0].decoration).toEqual(changed.decoration);
-  await page.getByRole('checkbox',{name:'完成：晚上慢跑之后拉伸',exact:true}).click();
+  await taskAction(page, '晚上慢跑之后拉伸', 'complete');
   await page.getByRole('button',{name:'已完成 1',exact:true}).click();
-  await page.getByRole('checkbox',{name:'恢复：晚上慢跑之后拉伸',exact:true}).click();
+  await taskAction(page, '晚上慢跑之后拉伸', 'restore');
   expect((await records(page))[0].decoration).toEqual(changed.decoration);
-  await page.getByRole('button',{name:'删除：晚上慢跑之后拉伸',exact:true}).click();
-  await page.getByRole('button',{name:'确认删除',exact:true}).click();
+  await taskAction(page,'晚上慢跑之后拉伸','delete');
   await expect(card).toHaveCount(0);
 });
 

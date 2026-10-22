@@ -1,5 +1,5 @@
 import { assets, type AssetName } from '../assets/manifest';
-import fallbackStar from '../../public/assets/cozy_days/vectors/symbols/star_cream.svg?raw';
+import fallbackStar from '../assets/fallback-star.svg?raw';
 // The approved SVG is embedded in the bundle, so fallback also works offline.
 const fallbackUrl = `data:image/svg+xml,${encodeURIComponent(fallbackStar)}`;
 export function Asset({ name, className = '' }: { name: AssetName; className?: string }) {
@@ -9,4 +9,3 @@ export function Asset({ name, className = '' }: { name: AssetName; className?: s
     onError={event => { const img = event.currentTarget; if (img.src !== fallbackUrl) { img.src = fallbackUrl; img.style.aspectRatio = '1 / 1'; } }}
     style={{ aspectRatio: `${asset.width} / ${asset.height}`, objectFit: asset.fit, objectPosition: asset.anchor }} />;
 }
-

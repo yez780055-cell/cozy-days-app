@@ -1,3 +1,4 @@
+import { taskAction } from './task-actions';
 import { test, expect } from '@playwright/test';
 import fs from 'node:fs';
 const catalog: { file: string }[] = JSON.parse(fs.readFileSync('src/assets/ready-catalog.json', 'utf8').replace(/^\uFEFF/, ''));
@@ -29,9 +30,9 @@ for (const [width, height] of [[360, 740], [393, 852], [430, 932]]) {
     await page.getByRole('button', { name: '编辑：阅读一本新书', exact: true }).click();
     await page.getByRole('textbox', { name: '想做些什么？' }).fill('晚上做十分钟拉伸');
     await page.getByRole('button', { name: '保存', exact: true }).click();
-    await page.getByRole('checkbox', { name: '完成：晚上做十分钟拉伸', exact: true }).click();
+    await taskAction(page,'晚上做十分钟拉伸','complete');
     await page.getByRole('button', { name: '撤销', exact: true }).click();
-    await expect(page.getByRole('checkbox', { name: '完成：晚上做十分钟拉伸', exact: true })).toBeVisible();
+    await expect(page.getByRole('button', { name: '编辑：晚上做十分钟拉伸', exact: true })).toBeVisible();
     await page.getByRole('button', { name: '选择日期', exact: true }).click();
     await page.getByRole('button', { name: '回到今天', exact: true }).click();
     await page.locator('img').evaluateAll(imgs => Promise.all(imgs.map(img => (img as HTMLImageElement).decode())));
@@ -46,8 +47,7 @@ for (const [width, height] of [[360, 740], [393, 852], [430, 932]]) {
       await page.getByRole('button', { name, exact: true }).click();
       await expect(page.getByRole('button', { name, exact: true })).toHaveAttribute('aria-current', 'page');
     }
-    await page.getByRole('button', { name: '删除：晚上做十分钟拉伸', exact: true }).click();
-    await page.getByRole('button', { name: '确认删除', exact: true }).click();
+    await taskAction(page,'晚上做十分钟拉伸','delete');
     await expect(page.getByTestId('todo-card')).toHaveCount(0);
     expect(errors).toEqual([]);
   });

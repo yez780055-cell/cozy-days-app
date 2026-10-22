@@ -1,0 +1,71 @@
+/* Warm paper first: persisted themes now tint a narrow edge, not the entire card. */
+.swipe-shell .task-card[data-theme], .decoration-sample[data-theme] {
+  background-color: #fffaf0;
+  background-image: linear-gradient(#fffcf3d9,#fffcf3d9),url('/assets/cozy_days/raster/backgrounds/paper_texture.png');
+  background-size: auto,320px 320px;
+  border-color: #e9dcc8;
+  box-shadow: inset 2px 0 var(--card-accent,#e6d4b4),0 2px 6px #8e705810;
+}
+[data-theme="cream"] { --card-accent: #e8d5a9; }
+[data-theme="rose"] { --card-accent: #eebdcb; }
+[data-theme="lavender"] { --card-accent: #d5c5e8; }
+[data-theme="sage"] { --card-accent: #cadbb7; }
+.swipe-shell { padding-bottom: 8px; }
+.swipe-shell .task-card { min-height: 64px; padding: 8px 8px 8px 15px; gap: 8px; border-radius: 17px 15px 18px 16px; }
+.swipe-rail { bottom: 8px; border-radius: 17px 15px 18px 16px; }
+.task-content { line-height: 1.5; gap: 3px; letter-spacing: .2px; }
+.task-content .task-meta { display: flex; align-items: center; flex-wrap: wrap; gap: 3px 10px; font-size: 11px; line-height: 1.35; color: #a28b74; }
+.task-meta time { white-space: nowrap; font-variant-numeric: tabular-nums; }
+.task-art { width: 44px; height: 44px; }
+.task-art .task-illustration { max-width: 32px; max-height: 32px; top: 1px; left: 5px; }
+.task-art .task-sticker { width: 10px; bottom: 0; right: 0; }
+.task-card[data-layout="1"] .task-art .task-illustration { top: 10px; left: 7px; }
+.task-card[data-layout="1"] .task-art .task-sticker { top: 0; left: 0; }
+.task-card[data-layout="2"] .task-art .task-illustration { top: 1px; left: 0; }
+.task-card[data-layout="2"] .task-art .task-sticker { left: 1px; bottom: 0; }
+.task-favorite { width: 21px; }
+.date-section { display: grid; grid-template-columns: minmax(0,1fr) 88px; grid-template-rows: auto auto auto; column-gap: 6px; padding: 8px 18px 4px; }
+.date-row { grid-column: 1/-1; }
+.date-navigation { grid-column: 2; grid-row: 2; margin: 0; gap: 0; }
+.date-navigation > span { display: none; }
+.view-tabs { grid-column: 1; grid-row: 2; gap: 5px; min-width: 0; align-items: center; }
+.view-tabs > button { min-width: 0; font-size: 10px; padding: 7px 9px; gap: 5px; min-height: 44px; background: transparent; border-radius: 14px; color: #8d7663; }
+.view-tabs > button.active { background: #efe4d3; color: #6e5846; box-shadow: none; }
+.view-tabs > button > span { background: #fff8; color: #9c8068; }
+.category-row { grid-column: 1/-1; display: flex; gap: 2px; min-width: 0; align-items: center; }
+.category-tabs { display: flex; flex: 1; min-width: 0; overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: none; gap: 3px; }
+.category-tabs::-webkit-scrollbar { display: none; }
+.category-tabs button { flex: none; min-width: 44px; min-height: 44px; border: 0; padding: 5px 0; background: transparent; border-radius: 18px; font-size: 12px; }
+.category-tabs button > span { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 6px 11px; border-radius: 999px; background: #f1e8dc; color: #8e7865; white-space: nowrap; }
+.category-tabs button[data-tone="1"] > span { background: #f6e1e2; }
+.category-tabs button[data-tone="2"] > span { background: #eae5ee; }
+.category-tabs button[data-tone="3"] > span { background: #f6e9cb; }
+.category-tabs button[aria-pressed="true"] > span { background: #554d45; color: #fff9ef; box-shadow: 0 2px 5px #6e52431a; }
+.category-tabs small { font-size: 10px; opacity: .75; }
+.category-add { flex: none; width: 44px; height: 44px; padding: 0; border: 0; background: transparent; display: grid; place-items: center; border-radius: 50%; color: #816e5e; }
+.task-list-viewport { position: relative; display: flex; flex-direction: column; flex: 1; min-height: 0; }
+.task-list-viewport--populated { margin-bottom: 82px; }
+.task-list-viewport .task-area { margin-bottom: 0; padding: 0 18px 48px; }
+.task-bottom-fade { position: absolute; z-index: 2; left: 0; right: 0; bottom: 0; height: 48px; background: linear-gradient(to bottom,#fff7e900,#fff7e9dd 75%,#fff7e9); pointer-events: none; }
+.list-heading { padding: 2px 4px 10px; }
+.list-heading h2 { font-size: 11px; }
+.list-heading h2 .asset { width: 65px; top: -12px; opacity: .3; }
+.schedule-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: -8px 0 17px; }
+.schedule-fields > label { min-width: 0; display: flex; flex-direction: column; gap: 7px; color: #957d68; font-size: 11px; }
+.schedule-fields select,.schedule-fields input,.category-form input { min-width: 0; width: 100%; min-height: 44px; border: 1px solid #e5d6c4; border-radius: 10px; background: #fffaf0; color: #79634f; padding: 8px; font: inherit; }
+.time-input { display: flex; align-items: center; position: relative; }
+.time-input input { padding-right: 40px; }
+.time-input button { position: absolute; right: 0; min-width: 40px; min-height: 44px; border: 0; background: transparent; color: #b07986; font-size: 10px; padding: 5px; }
+.modal form > .todo-submit { position: sticky; bottom: 0; z-index: 1; }
+.category-form > label { display: block; color: #957861; font-size: 12px; margin-bottom: 8px; }
+.category-form > div { display: flex; gap: 9px; }
+.category-form input { flex: 1; font-size: 16px; }
+.category-form .button { flex: none; padding: 10px 12px; }
+.category-cancel { min-height: 44px; border: 0; background: none; padding: 8px 0; color: #a67986; font-size: 12px; }
+.category-note,.category-delete p { color: #92755e; font-size: 12px; line-height: 1.8; }
+.category-manager-list { margin: 12px 0 0; padding: 0; list-style: none; }
+.category-manager-list li { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 48px; border-bottom: 1px dashed #e8d9c6; font-size: 13px; overflow-wrap: anywhere; }
+.category-manager-list li > div { display: flex; flex: none; }
+.category-manager-list small { font-size: 10px; color: #af9a84; }
+@media(max-width:375px) { .task-list-viewport .task-area { padding-left: 14px; padding-right: 14px; } .date-section { padding-left: 16px; padding-right: 16px; } }
+@media(max-height:700px) { .date-section { padding-top: 3px; } .task-art { height: 40px; } }

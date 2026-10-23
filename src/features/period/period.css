@@ -3,7 +3,7 @@
 .period-page button:focus-visible{outline:2px solid #bb536f;outline-offset:2px}
 .period-page button:disabled{cursor:default;opacity:.5}
 .period-header{min-height:198px;position:relative;overflow:hidden;background:radial-gradient(ellipse at 0 5%,#f8cbd5a8,transparent 70%),radial-gradient(ellipse at 90% 0%,#e6d9f4,transparent 75%),linear-gradient(0deg,#fbe6d4,var(--paper));border-bottom:1px solid #eddbcc}
-.period-header-copy{position:relative;z-index:1;padding:25px 0 20px 22px;pointer-events:none}
+.period-header-copy{position:relative;z-index:1;width:53%;padding:25px 0 20px 22px;pointer-events:none}
 .period-header-copy>span{font-size:10px;letter-spacing:1.7px;color:#716165}
 .period-header h1{font-size:38px;letter-spacing:4px;margin:14px 0 8px;line-height:1.1;font-weight:600}
 .period-header em,.period-card em{color:#d85f84;font-style:normal}
@@ -11,20 +11,13 @@
 .period-header-sticker{position:absolute;right:14px;top:18px;font-size:10px;line-height:1.7;transform:rotate(8deg);background:#fff8e6b8;padding:9px 12px;box-shadow:0 2px 4px #72544512;border:1px dashed #e8d3b6}
 
 .period-art{position:relative;pointer-events:none;user-select:none}
-.period-art img{width:100%;height:100%;object-fit:contain}
-.period-art--header{position:absolute;right:3px;bottom:0;width:155px;height:139px}
-.period-cat{position:absolute;width:80px;height:72px;border-radius:44% 44% 34% 34%;background:#fffaf0;border:1.5px solid #8b7874;bottom:12px;right:9px;transform:rotate(7deg);box-shadow:inset 0 -8px 0 #f7ddd1}
-.period-cat:before,.period-cat:after{content:'';position:absolute;top:-13px;width:24px;height:29px;border-radius:8px 80% 0 0;background:inherit;border-top:1.5px solid #8b7874}
-.period-cat:before{left:5px;transform:rotate(-22deg)}
-.period-cat:after{right:5px;transform:rotate(11deg)}
-.period-cat b{position:absolute;inset:22px 0 auto;text-align:center;font:22px Georgia,serif;z-index:1;color:#70524f}
-.period-cat i{position:absolute;left:10px;top:39px;width:12px;height:5px;background:#f4aebb;border-radius:50%;box-shadow:47px 0 0 #f4aebb;opacity:.8}
-.period-cat--black{background:#4a454b;box-shadow:inset 0 -8px 0 #3c383e;width:65px;height:57px;right:70px;bottom:2px;transform:rotate(-9deg)}
-.period-cat--black b{color:#f8dba8;font-size:18px;top:16px}
-.period-cat--black i{left:6px;top:32px;box-shadow:39px 0 0 #f4aebb;width:10px}
-.period-moon{position:absolute;left:10px;top:0;color:#c6a356;font-size:48px;transform:rotate(-15deg)}
-.period-star{position:absolute;left:83px;top:-3px;color:#bba365;font-size:27px}
-.period-art-heart{position:absolute;right:5px;bottom:-5px;color:#d27690;font-size:45px}
+.period-art{z-index:0}
+.period-art img{position:absolute;object-fit:contain}
+.period-art .period-art-main{inset:0;width:100%;height:100%}
+.period-art--header{position:absolute;right:2px;bottom:2px;width:143px;height:104px}
+.period-art--header .period-art-star{width:20px;height:20px;right:13px;top:2px}
+.period-art--header .period-art-sparkle{width:19px;height:19px;left:2px;top:24px}
+.period-art--header .period-art-heart{width:20px;height:20px;left:36px;bottom:0}
 
 .period-content{padding:14px 13px 22px;display:flex;flex-direction:column;gap:13px;background-image:radial-gradient(#b9957020 .55px,transparent .65px);background-size:5px 5px}
 .period-card{flex:none;min-width:0;position:relative;background:#fffcf6ed;border:1px solid #eddfd3;border-radius:22px;padding:17px 15px;box-shadow:0 3px 9px #8d644008}
@@ -83,7 +76,8 @@
 .period-empty p{font-size:12px;line-height:1.8;color:#856f64;margin:0 0 14px}
 .period-primary{display:inline-flex;justify-content:center;align-items:center;gap:6px;min-height:44px;padding:10px 16px;border:1px solid #d98a9f;background:#f7d7df;color:#7e3e56;border-radius:14px;font:inherit;font-size:13px}
 
-.period-daily:before{content:'';position:absolute;top:-5px;left:70%;width:48px;height:12px;background:repeating-linear-gradient(45deg,#e7b5b560 0 4px,#edc7c766 4px 8px);transform:rotate(12deg)}
+.period-diary-tape{position:absolute;pointer-events:none;top:-10px;left:68%;width:40px;height:24px;object-fit:contain;transform:rotate(12deg);opacity:.92}
+.period-calendar-flower{position:absolute;pointer-events:none;left:53%;top:-7px;width:18px;height:18px;object-fit:contain;opacity:.85}
 .period-daily>header>span{font-size:11px;color:#92746d}
 .period-daily fieldset{border:0;margin:14px 0 0;padding:0;min-width:0}
 .period-daily legend{display:flex;align-items:center;gap:6px;font-size:12px;padding:0}
@@ -98,10 +92,7 @@
 .period-choice-icon.row-2{background:#f8eed9;color:#9c8062}
 .period-note{display:flex;align-items:center;justify-content:space-between;margin-top:13px;padding:9px 14px;background:#ece3f2a3;border-radius:10px;min-height:57px;transform:rotate(-1deg)}
 .period-note>span{font-size:11px;line-height:1.7;color:#796582}
-.period-art--note{width:90px;height:49px}
-.period-art--note .period-cat{transform:scale(.55);transform-origin:right bottom;right:0;bottom:0}
-.period-art--note .period-cat--black{right:36px;bottom:0}
-.period-art--note .period-moon,.period-art--note .period-star,.period-art--note .period-art-heart{display:none}
+.period-art--note{width:96px;height:52px;flex:none}
 
 .period-reminders ul{list-style:none;margin:0;padding:0}
 .period-reminders li{display:flex;align-items:center;gap:8px;border-top:1px solid #f2e6dd;padding:7px 0;font-size:13px}
@@ -120,11 +111,8 @@
 .period-tips b{font-size:13px;font-weight:500;line-height:1.7}
 .period-tips p{font-size:12px;line-height:1.8;margin:6px 0;color:#7d6a60}
 .period-tips button>span{display:flex;align-items:center;font-size:11px;color:#a45e78;min-height:32px}
-.period-art--tips{position:absolute;right:-7px;bottom:0;width:95px;height:100px;opacity:.8}
-.period-art--tips .period-cat{transform:scale(.75);transform-origin:right bottom;bottom:0}
-.period-art--tips .period-cat--black{right:25px;bottom:-8px}
-.period-art--tips .period-moon,.period-art--tips .period-star{display:none}
-.period-art--tips .period-art-heart{bottom:51px}
+.period-art--tips{position:absolute;right:8px;bottom:8px;width:54px;height:38px;opacity:.88}
+.period-art--tips .period-art-heart{width:16px;height:16px;right:1px;top:0}
 .period-storage{font-size:10px;text-align:center;color:#87746b;line-height:1.7;margin:4px 0}
 .period-error{margin:10px;padding:12px;border-radius:12px;background:#f8dce3;color:#894159;font-size:12px;line-height:1.7}
 .period-error button{margin-left:8px;border:0;background:#fff7ef;color:inherit;min-height:44px;padding:4px 12px;border-radius:8px}
@@ -144,7 +132,7 @@
 .period-card{padding-left:12px;padding-right:12px}
 .period-header-copy{padding-left:19px}
 .period-header h1{font-size:35px}
-.period-art--header{right:-19px;transform:scale(.9);transform-origin:right bottom}
+.period-art--header{right:0;width:126px;height:92px}
 .period-header-sticker{right:8px;font-size:9px}
 .period-calendar header h2{font-size:18px}
 .period-legend{gap:8px;font-size:9px}

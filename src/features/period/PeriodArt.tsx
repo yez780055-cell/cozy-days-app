@@ -1,8 +1,19 @@
-// Asset task integration point. Supply independent transparent illustrations here.
-export const periodArt: Partial<Record<'header' | 'note' | 'tips', string>> = {};
-export function PeriodArt({ slot }: { slot: 'header' | 'note' | 'tips' }) {
-  const src = periodArt[slot];
+import { Asset } from '../../components/Asset';
+
+const art = {
+  header: 'cat',
+  note: 'empty',
+  tips: 'book',
+} as const;
+
+export function PeriodArt({ slot }: { slot: keyof typeof art }) {
   return <div className={`period-art period-art--${slot}`} aria-hidden="true">
-    {src ? <img src={src} alt="" draggable={false}/> : <><span className="period-moon">☾</span><span className="period-star">✧</span><div className="period-cat period-cat--white"><i/><b>· ᴗ ·</b></div><div className="period-cat period-cat--black"><i/><b>· ω ·</b></div><span className="period-art-heart">♡</span></>}
+    <Asset name={art[slot]} className="period-art-main"/>
+    {slot === 'header' && <>
+      <Asset name="star" className="period-art-star"/>
+      <Asset name="sparkle" className="period-art-sparkle"/>
+      <Asset name="heart" className="period-art-heart"/>
+    </>}
+    {slot === 'tips' && <Asset name="heart" className="period-art-heart"/>}
   </div>;
 }

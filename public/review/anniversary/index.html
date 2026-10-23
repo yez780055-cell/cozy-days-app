@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>小饱日常 · 纪念日验收</title>
+  <style>
+    *{box-sizing:border-box}body{margin:0;background:#fff7e9;color:#604b3c;font:16px/1.8 system-ui,sans-serif}main{max-width:1160px;margin:auto;padding:28px 20px}h1{font-size:30px}h2{font-size:21px;margin-top:36px}a{color:#a54570}p{max-width:850px}.screens{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}figure{margin:0}img{width:100%;border:1px solid #ebcdb4;border-radius:16px;background:#fff0e6}figcaption{font-size:13px;color:#896b55}code{overflow-wrap:anywhere}pre{padding:16px;background:#f6e9dc;border-radius:14px;white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px}.details{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;max-width:760px}@media(max-width:650px){.screens{grid-template-columns:1fr}.details{grid-template-columns:1fr}figure{max-width:430px;margin:auto}}
+  </style>
+</head>
+<body><main>
+  <p>COZY DAYS · ANNIVERSARY REVIEW</p><h1>纪念日，把日子认真收藏起来 ♡</h1>
+  <p><a href="../../">打开当前 Preview，点击底部「纪念日」</a> · <a href="../">返回总验收页</a></p>
+  <p>支持新增、全部字段编辑、删除确认、本地持久化、年度重复、本地日期倒计时、动态分类、周日期栏和月视图。首次打开没有演示数据；以下截图来自独立 Playwright 测试上下文的合成数据，截图时钟固定为 2026-10-23。</p>
+  <p>顶部双猫与空状态复用已有图片，卡片 emoji/字符为临时主题图标。没有新裁剪参考图，后续正式插画通过 artwork.ts 映射替换。</p>
+  <h2>实际手机尺寸</h2><div class="screens">
+    <figure><img src="./list-360.png" alt="360×740纪念日列表"><figcaption>360 × 740</figcaption></figure>
+    <figure><img src="./list-393.png" alt="393×852纪念日列表"><figcaption>393 × 852</figcaption></figure>
+    <figure><img src="./list-430.png" alt="430×932纪念日列表"><figcaption>430 × 932</figcaption></figure>
+  </div>
+  <h2>空状态与月视图</h2><div class="screens">
+    <figure><img loading="lazy" src="./empty-393.png" alt="无自动示例数据的空状态"><figcaption>真实空状态</figcaption></figure>
+    <figure><img loading="lazy" src="./month-393.png" alt="可选择和切换月份的月视图"><figcaption>月视图</figcaption></figure>
+    <figure><img loading="lazy" src="./editor-393.png" alt="纪念日全部字段编辑表单"><figcaption>编辑所有字段</figcaption></figure>
+  </div>
+  <h2>删除二次确认</h2><div class="details"><figure><img loading="lazy" src="./delete-393.png" alt="删除纪念日二次确认"><figcaption>取消会保留数据，确认后立即刷新列表与数量</figcaption></figure></div>
+  <h2>验证来源</h2><p>以下为截图生成时的源码提交与验证记录；后续仅追加证据及文档。构建提交可在 <a href="../build-info.json">build-info.json</a> 中查看。<a href="./source.json">查看截图与测试来源记录</a>。</p>
+  <p>已覆盖旧版数据库升级保留待办、跨年与闰年、世纪闰年、UTC 跨日和夏令时、离线写入与缺失图片回退。Android 原生键盘与系统安全区仍需真机验收；未运行全量 E2E，运行了受影响的纪念日、待办和分类测试。尚未实现提醒推送。</p>
+</main></body></html>

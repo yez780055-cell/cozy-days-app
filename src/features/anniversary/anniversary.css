@@ -41,3 +41,17 @@
 .ann-month-heading { display:flex; align-items:center; justify-content:space-between; }.ann-month-grid { display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:2px; margin:12px 0; }.ann-month-grid>small { text-align:center; padding:9px 0; color:#93705b; }.ann-month-grid button { border:0; border-radius:13px; background:#fff0e4; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; min-height:48px; }.ann-month-grid button[aria-pressed=true] { background:#f4bed0; color:#6b3b50; }.ann-month-events { max-height:120px; overflow:auto; font-size:13px; overflow-wrap:anywhere; }.ann-modal>.button { margin-top:10px; width:100%; }
 @media(max-width:360px) { .ann-content { padding:0 10px; }.ann-card { gap:6px; }.ann-card-icon { width:43px; font-size:31px; }.ann-date-title strong { font-size:21px; } }
 @media(max-height:700px) { .ann-hero { min-height:150px; padding-top:15px; }.ann-hero h1 { font-size:31px; }.ann-hero .ann-cats { width:130px; height:100px; } }
+.ann-hero h1 { display:flex; align-items:center; gap:6px; }
+.ann-title-heart { width:22px; height:22px; }
+.ann-hero-flower,.ann-hero-star { position:absolute; pointer-events:none; }
+.ann-hero-flower { width:22px; right:142px; bottom:18px; transform:rotate(-12deg); }
+.ann-hero-star { width:17px; right:12px; top:72px; }
+.ann-card { position:relative; overflow:hidden; }
+.ann-card-icon { z-index:1; }
+.ann-card-star,.ann-card-heart { position:absolute; width:15px; height:15px; pointer-events:none; }
+.ann-card-star { right:-2px; top:0; }
+.ann-card-heart { left:1px; bottom:2px; }
+.ann-card-copy { position:relative; padding-bottom:9px; }
+.ann-card-flower { position:absolute; left:-48px; right:auto; bottom:3px; width:18px; height:18px; opacity:.8; pointer-events:none; }
+.ann-card-tape { position:absolute; left:-50px; right:auto; width:38px; height:22px; top:-8px; transform:rotate(-6deg); opacity:.85; pointer-events:none; }
+@media(max-width:360px) { .ann-hero-flower { right:128px; } }

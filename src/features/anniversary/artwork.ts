@@ -1,7 +1,8 @@
 import type { AssetName } from '../../assets/manifest';
 
-// Replace these semantic aliases with the audited anniversary assets after its PR lands.
-// Existing Asset supplies a bundled offline fallback if an image is unavailable.
-export const anniversaryArtwork: Record<'headerCats' | 'emptyCollection' | 'sparkle', AssetName> = {
-  headerCats: 'cat', emptyCollection: 'empty', sparkle: 'sparkle',
+// Reuse the six user-approved, catalog-audited assets listed in the anniversary manifest.
+// Asset supplies a bundled offline fallback if an image is unavailable.
+export const anniversaryArtwork: Record<'headerCats' | 'emptyCollection' | 'sparkle' | 'flower' | 'heart' | 'star' | 'tape', AssetName> = {
+  headerCats: 'empty', emptyCollection: 'empty', sparkle: 'sparkle',
+  flower: 'flower', heart: 'heart', star: 'star', tape: 'tape',
 };

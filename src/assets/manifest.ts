@@ -16,6 +16,10 @@ export const assets = {
   work: registeredAsset('pencil_cup'),
   study: registeredAsset('books_upright'),
   home: registeredAsset('sprout'),
+  originalPlant: registeredAsset('original_plant'),
+  originalCheer: registeredAsset('original_cheer'),
+  originalBooks: registeredAsset('original_books_bubble'),
+  originalPeekingCat: registeredAsset('original_peeking_cat'),
 } as const;
 export type AssetName = keyof typeof assets;
 

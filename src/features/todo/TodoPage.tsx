@@ -108,6 +108,8 @@ export function TodoView({ store, initialDialog }: { store: TodoStore; initialDi
       <div className="hero-art" aria-hidden="true"><Asset name="hero"/><Asset name="cat" className="hero-cat"/></div>
       <Asset name="sparkle" className="hero-sparkle"/>
       <Asset name="star" className="hero-star"/>
+      <Asset name="originalPlant" className="original-plant"/>
+      <Asset name="originalCheer" className="original-cheer"/>
     </header>
     <section className="date-section" aria-label="日期与视图">
       <div className="date-row"><button className="date-button" aria-label="选择日期" onClick={() => setDialog('calendar')}>
@@ -138,10 +140,13 @@ export function TodoView({ store, initialDialog }: { store: TodoStore; initialDi
         </button>{completedOpen && completed.map(todo => <TodoCard key={todo.id} todo={todo} showDate={view === 'all'} onToggle={toggle} onEdit={openEdit} onDelete={remove}/>)}</div>}
         {totalForDate > 0 && view === 'date' && <div className="daily-progress" aria-label={`完成 ${completedForDate} / ${totalForDate}`}><span><Check size={13}/>已完成 {completedForDate} / {totalForDate}</span><div><i style={{ width: `${completedForDate / totalForDate * 100}%` }}/></div></div>}
       </>}
-      <div className="list-footer" aria-hidden="true"><Asset name="book"/><span>小小的进步，也值得被记住。</span><Asset name="cherries"/></div>
     </section>
     <div className="task-top-fade" aria-hidden="true"/>
     <div className="task-bottom-fade" aria-hidden="true"/>
+    </div>
+    <div className="original-bottom-decor" aria-hidden="true">
+      <Asset name="originalBooks" className="original-books"/>
+      <Asset name="originalPeekingCat" className="original-peeking-cat"/>
     </div>
     <button className="fab" aria-label="新增待办" onClick={() => { setEditing(null); setDialog('add'); }}><Plus size={32} strokeWidth={1.8}/></button>
     <div className="undo-stack" aria-label="操作撤销" data-count={undos.length}>{undos.map(record=><UndoToast key={record.token} label={record.label} task={record.snapshot.text} expiresAt={record.expiresAt} onUndo={()=>void undoOperation(record.token)} onExpire={()=>expire(record.token)}/>)}</div>

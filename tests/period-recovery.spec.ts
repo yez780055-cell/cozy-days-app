@@ -54,7 +54,7 @@ test('malformed period database is preserved and todo remains usable',async({pag
 });
 
 test('slow old writes cannot replace rapid newer edits across unmount',async({page})=>{
- await page.evaluate(async()=>{const path='/src/features/period/repository.ts';const {periodRepository}=await import(path);const save=periodRepository.save;let first=true;periodRepository.save=async(value:unknown)=>{if(first){first=false;await new Promise<void>(resolve=>{(window as unknown as {release:()=>void}).release=resolve;});}return save(value);};});
+ await page.evaluate(async()=>{const path='/src/features/period/repository.ts';const {periodRepository}=await import(path);const save=periodRepository.save;let first=true;periodRepository.save=async(value:unknown,expected:string)=>{if(first){first=false;await new Promise<void>(resolve=>{(window as unknown as {release:()=>void}).release=resolve;});}return save(value,expected);};});
  await page.getByRole('button',{name:'开心',exact:true}).click();await expect(page.locator('.period-storage')).toContainText('正在保存');await page.getByRole('navigation').getByRole('button',{name:'待办',exact:true}).click();await open(page);await page.getByRole('button',{name:'腹痛',exact:true}).click();await page.getByRole('button',{name:'疲惫',exact:true}).click();await page.evaluate(()=>(window as unknown as {release:()=>void}).release());await expect(page.locator('.period-storage')).toContainText('记录仅保存在');
  await page.reload();await open(page);for(const name of ['开心','腹痛','疲惫'])await expect(page.getByRole('button',{name,exact:true})).toHaveAttribute('aria-pressed','true');
 });
@@ -78,4 +78,42 @@ test('failed untouched new form retries with the same identity after refresh',as
 test('malformed draft shapes do not crash or corrupt a valid database',async({page})=>{
  await page.evaluate(()=>{localStorage.setItem('cozy-days-period-recovery-v1',JSON.stringify({stamp:Date.now(),drafts:{view:{dialog:'editor',editing:{id:4}},'editor-new':{id:3,start:null,end:[]},settings:{cycle:{},period:null}}}));sessionStorage.removeItem('cozy-days-period-recovery-v1');});
  await page.reload();await open(page);await page.getByRole('button',{name:'记录第一次经期',exact:true}).click();await expect(page.getByLabel('开始日期',{exact:true})).toHaveValue(/\d{4}-\d{2}-\d{2}/);await page.keyboard.press('Escape');await page.getByRole('button',{name:'周期设置',exact:true}).click();await expect(page.getByLabel('默认周期长度（天）')).toHaveValue('28');
+});
+
+test('external newer database is not silently overwritten by the mounted session',async({page})=>{
+ await page.evaluate(async()=>{const req=indexedDB.open('cozy-days-period');await new Promise<void>(resolve=>{req.onsuccess=()=>{const tx=req.result.transaction('state','readwrite');tx.objectStore('state').put({id:'local',value:{periods:[],days:{},reminders:[{id:'external',text:'另一标签页的新记录',completed:false}],settings:{cycleLength:28,periodLength:5}}});tx.oncomplete=()=>{req.result.close();resolve();};};});});
+ await page.getByRole('button',{name:'开心',exact:true}).click();await expect(page.getByRole('alert')).toContainText('冲突');await expect(page.getByRole('button',{name:'使用记录库版本'})).toBeVisible();
+ await page.getByRole('button',{name:'使用记录库版本'}).click();await expect(page.getByRole('checkbox',{name:'完成提醒：另一标签页的新记录'})).toBeVisible();await page.getByRole('button',{name:'查看恢复备份'}).click();await expect(page.getByRole('dialog')).toContainText('另一标签页的新记录');await expect(page.getByRole('dialog').getByRole('button',{name:'导出备份'}).first()).toBeVisible();
+});
+
+test('sparse period array is rejected without crashing or clearing the original',async({page})=>{
+ await page.evaluate(async()=>{const req=indexedDB.open('cozy-days-period');await new Promise<void>(resolve=>{req.onsuccess=()=>{const tx=req.result.transaction('state','readwrite');tx.objectStore('state').put({id:'local',value:{periods:new Array(1),days:{},reminders:[],settings:{cycleLength:28,periodLength:5}}});tx.oncomplete=()=>{req.result.close();resolve();};};});});
+ await page.reload();await page.getByRole('navigation').getByRole('button',{name:'生理期',exact:true}).click();await expect(page.getByRole('alert')).toContainText('原数据已保留');await expect(page.locator('.period-calendar')).toHaveCount(0);
+});
+
+test('replacement requires confirmation and refuses unreliable backup storage',async({page})=>{
+ await page.evaluate(async()=>{const req=indexedDB.open('cozy-days-period');await new Promise<void>(resolve=>{req.onsuccess=()=>{const tx=req.result.transaction('state','readwrite');tx.objectStore('state').put({id:'local',value:{periods:[],days:{},reminders:[{id:'external',text:'必须保留',completed:false}],settings:{cycleLength:28,periodLength:5}}});tx.oncomplete=()=>{req.result.close();resolve();};};});});await page.getByRole('button',{name:'开心',exact:true}).click();await expect(page.getByRole('alert')).toContainText('冲突');
+ await page.getByRole('button',{name:'恢复草稿版本',exact:true}).click();await expect(page.getByText('草稿将替换当前记录库的全部生理期记录。',{exact:false})).toBeVisible();
+ await page.evaluate(()=>{const set=Storage.prototype.setItem;Storage.prototype.setItem=function(k,v){if(this===localStorage)throw new DOMException('Synthetic quota');return set.call(this,k,v);};});await page.getByRole('button',{name:'确认替换记录库'}).click();await expect(page.getByRole('alert')).toContainText('无法可靠保存');await expect(page.locator('.period-calendar')).toHaveCount(0);
+ await page.getByRole('button',{name:'使用记录库版本'}).click();await expect(page.getByRole('checkbox',{name:'完成提醒：必须保留'})).toBeVisible();await page.getByRole('button',{name:'查看恢复备份'}).click();const download=page.waitForEvent('download');await page.getByRole('dialog').getByRole('button',{name:'导出备份'}).first().click();expect((await download).suggestedFilename()).toBe('cozy-days-period-recovery.json');
+});
+
+test('archived versions can be explicitly restored after confirmation',async({page})=>{
+ await failWrites(page);await page.getByRole('button',{name:'开心',exact:true}).click();await expect(page.getByRole('alert')).toContainText('保存失败');
+ await page.evaluate(async()=>{const req=indexedDB.open('cozy-days-period');await new Promise<void>(resolve=>{req.onsuccess=()=>{const tx=req.result.transaction('state','readwrite');tx.objectStore('state').add({id:'local',value:{periods:[],days:{},reminders:[{id:'backup',text:'原始记录',completed:false}],settings:{cycleLength:28,periodLength:5}}});tx.oncomplete=()=>{req.result.close();resolve();};};});});
+ await page.reload();await page.getByRole('navigation').getByRole('button',{name:'生理期',exact:true}).click();await expect(page.getByRole('alert')).toContainText('冲突');await page.getByRole('button',{name:'恢复草稿版本',exact:true}).click();await page.getByRole('button',{name:'确认替换记录库'}).click();await page.getByRole('button',{name:'重试',exact:true}).click();await expect(page.locator('.period-storage')).toContainText('记录仅保存在');await expect(page.getByRole('button',{name:'开心',exact:true})).toHaveAttribute('aria-pressed','true');
+ await page.getByRole('button',{name:'查看恢复备份'}).click();await page.getByRole('button',{name:'恢复此副本的记录库版本'}).first().click();await page.getByRole('button',{name:'恢复草稿版本',exact:true}).click();await page.getByRole('button',{name:'确认替换记录库'}).click();await page.getByRole('button',{name:'重试',exact:true}).click();await expect(page.getByRole('checkbox',{name:'完成提醒：原始记录'})).toBeVisible();await page.reload();await open(page);await expect(page.getByRole('checkbox',{name:'完成提醒：原始记录'})).toBeVisible();
+});
+
+test('repository rejects malformed writes before changing the database',async({page})=>{
+ expect(await page.evaluate(async()=>{const path='/src/features/period/repository.ts';const {periodRepository}=await import(path);const value=await periodRepository.load();try{await periodRepository.save({...value,periods:new Array(1)},JSON.stringify(value));return false;}catch{return JSON.stringify(await periodRepository.load())===JSON.stringify(value);}})).toBeTruthy();
+});
+
+test('one slow load survives page unmount without a competing old load',async({page})=>{
+ await page.reload();await page.evaluate(async()=>{const path='/src/features/period/repository.ts';const {periodRepository}=await import(path);const load=periodRepository.load;let calls=0;periodRepository.load=()=>{calls++;(window as unknown as {loadCalls:number}).loadCalls=calls;return new Promise(resolve=>{(window as unknown as {finishLoad:()=>void}).finishLoad=async()=>resolve(await load());});};});
+ await page.getByRole('navigation').getByRole('button',{name:'生理期',exact:true}).click();await expect(page.getByText('正在打开你的手账…')).toBeVisible();await page.getByRole('navigation').getByRole('button',{name:'待办',exact:true}).click();await page.getByRole('navigation').getByRole('button',{name:'生理期',exact:true}).click();expect(await page.evaluate(()=>(window as unknown as {loadCalls:number}).loadCalls)).toBe(1);await page.evaluate(()=>(window as unknown as {finishLoad:()=>void}).finishLoad());await expect(page.locator('.period-calendar')).toBeVisible();
+});
+
+for(const [instant,hour] of [['2026-03-08T09:59:50Z',3],['2026-11-01T08:59:50Z',1]] as const)test(`DST clock change preserves date draft ${instant}`,async({browser})=>{
+ const context=await browser.newContext({timezoneId:'America/Los_Angeles'});const p=await context.newPage();await p.clock.install({time:new Date(instant)});await p.goto('/');await open(p);await p.getByRole('button',{name:'记录第一次经期',exact:true}).click();const date=await p.getByLabel('开始日期',{exact:true}).inputValue();await p.clock.fastForward(40000);await p.evaluate(()=>window.dispatchEvent(new Event('focus')));expect(await p.evaluate(()=>new Date().getHours())).toBe(hour);await expect(p.getByLabel('开始日期',{exact:true})).toHaveValue(date);await context.close();
 });

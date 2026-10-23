@@ -26,7 +26,8 @@ export function recoveryStatus() { return kind !== 'memory'; }
 export function recoveryNotice() { return kind==='local'?'草稿暂存在此设备，保存成功后关闭。':kind==='session'?'草稿仅暂存在此标签页，关闭标签页会丢失。':'草稿仅内存保留，刷新或关闭页面可能丢失。'; }
 export function pendingRecovery() { return memory.pending; }
 export function setPending(data?: unknown, base='') { memory.pending = data===undefined?undefined:{data,base}; return persistRecovery(); }
-export function archiveConflict(value: unknown) { memory.conflicts=[...(Array.isArray(memory.conflicts)?memory.conflicts:[]),value]; persistRecovery(); }
+export function archiveConflict(value: unknown) { memory.conflicts=[...(Array.isArray(memory.conflicts)?memory.conflicts:[]),value]; persistRecovery(); return kind==='local'; }
+export function conflictArchives() { return Array.isArray(memory.conflicts)?memory.conflicts:[]; }
 export function usePeriodDraft<T extends object>(name: string, initial: () => T, validate?: (value:unknown)=>value is T) {
   const [value, setValue] = useState<T>(() => {
     const fallback=initial(), stored=memory.drafts?.[name];

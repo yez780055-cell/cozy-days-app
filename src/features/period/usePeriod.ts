@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { emptyData, type PeriodData } from './model';
-import { periodRepository, validPeriodData } from './repository';
-import { archiveConflict, pendingRecovery, recoveryNotice, recoveryStatus, setPending } from './recovery';
+import { PeriodConflictError, periodRepository, validPeriodData } from './repository';
+import { archiveConflict, conflictArchives, pendingRecovery, recoveryNotice, recoveryStatus, setPending } from './recovery';
 // A module-owned session and single writer outlive page mounts.
 let state = { data: emptyData(), ready: false, error: '', saving: false, durable: false };
 const listeners = new Set<() => void>();
@@ -37,10 +37,16 @@ function save(): Promise<boolean> {
   writing = (async () => {
     while (true) {
       const value = state.data, version = revision;
-      try { await periodRepository.save(value); }
-      catch { publish({ error: '保存失败，当前更改尚未保存，请重试。', saving: false }); return false; }
-      if (version !== revision) continue;
+      try { await periodRepository.save(value,baseline); }
+      catch(error) {
+        if(error instanceof PeriodConflictError) {
+          conflict={database:error.current,draft:state.data};
+          publish({ready:false,error:'记录库与恢复草稿存在冲突，双方暂留在恢复区，请选择恢复来源。',saving:false});
+        } else publish({ error: '保存失败，当前更改尚未保存，请重试。', saving: false });
+        return false;
+      }
       baseline=JSON.stringify(value);
+      if (version !== revision) { publish({durable:setPending(state.data,baseline)}); continue; }
       setPending(undefined);
       publish({ error: '', saving: false, durable: recoveryStatus() });
       return true;
@@ -59,9 +65,15 @@ export function usePeriod() {
   }
   function resolveConflict(source:'database'|'draft') {
     if(!conflict)return;
-    archiveConflict(conflict);
+    const backedUp=archiveConflict(conflict);
+    if(source==='draft'&&!backedUp) { publish({error:'无法可靠保存冲突备份，记录库未替换。请启用设备本地存储，或先查看并导出备份。'});return; }
     const data=conflict[source];baseline=JSON.stringify(conflict.database);conflict=undefined;revision++;
     publish({data,ready:true,error:source==='draft'?'已恢复草稿，尚未保存，请重试保存。':'',durable:setPending(source==='draft'?data:undefined,baseline)});
   }
-  return { ...state, conflict:!!conflict, resolveConflict, notice:recoveryNotice(), update, retry: () => state.ready ? save() : load() };
+  async function restoreArchive(value:unknown) {
+    if(!validPeriodData(value))return;
+    try { const database=await periodRepository.load();conflict={database,draft:value};publish({ready:false,error:'恢复备份将替换当前记录，请先检查双方内容并确认。'}); }
+    catch { publish({error:'记录读取失败，未恢复备份，原数据已保留。'}); }
+  }
+  return { ...state, conflict:!!conflict, conflictData:conflict, archives:conflictArchives(),restoreArchive, resolveConflict, notice:recoveryNotice(), update, retry: () => state.ready ? save() : load() };
 }

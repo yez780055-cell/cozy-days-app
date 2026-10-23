@@ -31,6 +31,7 @@ export function SettingsPage({ fontId, pendingFontId, onSelect, onBack }: {
         aria-checked={fontId === option.id}
         aria-label={`选择${option.name}`}
         aria-busy={pendingFontId === option.id}
+        disabled={pendingFontId !== null}
         onClick={() => onSelect(option.id)}
       >
         <span className="font-option-copy"><strong>{option.name}</strong><small>{option.description}</small></span>

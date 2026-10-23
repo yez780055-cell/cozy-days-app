@@ -44,8 +44,8 @@ export function loadFont(id: FontId): Promise<void> {
   const pending = Promise.all(option.faces.map(async source => {
     const face = new FontFace(option.family, `url("${source.url}")`, { weight: source.weight, style: 'normal', display: 'swap' });
     await face.load();
-    document.fonts.add(face);
-  })).then(() => undefined);
+    return face;
+  })).then(faces => { faces.forEach(face => document.fonts.add(face)); });
   loadedFonts.set(id, pending);
   pending.catch(() => loadedFonts.delete(id));
   return pending;

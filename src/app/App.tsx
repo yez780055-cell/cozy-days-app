@@ -19,6 +19,8 @@ export default function App() {
   const pressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const pressOrigin = useRef<{x:number;y:number}|null>(null);
   const longPressTriggered = useRef(false);
+  const activePointer = useRef<number | null>(null);
+  const fontBusy = useRef(false);
   const [fontId, setFontId] = useState<FontId>(() => {
     const id = getStoredFontId();
     applyFontStack(id);
@@ -31,8 +33,13 @@ export default function App() {
   useEffect(() => { void loadFont(fontId).catch(() => setFontError(true)); }, []);
   useEffect(() => {
     try {
-      if (!localStorage.getItem('cozy-days.settings-hint-seen')) setShowSettingsHint(true);
+      if (!localStorage.getItem('cozy-days.settings-hint-seen')) {
+        setShowSettingsHint(true);
+        localStorage.setItem('cozy-days.settings-hint-seen', '1');
+      }
     } catch { /* Hint is optional when storage is unavailable. */ }
+    const hintTimer = setTimeout(() => setShowSettingsHint(false), 5000);
+    return () => { clearTimeout(hintTimer); clearPress(); };
   }, []);
   useEffect(() => {
     if (!quickMenuOpen) return;
@@ -63,7 +70,8 @@ export default function App() {
     setQuickMenuOpen(false);
   }
   async function selectFont(id: FontId) {
-    if (id === fontId || pendingFontId) return;
+    if ((id === fontId && !fontError) || fontBusy.current) return;
+    fontBusy.current = true;
     setPendingFontId(id);
     setFontError(false);
     try {
@@ -74,6 +82,7 @@ export default function App() {
     } catch {
       setFontError(true);
     } finally {
+      fontBusy.current = false;
       setPendingFontId(null);
     }
   }
@@ -105,9 +114,9 @@ export default function App() {
     <main className="phone" style={{ '--device-width': `${device.width}px`, '--device-height': `${device.height}px` } as React.CSSProperties}>
       {preview && PreviewStates ? <Suspense fallback={<p>载入预览…</p>}><PreviewStates/></Suspense> : page === 'todo' ? <TodoPage/> : page === 'period' ? <PeriodPage/> : page === 'anniversary' ? <AnniversaryPage/> : <SettingsPage fontId={fontId} pendingFontId={pendingFontId} onSelect={id => void selectFont(id)} onBack={() => setPage(returnPage)}/>}
       {fontError && page === 'settings' && <p className="font-error" role="alert">字体加载失败，请重试。当前字体选择没有更改。</p>}
-      {quickMenuOpen && <><button type="button" className="quick-menu-backdrop" aria-label="关闭快捷菜单" onClick={() => setQuickMenuOpen(false)}/><div className="nav-quick-menu" role="menu" aria-label="快捷菜单"><button type="button" role="menuitem" onClick={openSettings}><Settings size={17}/>设置</button></div></>}
+      {quickMenuOpen && <><button type="button" className="quick-menu-backdrop" aria-label="关闭快捷菜单" onClick={() => setQuickMenuOpen(false)}/><div className="nav-quick-menu" role="menu" aria-label="快捷菜单"><button type="button" role="menuitem" autoFocus onClick={openSettings}><Settings size={17}/>设置</button></div></>}
       {showSettingsHint && !quickMenuOpen && page !== 'settings' && <div className="settings-hint" role="status">长按底部导航打开设置</div>}
-      <nav className="bottom-nav" aria-label="应用模块">{[{id:'todo' as const,label:'待办',Icon:House},{id:'period' as const,label:'生理期',Icon:CalendarDays},{id:'anniversary' as const,label:'纪念日',Icon:Heart}].map(({id,label,Icon}) => <button key={id} className={page === id ? 'selected' : ''} aria-current={page === id ? 'page' : undefined} aria-label={`${label}；长按打开设置`} aria-description="长按约半秒打开设置" onPointerDown={event => { if (event.button !== 0 && event.pointerType !== 'touch') return; longPressTriggered.current = false; pressOrigin.current = {x:event.clientX,y:event.clientY}; try { event.currentTarget.setPointerCapture(event.pointerId); } catch { /* Pointer capture is unavailable in some WebViews. */ } pressTimer.current = setTimeout(openQuickMenu, 500); }} onPointerMove={event => { const origin=pressOrigin.current; if (origin && Math.hypot(event.clientX-origin.x,event.clientY-origin.y)>12) clearPress(); }} onPointerUp={clearPress} onPointerCancel={() => { clearPress(); longPressTriggered.current = false; }} onLostPointerCapture={clearPress} onContextMenu={event => { event.preventDefault(); openQuickMenu(); }} onKeyDown={event => { if ((event.key === 'ContextMenu' || (event.shiftKey && event.key === 'F10')) && !quickMenuOpen) { event.preventDefault(); openQuickMenu(); } }} onClick={event => { if (longPressTriggered.current) { event.preventDefault(); event.stopPropagation(); longPressTriggered.current = false; return; } if (preview) location.assign('/'); else setPage(id); }}><span><Icon size={23} strokeWidth={1.7}/></span>{label}</button>)}</nav>
+      <nav className="bottom-nav" aria-label="应用模块">{[{id:'todo' as const,label:'待办',Icon:House},{id:'period' as const,label:'生理期',Icon:CalendarDays},{id:'anniversary' as const,label:'纪念日',Icon:Heart}].map(({id,label,Icon}) => <button key={id} className={page === id ? 'selected' : ''} aria-current={page === id ? 'page' : undefined} aria-label={label} aria-description="长按约半秒打开设置" onPointerDown={event => { if (!event.isPrimary || (event.button !== 0 && event.pointerType !== 'touch')) return; clearPress(); activePointer.current = event.pointerId; longPressTriggered.current = false; pressOrigin.current = {x:event.clientX,y:event.clientY}; try { event.currentTarget.setPointerCapture(event.pointerId); } catch { /* Pointer capture is unavailable in some WebViews. */ } pressTimer.current = setTimeout(openQuickMenu, 500); }} onPointerMove={event => { if (activePointer.current !== event.pointerId) return; const origin=pressOrigin.current; if (origin && Math.hypot(event.clientX-origin.x,event.clientY-origin.y)>12) clearPress(); }} onPointerUp={event => { if (activePointer.current === event.pointerId) clearPress(); }} onPointerCancel={event => { if (activePointer.current === event.pointerId) { clearPress(); longPressTriggered.current = false; } }} onLostPointerCapture={clearPress} onContextMenu={event => { event.preventDefault(); openQuickMenu(); }} onKeyDown={event => { if ((event.key === 'ContextMenu' || (event.shiftKey && event.key === 'F10')) && !quickMenuOpen) { event.preventDefault(); openQuickMenu(); } }} onClick={event => { if (longPressTriggered.current) { event.preventDefault(); event.stopPropagation(); longPressTriggered.current = false; return; } if (preview) location.assign('/'); else setPage(id); }}><span><Icon size={23} strokeWidth={1.7}/></span>{label}</button>)}</nav>
     </main>
     {import.meta.env.DEV && <div className="desktop-caption">把平凡的小日子，过得柔软一点。<span>LOCAL FIRST · MADE FOR YOUR EVERYDAY</span></div>}
   </div>;

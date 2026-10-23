@@ -19,7 +19,7 @@
 |---|---|---|
 | M0 | Inventory, protection, baseline, task/asset map | Complete; both builds, 59 E2E and 4 Pages tests passed |
 | M1 | Anniversary functionality | Complete; source `d4adc9d1e7f3bd85f402159b857455b7e82f02b3`; 35 specialist + 17 existing regressions + 4 Pages tests and both builds passed; checkpoint `checkpoint/anniversary-functional-20261023T144942Z` |
-| M2 | Period functionality and failed-save behavior | Not started; requires M1 completion |
+| M2 | Period functionality and failed-save behavior | In progress after verified M1 checkpoint; integrate #10, then verify drafts, failure recovery and independent storage |
 | M3 | Anniversary assets and visual comparison | Not started; copyright/asset review required |
 | M4 | Period assets and responsive review | Not started; copyright/asset review required |
 | M5 | Cross-feature audit and regression | Not started; only after M1–M4 |
@@ -37,6 +37,8 @@
 | 5 | `npm run test:pages` | 0 | 4 passed |
 
 ## Follow-up risks and execution boundary
+
+- Supplemental M1 online checks: Cloudflare build `75e7de3a7a2811c3d0ccd5c766f2e8979012e387` and screenshot source `d4adc9d1e7f3bd85f402159b857455b7e82f02b3` were verified at `https://1e7386ab.cozy-days-app.pages.dev/`. The unchanged default 60-second remote suite had 3 passes and one 430x932 timeout; that unchanged case also timed out on retry. The first preserved trace shows the pre-existing `bedroom_header.png` API request consumed 45.235 seconds. Both failures and traces are archived; neither is reported green. A supplemental full remote run uses an explicitly recorded 180-second network observation budget with all assertions unchanged. Required local test files/default budgets remain unchanged and passed as recorded. Online responsiveness remains an M5 release risk until reevaluated; the M1 tag establishes scoped functionality, not general network-performance acceptance.
 
 - Runtime used: Node `v22.23.4`, npm `11.10.1`, via temporary PATH prefix.
 - M1 final verification on source `d4adc9d1e7f3bd85f402159b857455b7e82f02b3`: `npm run build` and `npm run build:pages` exited 0; `npx playwright test --config playwright.anniversary.config.ts` passed 35, including migration, persistence failure/retry and mobile coverage; `npx playwright test tests/swipe.spec.ts tests/audit-regressions.spec.ts tests/font-switcher.spec.ts` passed 17; `npm run test:pages` passed 4. These are scoped M1 runs, not the full M5 E2E suite. Exact transcripts and source SHA are under ignored `artifacts/integration/m1/`. The 11 screenshots under `public/review/anniversary/` were copied from the test run and SHA-256 checked against the archived originals. No physical-device test or visual comparison against a reference was performed; screenshots are evidence for review, not visual approval. No independent final review agent ran (agent thread limit); the primary coordinator completed the version-boundary diff review, including committed source/tests, complete migration snapshots/indexes, frozen paths, source identity and command exits. This is not dual review.

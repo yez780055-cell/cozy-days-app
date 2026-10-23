@@ -1,30 +1,31 @@
 {
-  "sourceCommit": "d4adc9d1e7f3bd85f402159b857455b7e82f02b3",
-  "capturedAt": "2026-10-23",
+  "sourceCommit": "48d1bf81e9b61757323f10de22a21245417184c4",
+  "capturedAt": "2026-10-24",
   "clock": "2026-10-23T12:00:00+08:00",
   "tool": "Playwright Chromium",
-  "command": "npx playwright test --config playwright.anniversary.config.ts",
-  "result": "35 passed (anniversary specialist suite; exit 0)",
+  "command": "npx playwright test --config playwright.anniversary.config.ts --reporter=line",
+  "result": "39 passed (anniversary specialist suite; exit 0)",
   "viewports": [
     "360x740",
     "393x852",
     "430x932"
   ],
-  "placeholders": [
-    "Header and empty-state cats reuse existing audited artwork",
-    "Card theme icons use temporary emoji/characters"
+  "assets": [
+    "Six previously reviewed, user-authorized project assets reused in the hero, empty state, and card accents; canonical hashes and alpha audit in docs/integration/m3-anniversary-assets.md",
+    "Nine needs-redraw illustrations remain gaps; reference crops are not used as app assets"
   ],
   "notRun": [
     "Full integration E2E suite (reserved for M5)",
     "APK build",
     "Physical Android device acceptance",
-    "Visual comparison against an approved reference"
+    "Remote Preview validation"
   ],
   "additionalChecks": {
+    "npm ci": "exit 0",
     "npm run build": "exit 0",
     "npm run build:pages": "exit 0",
     "existingMainRegressionSuite": "17 passed, exit 0",
     "npm run test:pages": "4 passed, exit 0"
   },
-  "notes": "Synthetic test data in fresh browser contexts. Screenshots are automated review evidence and do not imply visual approval. See docs/integration/m1.md for scope and limitations."
+  "notes": "Real automated screenshots are recorded in public/review/anniversary and artifacts/integration/m3. The asset gallery was compared on light and dark checkerboards and screenshots were reviewed beside public/review/anniversary-assets/reference.png. The fully framed 360px card is documented in artifacts/integration/m3/card-360.png. M3 does not claim visual coverage for the nine missing illustrations."
 }

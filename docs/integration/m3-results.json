@@ -1,0 +1,34 @@
+{
+  "milestone": "M3 anniversary assets",
+  "status": "PASS",
+  "primarySourceSha": "48d1bf81e9b61757323f10de22a21245417184c4",
+  "metadataAndTestCorrectionSha": "58447f89bf759eee668cbee34849bf2b1873d12e",
+  "matrix": [
+    { "command": "npm ci", "sourceSha": "48d1bf81e9b61757323f10de22a21245417184c4", "exitCode": 0, "result": "installed; audit reports 1 moderate and 1 high advisory", "log": "artifacts/integration/m3/npm-ci-final.log", "logSha256": "5b616d2913a5e5ac76de42221101b1229e3f231555d9f5ed35eb885a0ca75c02" },
+    { "command": "npm run build", "sourceSha": "48d1bf81e9b61757323f10de22a21245417184c4", "exitCode": 0, "result": "passed", "log": "artifacts/integration/m3/build-final.log", "logSha256": "d87240d824e1e391e552c7933e44ec7b242b07407e9fd024cb88a70096f28f94" },
+    { "command": "npm run build:pages", "sourceSha": "48d1bf81e9b61757323f10de22a21245417184c4", "exitCode": 0, "result": "passed", "log": "artifacts/integration/m3/build-pages-final.log", "logSha256": "b77853cf5dc61b11ec8187aa7b069d274593ed404cb353821894e5ced4ca7a95" },
+    { "command": "npx playwright test --config playwright.anniversary.config.ts --reporter=line", "sourceSha": "48d1bf81e9b61757323f10de22a21245417184c4", "exitCode": 0, "result": "39 passed, including original todo/category regressions", "log": "artifacts/integration/m3/anniversary-final.log", "logSha256": "c3f57d7a1a7c5af26dec97ff39ffde0ef6f1723e732f0a263dd3546d6b431072" },
+    { "command": "npx playwright test tests/swipe.spec.ts tests/audit-regressions.spec.ts tests/font-switcher.spec.ts --reporter=line", "sourceSha": "48d1bf81e9b61757323f10de22a21245417184c4", "exitCode": 0, "result": "17 passed", "log": "artifacts/integration/m3/regressions-final.log", "logSha256": "dd3a4c84d45ad810d4422f0419c484a3b6468860f603d64e557cf7636eebfe5b" },
+    { "command": "npm run test:pages", "sourceSha": "48d1bf81e9b61757323f10de22a21245417184c4", "exitCode": 0, "result": "4 passed", "log": "artifacts/integration/m3/pages-final.log", "logSha256": "83b0f91b46943270a1ab5dc3e4c156646e6db62a3996d9b471076b9a75a1aa27" }
+  ],
+  "postCorrectionChecks": [
+    { "command": "npm run build", "sourceSha": "58447f89bf759eee668cbee34849bf2b1873d12e", "exitCode": 0, "result": "passed", "log": "artifacts/integration/m3/build-final-58447f8.log", "logSha256": "bdcb01c71a00304708e7930b64102846c7cc5856938c564bf58830284d4a0a97" },
+    { "command": "npm run build:pages", "sourceSha": "58447f89bf759eee668cbee34849bf2b1873d12e", "exitCode": 0, "result": "passed", "log": "artifacts/integration/m3/build-pages-final-58447f8.log", "logSha256": "b77853cf5dc61b11ec8187aa7b069d274593ed404cb353821894e5ced4ca7a95" },
+    { "command": "npx playwright test --config playwright.anniversary.config.ts tests/anniversary-assets.spec.ts --reporter=line", "sourceSha": "58447f89bf759eee668cbee34849bf2b1873d12e", "exitCode": 0, "result": "4 passed; verified full-card framing, live edit/delete confirmation hit areas, resource hashes/alpha, and light/dark gallery", "log": "artifacts/integration/m3/assets-final-58447f8.log", "logSha256": "ea2e254573235c53ec574232bd4d2156c4b1c6180e137ed3dbe200f23c9c4bdc" }
+  ],
+  "screenshots": [
+    { "path": "artifacts/integration/m3/hero-empty-360.png", "size": "360x740", "sha256": "a6f72008a945e002816938642808245b942993846aee9eb510e9e458eabc42e3" },
+    { "path": "artifacts/integration/m3/hero-empty-393.png", "size": "393x852", "sha256": "26c1247692dec6439fea0645621b2f5c9c0dd2a065314bb69b29b17bef3b4b07" },
+    { "path": "artifacts/integration/m3/hero-empty-430.png", "size": "430x932", "sha256": "53f7fd423d195cd48b23cc0d6b31b35a406d925ec059a2f68d2a3f5b9f81d6d8" },
+    { "path": "artifacts/integration/m3/card-360.png", "size": "360x740", "sha256": "573cd36ad89e1180f8cdf5912b99390f328e6158e81913bdd2f73f1e8e2f40c3" },
+    { "path": "artifacts/integration/m3/card-393.png", "size": "393x852", "sha256": "c41970333e2c112cf125a85ae969bae11aab88f5caf6d71fff3d1ef5c9220f1c" },
+    { "path": "artifacts/integration/m3/card-430.png", "size": "430x932", "sha256": "93c7c91c1b51c15916b46985eeb478872eb43724cef155a1de679e0df078ba6b" },
+    { "path": "artifacts/integration/m3/assets-light.png", "size": "1100x1913", "sha256": "237c79b3896eec5df140dbe74a24677b458e14ffbaa72b99311c1bdbce39401c" },
+    { "path": "artifacts/integration/m3/assets-dark.png", "size": "1100x1913", "sha256": "a79d1100da685c8be15df58f3a11e034c10a5087b6bb993928407f18c9138198" }
+  ],
+  "knownIssues": [
+    "The first preflight run was inadvertently overlapped with a retry after an exec session yielded; it logged one strict-locator failure and one Playwright trace ENOENT. The transcript artifacts/integration/m3/anniversary.log remains. That failed run's trace ZIP was later removed from test-results by subsequent Playwright runs and could not be retained. The final 48d matrix ran serially and passed; the corrected asset tests were rerun serially on 58447f8.",
+    "Nine anniversary illustrations remain needs-redraw; no screenshot crops were used in app content.",
+    "The full E2E run is deferred to M5 per GOAL.md. No Android device test or remote Preview validation was part of M3."
+  ]
+}

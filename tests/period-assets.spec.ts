@@ -47,7 +47,26 @@ for (const viewport of viewports) {
 
     await page.evaluate(() => document.fonts.ready);
     await page.screenshot({ path: `artifacts/integration/m4/period-${viewport.width}x${viewport.height}.png`, animations: 'disabled' });
-    await page.screenshot({ path: `artifacts/integration/m4/period-full-${viewport.width}x${viewport.height}.png`, fullPage: true, animations: 'disabled' });
+    const overlaps = (a: { x:number; y:number; width:number; height:number }, b: { x:number; y:number; width:number; height:number }) => a.x < b.x + b.width && a.x + a.width > b.x && a.y < b.y + b.height && a.y + a.height > b.y;
+    const flower = await period.locator('.period-calendar-flower').boundingBox();
+    const calendarControls = await period.locator('.period-calendar header button').evaluateAll(buttons => buttons.map(button => { const rect = button.getBoundingClientRect(); return { x:rect.x, y:rect.y, width:rect.width, height:rect.height }; }));
+    expect(calendarControls.every(control => !overlaps(flower!, control))).toBe(true);
+    const diary = period.locator('.period-daily');
+    await diary.scrollIntoViewIfNeeded();
+    await expect(diary).toBeInViewport();
+    const tape = await diary.locator('.period-diary-tape').boundingBox();
+    const diaryHeading = await diary.locator('header h2').boundingBox();
+    const diaryDate = await diary.locator('header>span').boundingBox();
+    expect(overlaps(tape!, diaryHeading!)).toBe(false);
+    expect(overlaps(tape!, diaryDate!)).toBe(false);
+    await page.screenshot({ path: `artifacts/integration/m4/diary-${viewport.width}x${viewport.height}.png`, animations: 'disabled' });
+    const tips = period.locator('.period-tips');
+    await tips.scrollIntoViewIfNeeded();
+    await expect(tips).toBeInViewport();
+    const book = await tips.locator('.period-art-main').boundingBox();
+    const tipContent = await tips.locator('button[aria-label="查看小贴士详情"]').boundingBox();
+    expect(overlaps(book!, tipContent!)).toBe(false);
+    await page.screenshot({ path: `artifacts/integration/m4/tips-${viewport.width}x${viewport.height}.png`, animations: 'disabled' });
   });
 }
 
@@ -84,7 +103,8 @@ test('period asset source files match their declared dimensions, pixel alpha and
     expect(item.height, item.name).toBe(item.expectedHeight);
     expect(item.clearFraction, `${item.name} transparent edge coverage`).toBeCloseTo(item.expectedClear, 3);
     expect(item.clearFraction, `${item.name} has alpha`).toBeGreaterThan(0);
-    expect(item.opaqueFraction, `${item.name} retains painted pixels`).toBeGreaterThan(0);
+    // Some approved PNGs use soft watercolor edges only; painted pixels may all be partially transparent.
+    expect(item.opaqueFraction + item.partialFraction, `${item.name} retains painted pixels`).toBeGreaterThan(0);
     expect(item.hash, `${item.name} canonical SHA-256`).toMatch(/^[0-9a-f]{64}$/);
     expect(item.hash, `${item.name} canonical source hash`).toBe(item.expectedHash);
   }

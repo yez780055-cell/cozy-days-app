@@ -72,8 +72,10 @@ export const anniversaryRepository = {
     }
     const current = value.id === undefined ? undefined : await database.anniversaries.get(value.id);
     if (value.id !== undefined && !current) throw new Error('这条纪念日已不存在，请重新打开页面。');
-    return database.anniversaries.put({ ...value, name, note: value.note.trim().slice(0, 500),
-      icon: value.icon.slice(0, 16), createdAt: current?.createdAt ?? Date.now(), updatedAt: Date.now() });
+    const row = { ...value, name, note: value.note.trim().slice(0, 500),
+      icon: value.icon.slice(0, 16), createdAt: current?.createdAt ?? Date.now(), updatedAt: Date.now() };
+    const id = await database.anniversaries.put(row);
+    return { ...row, id };
   }),
   remove: (id: number) => database.anniversaries.delete(id),
 };

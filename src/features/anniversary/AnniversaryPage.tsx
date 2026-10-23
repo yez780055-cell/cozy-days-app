@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from 'react';
+import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { CalendarDays, ChevronLeft, ChevronRight, Pencil, Plus, Trash2 } from 'lucide-react';
 import { Asset } from '../../components/Asset';
 import { Button } from '../../components/Button';
@@ -37,27 +37,49 @@ export default function AnniversaryPage() {
   const [deleting, setDeleting] = useState<Anniversary | null>(null);
   const [busy, setBusy] = useState(false);
   const [loaded, setLoaded] = useState(false);
+  const mutationPending = useRef(false);
+  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState('');
   useEffect(() => {
     let mounted = true;
-    void anniversaryRepository.all().then(data => { if (mounted) { setRows(data); setLoaded(true); } }).catch(() => { if (mounted) setError('暂时无法读取收藏，请重新进入纪念日页面重试。'); });
+    void anniversaryRepository.all().then(data => { if (mounted) { setRows(data); setLoaded(true); } }).catch(() => { if (mounted) setError('暂时无法读取收藏，请重新读取或重新进入纪念日页面重试。'); });
     const update = () => setToday(dateKey());
     const timer = window.setInterval(update, 30000);
     window.addEventListener('focus', update); document.addEventListener('visibilitychange', update);
     return () => { mounted = false; clearInterval(timer); window.removeEventListener('focus', update); document.removeEventListener('visibilitychange', update); };
   }, []);
+  async function refresh(committed?: '保存' | '删除') {
+    setRefreshing(true);
+    try { setRows(await anniversaryRepository.all()); setLoaded(true); setError(''); }
+    catch { setError(committed ? `已${committed}，但暂时无法刷新收藏。请重新读取，无需重复${committed}。` : '暂时无法读取收藏，请重新读取或重新进入纪念日页面重试。'); }
+    finally { setRefreshing(false); }
+  }
   async function save(value: Anniversary) {
+    if (mutationPending.current) return;
+    mutationPending.current = true;
     setBusy(true); setError('');
-    try { await anniversaryRepository.save(value); setRows(await anniversaryRepository.all()); setEditor(null); }
+    try {
+      const saved = await anniversaryRepository.save(value);
+      // A committed write remains successful even if the following read fails.
+      setRows(current => [...current.filter(row => row.id !== saved.id), saved]);
+      setEditor(null);
+      await refresh('保存');
+    }
     catch { setError('保存失败，请检查名称和日期后重试。'); }
-    finally { setBusy(false); }
+    finally { mutationPending.current = false; setBusy(false); }
   }
   async function remove() {
-    if (deleting?.id === undefined) return;
+    if (deleting?.id === undefined || mutationPending.current) return;
+    mutationPending.current = true;
     setBusy(true); setError('');
-    try { await anniversaryRepository.remove(deleting.id); setRows(await anniversaryRepository.all()); setDeleting(null); }
+    try {
+      await anniversaryRepository.remove(deleting.id);
+      setRows(current => current.filter(row => row.id !== deleting.id));
+      setDeleting(null);
+      await refresh('删除');
+    }
     catch { setError('删除失败，你的收藏仍在，请重试。'); }
-    finally { setBusy(false); }
+    finally { mutationPending.current = false; setBusy(false); }
   }
   function create() { setError(''); setEditor({ name: '', date: selected, theme: '生活', note: '', icon: '♡', yearly: true, color: 'pink', createdAt: Date.now(), updatedAt: Date.now() }); }
   const date = localDate(selected);
@@ -90,7 +112,7 @@ export default function AnniversaryPage() {
           </article>; })}
         </div><p className="ann-footer">♡ 每个小日子，都有被珍藏的理由</p>
       </div>
-      {error && !editor && !deleting && <p role="alert" className="error-message">{error}</p>}
+      {error && !editor && !deleting && <div><p role="alert" className="error-message">{error}</p><Button variant="soft" disabled={refreshing || busy} onClick={() => void refresh()}>{refreshing ? '正在读取…' : '重新读取收藏'}</Button></div>}
     </section>
     <button className="fab ann-fab" aria-label="新增纪念日" disabled={!loaded} onClick={create}><Plus size={32}/></button>
     {editor && <Modal title={editor.id === undefined ? '新增纪念日' : '编辑纪念日'} className="ann-modal" onClose={() => { if (!busy) setEditor(null); }}>{error && <p role="alert" className="error-message">{error}</p>}<AnniversaryForm value={editor} onSave={save} busy={busy}/></Modal>}

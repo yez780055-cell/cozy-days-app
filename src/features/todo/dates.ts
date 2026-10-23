@@ -3,6 +3,11 @@ export function toDateKey(date: Date): string {
 }
 export const todayKey = () => toDateKey(new Date());
 export const parseDate = (key: string) => new Date(`${key}T12:00:00`);
+export function isDateKey(value: string): boolean {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+  const date = parseDate(value);
+  return !Number.isNaN(date.getTime()) && toDateKey(date) === value;
+}
 export function shiftDate(key: string, amount: number) {
   const date = parseDate(key);
   date.setDate(date.getDate() + amount);

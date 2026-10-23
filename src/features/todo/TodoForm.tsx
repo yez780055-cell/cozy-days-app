@@ -5,6 +5,7 @@ import { Button } from '../../components/Button';
 import type { Todo } from '../../data/database';
 import { createSeed, decorationIdentity, resolveDecoration, reviseDecoration, type TaskDecoration } from './decorations';
 import { canonicalTime, DEFAULT_CATEGORY, defaultCategories, type Category } from '../../data/categories';
+import { isDateKey } from './dates';
 import { CalendarPanel } from './CalendarPicker';
 export function TodoForm({ todo, date, categories=defaultCategories, defaultCategoryId=DEFAULT_CATEGORY, onSave, onClose }: {
   todo: Todo | null; date: string; categories?:Category[];defaultCategoryId?:string; onSave: (text: string, date: string, id?: number, decoration?: TaskDecoration, favorite?: boolean, categoryId?:string,time?:string) => Promise<boolean>; onClose: () => void;
@@ -37,7 +38,7 @@ export function TodoForm({ todo, date, categories=defaultCategories, defaultCate
   const submit = async (event: FormEvent) => {
     event.preventDefault();
     if (!text.trim() || !formDate || busy) return;
-    if(!/^\d{4}-\d{2}-\d{2}$/.test(formDate)||Number.isNaN(new Date(formDate+'T12:00:00Z').getTime())||new Date(formDate+'T12:00:00').toISOString().slice(0,10)!==formDate){setError('请从日历选择有效日期，或填写 YYYY-MM-DD。');return;}
+    if(!isDateKey(formDate)){setError('请从日历选择有效日期，或填写 YYYY-MM-DD。');return;}
     if(time&&!canonicalTime(time)){setError('时间请填写为 00:00–23:59，或从面板选择。');return;}
     setBusy(true);
     const saved = await onSave(text.trim(), formDate, todo?.id, reviseDecoration(text.trim(), decoration), favorite,categoryId,time);
@@ -49,7 +50,7 @@ export function TodoForm({ todo, date, categories=defaultCategories, defaultCate
     <label className="field-label" htmlFor="todo-content">想做些什么？</label>
     <textarea id="todo-content" data-autofocus rows={3} maxLength={1000} placeholder="写下要做的事情…" value={text} onChange={event => setText(event.target.value)} required/>
     <div className="form-date"><label className="field-label" htmlFor="form-date">归属日期</label><div className="date-entry"><input id="form-date" aria-label="归属日期" type="text" inputMode="numeric" value={formDate} onChange={event=>setFormDate(event.target.value)} placeholder="YYYY-MM-DD"/><button className="paper-select" type="button" aria-label="选择归属日期" aria-expanded={panel==='date'} aria-controls="form-date-panel" onClick={()=>togglePanel('date')}><CalendarDays size={17}/><ChevronDown size={16}/></button></div></div>
-    {panel==='date'&&<div id="form-date-panel" className="paper-panel" role="group" aria-label="归属日期日历"><CalendarPanel key={formDate} value={/^\d{4}-\d{2}-\d{2}$/.test(formDate)&&!Number.isNaN(new Date(formDate).getTime())?formDate:date} onSelect={value=>{setFormDate(value);setPanel(null);}}/></div>}
+    {panel==='date'&&<div id="form-date-panel" className="paper-panel" role="group" aria-label="归属日期日历"><CalendarPanel key={formDate} value={isDateKey(formDate)?formDate:date} onSelect={value=>{setFormDate(value);setPanel(null);}}/></div>}
     <div className="schedule-fields"><div><span className="field-label">所属分类</span><button className="paper-select" type="button" aria-label="所属分类" aria-expanded={panel==='category'} aria-controls="form-category-panel" onClick={()=>togglePanel('category')}><span>{categories.find(c=>c.id===categoryId)?.name??'生活'}</span><ChevronDown size={16}/></button></div>
       <div><label className="field-label" htmlFor="planned-time">时间（可选）</label><span className="time-input"><input id="planned-time" aria-label="计划时间" type="text" inputMode="numeric" placeholder="不设时间" maxLength={5} value={time} onChange={event=>setTime(event.target.value)}/><button type="button" aria-label="选择时间" aria-expanded={panel==='time'} aria-controls="form-time-panel" onClick={()=>togglePanel('time')}><Clock size={17}/></button></span></div></div>
     {panel==='category'&&<div id="form-category-panel" className="paper-panel category-options" role="group" aria-label="选择所属分类">{categories.map(category=><button type="button" key={category.id} aria-pressed={category.id===categoryId} onClick={()=>{setCategoryId(category.id);setPanel(null);}}>{category.name}</button>)}</div>}

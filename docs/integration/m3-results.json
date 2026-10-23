@@ -3,6 +3,7 @@
   "status": "PASS",
   "primarySourceSha": "48d1bf81e9b61757323f10de22a21245417184c4",
   "metadataAndTestCorrectionSha": "58447f89bf759eee668cbee34849bf2b1873d12e",
+  "assetScreenshotSourceSha": "58447f89bf759eee668cbee34849bf2b1873d12e",
   "matrix": [
     { "command": "npm ci", "sourceSha": "48d1bf81e9b61757323f10de22a21245417184c4", "exitCode": 0, "result": "installed; audit reports 1 moderate and 1 high advisory", "log": "artifacts/integration/m3/npm-ci-final.log", "logSha256": "5b616d2913a5e5ac76de42221101b1229e3f231555d9f5ed35eb885a0ca75c02" },
     { "command": "npm run build", "sourceSha": "48d1bf81e9b61757323f10de22a21245417184c4", "exitCode": 0, "result": "passed", "log": "artifacts/integration/m3/build-final.log", "logSha256": "d87240d824e1e391e552c7933e44ec7b242b07407e9fd024cb88a70096f28f94" },

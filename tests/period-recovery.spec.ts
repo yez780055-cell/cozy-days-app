@@ -117,3 +117,25 @@ test('one slow load survives page unmount without a competing old load',async({p
 for(const [instant,hour] of [['2026-03-08T09:59:50Z',3],['2026-11-01T08:59:50Z',1]] as const)test(`DST clock change preserves date draft ${instant}`,async({browser})=>{
  const context=await browser.newContext({timezoneId:'America/Los_Angeles'});const p=await context.newPage();await p.clock.install({time:new Date(instant)});await p.goto('/');await open(p);await p.getByRole('button',{name:'记录第一次经期',exact:true}).click();const date=await p.getByLabel('开始日期',{exact:true}).inputValue();await p.clock.fastForward(40000);await p.evaluate(()=>window.dispatchEvent(new Event('focus')));expect(await p.evaluate(()=>new Date().getHours())).toBe(hour);await expect(p.getByLabel('开始日期',{exact:true})).toHaveValue(date);await context.close();
 });
+
+async function seedRecoveryArchive(page:Page) {
+ await page.evaluate(async()=>{const path='/src/features/period/recovery.ts';const {archiveConflict}=await import(path);const database={periods:[],days:{},reminders:[],settings:{cycleLength:28,periodLength:5}};archiveConflict({database,draft:{...database,reminders:[{id:'old',text:'历史副本',completed:false}]}});});
+ await page.getByRole('navigation').getByRole('button',{name:'待办',exact:true}).click();await open(page);
+}
+test('historical recovery locks immediately during slow read and remount does not start another load',async({page})=>{
+ await seedRecoveryArchive(page);await page.getByRole('button',{name:'查看恢复备份'}).click();
+ await page.evaluate(async()=>{const path='/src/features/period/repository.ts';const {periodRepository}=await import(path);const load=periodRepository.load;let calls=0;periodRepository.load=()=>{calls++;(window as unknown as {restoreLoads:number}).restoreLoads=calls;return new Promise(resolve=>{(window as unknown as {finishRestore:()=>void}).finishRestore=async()=>resolve(await load());});};});
+ await page.getByRole('button',{name:'恢复此副本的草稿版本'}).first().click();await expect(page.locator('.period-calendar')).toHaveCount(0);await expect(page.getByRole('button',{name:'开心',exact:true})).toHaveCount(0);
+ await page.getByRole('navigation').getByRole('button',{name:'待办',exact:true}).click();await page.getByRole('navigation').getByRole('button',{name:'生理期',exact:true}).click();expect(await page.evaluate(()=>(window as unknown as {restoreLoads:number}).restoreLoads)).toBe(1);await page.evaluate(()=>(window as unknown as {finishRestore:()=>void}).finishRestore());await expect(page.getByRole('alert')).toContainText('确认');
+});
+
+test('historical recovery archives the latest failed pending diary before switching sources',async({page})=>{
+ await seedRecoveryArchive(page);await failWrites(page);await page.getByRole('button',{name:'开心',exact:true}).click();await expect(page.getByRole('alert')).toContainText('保存失败');await page.getByRole('button',{name:'查看恢复备份'}).click();await page.getByRole('button',{name:'恢复此副本的草稿版本'}).first().click();await expect(page.getByRole('alert')).toContainText('确认');await page.getByRole('button',{name:'使用记录库版本'}).click();await page.getByRole('button',{name:'查看恢复备份'}).click();await expect(page.getByRole('dialog')).toContainText('开心');
+ await page.getByRole('dialog').getByRole('button',{name:'恢复此副本的草稿版本'}).nth(1).click();await page.getByRole('button',{name:'恢复草稿版本',exact:true}).click();await page.getByRole('button',{name:'确认替换记录库'}).click();await expect(page.getByRole('button',{name:'开心',exact:true})).toHaveAttribute('aria-pressed','true');
+});
+
+test('historical recovery cannot discard pending changes when local backup fails',async({page})=>{
+ await seedRecoveryArchive(page);await failWrites(page);await page.getByRole('button',{name:'开心',exact:true}).click();await expect(page.getByRole('alert')).toContainText('保存失败');
+ await page.evaluate(()=>{const set=Storage.prototype.setItem;Storage.prototype.setItem=function(k,v){if(this===localStorage)throw new DOMException('Synthetic denied');return set.call(this,k,v);};});
+ await page.getByRole('button',{name:'查看恢复备份'}).click();await page.getByRole('button',{name:'恢复此副本的草稿版本'}).first().click();await expect(page.getByRole('alert')).toContainText('恢复未开始');await expect(page.getByRole('button',{name:'开心',exact:true})).toHaveAttribute('aria-pressed','true');await page.getByRole('navigation').getByRole('button',{name:'待办',exact:true}).click();await open(page);await expect(page.getByRole('button',{name:'开心',exact:true})).toHaveAttribute('aria-pressed','true');
+});

@@ -24,7 +24,7 @@ test('settings raw empty input survives refresh and failed settings save stays o
 
 test('newer session fallback beats stale local backup; retry identity remains stable',async({page})=>{
  await failWrites(page);await page.getByRole('button',{name:'开心',exact:true}).click();await expect(page.getByRole('alert')).toContainText('保存失败');
- await page.evaluate(()=>{const set=Storage.prototype.setItem;Storage.prototype.setItem=function(k,v){if(this===localStorage && k==='cozy-days-period-recovery-v1')throw new DOMException('Synthetic quota');return set.call(this,k,v);};});
+ await page.evaluate(()=>{const set=Storage.prototype.setItem;Storage.prototype.setItem=function(k,v){if(this===localStorage && k.startsWith('cozy-days-period-recovery-v1'))throw new DOMException('Synthetic quota');return set.call(this,k,v);};});
  await page.getByRole('button',{name:'腹痛',exact:true}).click();await expect(page.locator('.period-storage')).toContainText('标签页');await page.reload();await open(page);
  await expect(page.getByRole('button',{name:'开心',exact:true})).toHaveAttribute('aria-pressed','true');await expect(page.getByRole('button',{name:'腹痛',exact:true})).toHaveAttribute('aria-pressed','true');
  await page.getByRole('button',{name:'重试',exact:true}).click();await expect(page.locator('.period-storage')).toContainText('记录仅保存在');
@@ -70,7 +70,7 @@ for(const zone of ['Pacific/Kiritimati','America/Los_Angeles'])test(`local midni
 
 test('failed untouched new form retries with the same identity after refresh',async({page})=>{
  await page.getByRole('button',{name:'记录第一次经期',exact:true}).click();await failWrites(page);await page.getByRole('button',{name:'保存经期记录'}).click();await expect(page.getByRole('dialog')).toBeVisible();
- const id=await page.evaluate(()=>JSON.parse(localStorage.getItem('cozy-days-period-recovery-v1')!).pending.data.periods[0].id);
+ const id=await page.evaluate(()=>JSON.parse(sessionStorage.getItem('cozy-days-period-recovery-v1')!).pending.data.periods[0].id);
  await page.reload();await open(page);await page.getByRole('button',{name:'保存经期记录'}).click();await expect(page.getByRole('dialog')).toHaveCount(0);await expect(page.locator('.period-storage')).toContainText('记录仅保存在');
  expect(await page.evaluate(async()=>{const path='/src/features/period/repository.ts';const {periodRepository}=await import(path);return (await periodRepository.load()).periods.map((x:{id:string})=>x.id);})).toEqual([id]);
 });
@@ -138,4 +138,17 @@ test('historical recovery cannot discard pending changes when local backup fails
  await seedRecoveryArchive(page);await failWrites(page);await page.getByRole('button',{name:'开心',exact:true}).click();await expect(page.getByRole('alert')).toContainText('保存失败');
  await page.evaluate(()=>{const set=Storage.prototype.setItem;Storage.prototype.setItem=function(k,v){if(this===localStorage)throw new DOMException('Synthetic denied');return set.call(this,k,v);};});
  await page.getByRole('button',{name:'查看恢复备份'}).click();await page.getByRole('button',{name:'恢复此副本的草稿版本'}).first().click();await expect(page.getByRole('alert')).toContainText('恢复未开始');await expect(page.getByRole('button',{name:'开心',exact:true})).toHaveAttribute('aria-pressed','true');await page.getByRole('navigation').getByRole('button',{name:'待办',exact:true}).click();await open(page);await expect(page.getByRole('button',{name:'开心',exact:true})).toHaveAttribute('aria-pressed','true');
+});
+
+test('another tab cannot erase a failed diary backup when its original tab closes',async({page,context})=>{
+ const other=await context.newPage();await other.goto('/');await open(other);
+ await failWrites(page);await page.getByRole('button',{name:'开心',exact:true}).click();await expect(page.getByRole('alert')).toContainText('保存失败');await expect(other.getByRole('button',{name:'查看恢复备份'})).toBeVisible();
+ await other.getByRole('button',{name:'周期设置',exact:true}).click();await other.getByLabel('默认周期长度（天）').fill('31');await other.keyboard.press('Escape');await expect(other.getByRole('dialog')).toHaveCount(0);await page.close();
+ const survivor=await context.newPage();await survivor.goto('/');await open(survivor);await expect(survivor.getByRole('button',{name:'查看恢复备份'})).toBeVisible();await survivor.getByRole('button',{name:'查看恢复备份'}).click();await expect(survivor.getByRole('dialog')).toContainText('开心');
+ await survivor.getByRole('button',{name:'恢复此副本的草稿版本'}).first().click();await survivor.getByRole('button',{name:'恢复草稿版本',exact:true}).click();await survivor.getByRole('button',{name:'确认替换记录库'}).click();await survivor.getByRole('button',{name:'重试',exact:true}).click();await expect(survivor.locator('.period-storage')).toContainText('记录仅保存在');await expect(survivor.getByRole('button',{name:'开心',exact:true})).toHaveAttribute('aria-pressed','true');await other.close();await survivor.close();
+});
+
+test('newer device draft survives reload when session writes fail',async({page})=>{
+ await page.getByRole('button',{name:'记录第一次经期',exact:true}).click();await page.getByLabel('开始日期',{exact:true}).fill('2026-10-01');
+ await page.evaluate(()=>{const set=Storage.prototype.setItem;Storage.prototype.setItem=function(k,v){if(this===sessionStorage)throw new DOMException('Synthetic quota');return set.call(this,k,v);};});await page.getByLabel('结束日期（进行中可留空）').fill('2026-10-02');await page.reload();await open(page);await expect(page.getByLabel('结束日期（进行中可留空）')).toHaveValue('2026-10-02');
 });

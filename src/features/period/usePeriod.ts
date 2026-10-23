@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { emptyData, type PeriodData } from './model';
 import { PeriodConflictError, periodRepository, validPeriodData } from './repository';
-import { archiveConflict, conflictArchives, pendingRecovery, recoveryNotice, recoveryStatus, setPending } from './recovery';
+import { archiveConflict, conflictArchives, isRecoveryStorageKey, pendingRecovery, recoveryNotice, recoveryStatus, setPending } from './recovery';
 // A module-owned session and single writer outlive page mounts.
 let state = { data: emptyData(), ready: false, error: '', saving: false, restoring: false, durable: false };
 const listeners = new Set<() => void>();
@@ -59,7 +59,13 @@ function save(): Promise<boolean> {
 }
 export function usePeriod() {
   const [, render] = useState(0);
-  useEffect(() => { const notify = () => render(n => n + 1); listeners.add(notify); if (!state.ready&&!state.restoring&&!conflict) void load(); return () => { listeners.delete(notify); }; }, []);
+  useEffect(() => {
+    const notify = () => render(n => n + 1);
+    const storage=(event:StorageEvent)=>{if(isRecoveryStorageKey(event.key))notify();};
+    listeners.add(notify);window.addEventListener('storage',storage);
+    if (!state.ready&&!state.restoring&&!conflict) void load();
+    return () => { listeners.delete(notify);window.removeEventListener('storage',storage); };
+  }, []);
   function update(change: (value: PeriodData) => PeriodData) {
     if (!state.ready) return Promise.resolve(false);
     const data = change(state.data); revision++;
@@ -98,5 +104,5 @@ export function usePeriod() {
     }
     catch { if(token!==restoreToken)return;conflict=previousConflict;publish({restoring:false,ready:previousReady,error:'记录读取失败，未恢复备份，原数据与草稿已保留。'}); }
   }
-  return { ...state, conflict:!!conflict, conflictData:conflict, archives:conflictArchives(),restoreArchive, resolveConflict, notice:recoveryNotice(), update, retry: () => state.restoring ? Promise.resolve() : state.ready ? save() : load() };
+  return { ...state, conflict:!!conflict, conflictData:conflict, archives:conflictArchives(baseline),restoreArchive, resolveConflict, notice:recoveryNotice(), update, retry: () => state.restoring ? Promise.resolve() : state.ready ? save() : load() };
 }

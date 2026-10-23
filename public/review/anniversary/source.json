@@ -1,0 +1,23 @@
+{
+  "sourceCommit": "066037bff48c1323e8e91807089efce86544e4aa",
+  "capturedAt": "2026-10-23T09:24:04.0386007Z",
+  "clock": "2026-10-23T12:00:00+08:00",
+  "tool": "Playwright with system Chrome",
+  "command": "npx playwright test --config playwright.anniversary.config.ts",
+  "result": "28 passed (13 anniversary + 15 existing todo/category regressions)",
+  "viewports": [
+    "360x740",
+    "393x852",
+    "430x932"
+  ],
+  "placeholders": [
+    "Header and empty-state cats reuse existing audited artwork",
+    "Card theme icons use temporary emoji/characters"
+  ],
+  "notRun": [
+    "Full E2E suite",
+    "Android hardware keyboard and system safe areas",
+    "APK build"
+  ],
+  "notes": "Only synthetic test data in fresh browser contexts; no runtime changes after sourceCommit"
+}

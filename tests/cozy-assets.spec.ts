@@ -16,6 +16,7 @@ test('正式素材、三种安卓视口、长文本与安全区', async ({ page 
       await page.getByRole('button',{name:'新增待办',exact:true}).click();
       await page.getByRole('textbox',{name:'想做些什么？'}).fill(text);
       await page.getByRole('button',{name:'保存',exact:true}).click();
+      await expect(page.getByRole('dialog')).not.toBeVisible();
     }
     await page.reload();
     await expect(page.getByTestId('todo-card')).toHaveCount(4);

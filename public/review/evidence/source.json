@@ -1,0 +1,20 @@
+{
+  "sourceCommit": "f076aa8c9db5e1e209bb928fb8e548f6b87d59c5",
+  "capturedAt": "2026-10-23T02:17:53.709Z",
+  "sizes": [
+    [
+      360,
+      740
+    ],
+    [
+      393,
+      852
+    ],
+    [
+      430,
+      932
+    ]
+  ],
+  "tool": "Playwright Chromium",
+  "data": "isolated synthetic tasks"
+}

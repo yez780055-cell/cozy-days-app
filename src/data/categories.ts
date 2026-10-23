@@ -10,6 +10,7 @@ export const defaultCategories: Category[] = [
   {id:'work',name:'工作',key:'工作',builtin:true,createdAt:0},
   {id:'life',name:'生活',key:'生活',builtin:true,createdAt:1},
   {id:'study',name:'学习',key:'学习',builtin:true,createdAt:2},
+  {id:'shopping',name:'购物',key:'购物',builtin:true,createdAt:3},
 ];
 export const categoryKey = (name:string) => name.normalize('NFKC').trim().replace(/\s+/g,' ').toLowerCase();
 export class CategoryError extends Error {}

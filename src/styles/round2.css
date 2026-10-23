@@ -1,5 +1,5 @@
 /* Warm paper first: persisted themes now tint a narrow edge, not the entire card. */
-.swipe-shell .task-card[data-theme], .decoration-sample[data-theme] {
+.swipe-shell .task-card[data-theme] {
   background-color: #fffaf0;
   background-image: linear-gradient(#fffcf3d9,#fffcf3d9),url('/assets/cozy_days/raster/backgrounds/paper_texture.png');
   background-size: auto,320px 320px;
@@ -56,7 +56,7 @@
 .time-input { display: flex; align-items: center; position: relative; }
 .time-input input { padding-right: 40px; }
 .time-input button { position: absolute; right: 0; min-width: 40px; min-height: 44px; border: 0; background: transparent; color: #b07986; font-size: 10px; padding: 5px; }
-.modal form > .todo-submit { position: sticky; bottom: 0; z-index: 1; }
+.modal form > .todo-submit { position: static; }
 .category-form > label { display: block; color: #957861; font-size: 12px; margin-bottom: 8px; }
 .category-form > div { display: flex; gap: 9px; }
 .category-form input { flex: 1; font-size: 16px; }
@@ -69,3 +69,42 @@
 .category-manager-list small { font-size: 10px; color: #af9a84; }
 @media(max-width:375px) { .task-list-viewport .task-area { padding-left: 14px; padding-right: 14px; } .date-section { padding-left: 16px; padding-right: 16px; } }
 @media(max-height:700px) { .date-section { padding-top: 3px; } .task-art { height: 40px; } }
+/* Form controls share the same paper surface, including in Android WebView. */
+.modal-header { justify-content: flex-start; gap: 8px; }
+.modal-header h2 { flex: 0 1 auto; }
+.modal-header > .icon-button:last-child { margin-left: auto; flex: none; }
+.favorite-star { flex: none; width: 44px; height: 44px; display: grid; place-items: center; color: #b19d81; background: #f7ecdc; border: 1px dashed #dbc6a8; border-radius: 15px 12px 14px 11px; }
+.favorite-star[aria-pressed="true"] { color: #ba852e; background: #ffedbc; border-style: solid; border-color: #d5ae66; }
+.form-date { margin: 16px 0; }
+.form-date .field-label,.schedule-fields .field-label { display: block; margin: 0 0 7px; font-size: 12px; }
+.schedule-fields { margin: 0 0 16px; gap: 10px; }
+.schedule-fields > div { min-width: 0; }
+.paper-select { width: 100%; min-height: 46px; padding: 10px; display: flex; gap: 7px; align-items: center; border: 1px solid #deccb4; border-radius: 12px 10px 13px 11px; background: #fffaf0; color: #79634f; box-shadow: 0 2px 3px #9272540a; font: inherit; font-size: 13px; text-align: left; }
+.paper-select span { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.paper-select svg { flex: none; }
+.paper-panel { padding: 12px; margin: 0 0 16px; border: 1px dashed #d8bfa0; border-radius: 14px 12px 16px 13px; background: #fcf1df; box-shadow: inset 0 1px 4px #b4936910; }
+.paper-panel .calendar-grid { gap: 2px; }
+.paper-panel .calendar-day { min-height: 36px; height: 36px; width: 100%; }
+.paper-panel .calendar-month { margin-bottom: 8px; }
+.paper-panel .button { min-height: 40px; padding: 8px 14px; }
+.category-options { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; max-height: 220px; overflow-y: auto; }
+.category-options button,.time-options button { border: 1px solid #dfceb7; border-radius: 11px 9px 12px 10px; min-height: 44px; padding: 8px; background: #fffaf0; color: #876952; font: inherit; font-size: 13px; overflow-wrap: anywhere; }
+.category-options button[aria-pressed="true"],.time-options button[aria-pressed="true"] { background: #eadfed; border-color: #bd9bb9; color: #735c79; box-shadow: inset 0 0 0 1px #bd9bb9; }
+.time-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 10px; }
+.time-columns strong { display: block; text-align: center; font-size: 12px; color: #96785f; margin-bottom: 7px; }
+.time-options { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 5px; max-height: 150px; overflow-y: auto; overscroll-behavior: contain; }
+.time-input input { font-size: 14px; min-height: 46px; }
+.clear-time { display: block; border: 0; background: transparent; color: #a76c80; min-height: 44px; margin: -12px 0 5px auto; padding: 8px; font-size: 12px; }
+.paper-select:active,.favorite-star:active,.category-options button:active,.time-options button:active { transform: scale(.97); }
+.paper-select:focus-visible,.favorite-star:focus-visible,.paper-panel button:focus-visible { outline: 2px solid #ab81a3; outline-offset: 2px; }
+.task-top-fade { position: absolute; z-index: 2; top: 0; left: 0; right: 0; height: 22px; background: linear-gradient(to bottom,#fff7e9,#fff7e900); pointer-events: none; opacity: 0; transition: opacity 180ms ease; }
+.is-scrolled .task-top-fade { opacity: 1; }
+.undo-stack { position: absolute; z-index: 7; left: 12px; right: 78px; bottom: calc(var(--nav-height) + 12px + env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 5px; max-height: min(32%,220px); overflow-y: auto; overscroll-behavior: contain; pointer-events: none; scrollbar-width: thin; }
+.undo-stack:empty { display: none; }
+.undo-stack .undo-toast { position: relative; left: auto; right: auto; bottom: auto; flex: none; min-height: 49px; padding: 0 10px 3px; gap: 5px; font-size: 11px; pointer-events: auto; box-shadow: 0 2px 6px #735c4015; }
+.undo-toast > span { min-width: 0; }
+.undo-toast small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 180px; opacity: .65; font-size: 10px; }
+@media(prefers-reduced-motion: reduce) { .task-top-fade { transition: none; } }
+.date-entry { display: flex; border: 1px solid #deccb4; border-radius: 12px 10px 13px 11px; background: #fffaf0; }
+.date-entry input { flex: 1; width: 0; min-width: 0; border: 0; background: transparent; padding: 10px 12px; color: #79634f; font: inherit; font-size: 14px; }
+.date-entry .paper-select { width: auto; border: 0; background: transparent; }

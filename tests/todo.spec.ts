@@ -21,7 +21,7 @@ test('新增、刷新保留、完成与准确撤销', async ({page}) => {
   await expect(page.getByRole('button', {name:'已完成 1',exact:true})).toBeVisible();
   await taskAction(page, '需要准确撤销的第二件', 'complete');
   await expect(page.getByRole('button', {name:'已完成 2',exact:true})).toBeVisible();
-  await page.getByRole('button', {name:'撤销',exact:true}).click();
+  await page.getByRole('button', {name:'撤销',exact:true}).last().click();
   await expect(page.getByRole('button',{name:'编辑：需要准确撤销的第二件',exact:true})).toBeVisible();
   await page.getByRole('button', {name:'已完成 1',exact:true}).click();
   await expect(page.getByRole('button',{name:'编辑：已经完成的第一件',exact:true})).toBeVisible();

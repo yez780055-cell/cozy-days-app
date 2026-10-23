@@ -65,7 +65,7 @@ async function add(page:Page,text:string) {
   await expect(page.getByRole('dialog')).not.toBeVisible();
 }
 
-test('新任务保存装饰，编辑重匹配，手动贴纸/配色持久化且不影响勾选删除', async({page})=>{
+test('新任务保存装饰，编辑重匹配，自动贴纸/配色持久化且不影响勾选删除', async({page})=>{
   await page.setViewportSize({width:360,height:740});
   await page.goto('/');
   await add(page,'去见一位老朋友');
@@ -75,23 +75,20 @@ test('新任务保存装饰，编辑重匹配，手动贴纸/配色持久化且�
   await expect(page.getByTestId('todo-card')).toHaveCount(1);
   expect((await records(page))[0].decoration).toEqual(first.decoration);
   await page.getByRole('button',{name:'编辑：去见一位老朋友',exact:true}).click();
-  await page.getByText('贴纸与卡片配色',{exact:true}).click();
-  await page.getByRole('button',{name:'樱桃',exact:true}).click();
-  await page.getByRole('button',{name:'浅薰衣草',exact:true}).click();
+  await expect(page.getByText('贴纸与卡片配色',{exact:true})).toHaveCount(0);
   await page.getByRole('textbox',{name:'想做些什么？'}).fill('晚上慢跑之后拉伸');
   await page.getByRole('button',{name:'保存',exact:true}).click();
   await expect(page.getByRole('dialog')).not.toBeVisible();
   const changed=(await records(page))[0];
-  expect(changed.decoration).toEqual({...first.decoration,illustrationId:'taskStretch',stickerId:'cherries',theme:'lavender'});
+  expect(changed.decoration).toEqual({...first.decoration,illustrationId:'taskStretch'});
   await page.reload();
   const card=page.getByTestId('todo-card');
-  await expect(card).toHaveAttribute('data-theme','lavender');
-  await expect(card.locator('.task-art')).toHaveAttribute('data-sticker','cherries');
+  await expect(card).toHaveAttribute('data-theme',first.decoration.theme);
+  await expect(card.locator('.task-art')).toHaveAttribute('data-sticker',first.decoration.stickerId);
   expect((await records(page))[0].decoration).toEqual(changed.decoration);
   // Cancel decoration edits without changing the saved appearance.
   await page.getByRole('button',{name:'编辑：晚上慢跑之后拉伸',exact:true}).click();
-  await page.getByText('贴纸与卡片配色',{exact:true}).click();
-  await page.getByRole('button',{name:'奶油',exact:true}).click();
+  await page.getByRole('button',{name:'收藏这件小事',exact:true}).click();
   await page.getByRole('button',{name:'关闭弹窗',exact:true}).click();
   await expect(page.getByRole('dialog')).not.toBeVisible();
   expect((await records(page))[0].decoration).toEqual(changed.decoration);
@@ -165,8 +162,7 @@ test('三视口装饰不覆盖文字/按钮/复选框，所有任务有可解码
     expect(await page.evaluate(()=>document.body.scrollWidth)).toBe(width);
     await page.screenshot({path:`artifacts/cozy-decorations-${width}x${height}.png`});
     await page.getByRole('button',{name:'编辑：预约剪头发',exact:true}).click();
-    await page.getByText('贴纸与卡片配色',{exact:true}).click();
-    await page.getByRole('button',{name:'樱桃',exact:true}).scrollIntoViewIfNeeded();
+    await expect(page.getByText('贴纸与卡片配色',{exact:true})).toHaveCount(0);
     await page.screenshot({path:`artifacts/cozy-decorations-picker-${width}x${height}.png`});
     await page.getByRole('button',{name:'关闭弹窗',exact:true}).click();
   }

@@ -68,26 +68,11 @@
 .task-card[data-layout="1"] .task-art .task-sticker { top: 0; left: 0; transform: rotate(-14deg); }
 .task-card[data-layout="2"] .task-art .task-illustration { top: 3px; left: 0; transform: rotate(6deg); }
 .task-card[data-layout="2"] .task-art .task-sticker { bottom: 1px; left: 2px; transform: rotate(-8deg); }
-.task-card[data-theme="cream"], [data-theme="cream"].decoration-sample { background: #fffaf0; border-color: #e9d8bd; }
-.task-card[data-theme="rose"], [data-theme="rose"].decoration-sample { background: #fff0f1; border-color: #edcdd5; }
-.task-card[data-theme="lavender"], [data-theme="lavender"].decoration-sample { background: #f6f0fc; border-color: #ddd0eb; }
-.task-card[data-theme="sage"], [data-theme="sage"].decoration-sample { background: #f1f6e9; border-color: #d9e1c8; }
+.task-card[data-theme="cream"] { background: #fffaf0; border-color: #e9d8bd; }
+.task-card[data-theme="rose"] { background: #fff0f1; border-color: #edcdd5; }
+.task-card[data-theme="lavender"] { background: #f6f0fc; border-color: #ddd0eb; }
+.task-card[data-theme="sage"] { background: #f1f6e9; border-color: #d9e1c8; }
 .task-card--done .task-art { opacity: .55; }
-.decoration-picker { margin: -5px 0 18px; border-top: 1px dashed var(--line); }
-.decoration-picker summary { cursor: pointer; min-height: 44px; padding: 12px 0; font-size: 12px; color: #957160; }
-.decoration-picker p { font-size: 10px; color: #987c6c; margin-bottom: 0; }
-.decoration-sample { display: flex; align-items: center; gap: 10px; padding: 10px; border: 1px solid; border-radius: 14px; margin-bottom: 12px; }
-.decoration-sample > .asset { flex: none; width: 35px; height: 35px; }
-.decoration-sample > .asset:last-child { width: 20px; height: 20px; }
-.decoration-sample span { min-width: 0; flex: 1; overflow-wrap: anywhere; white-space: pre-wrap; font-size: 12px; max-height: 85px; overflow: auto; }
-.sticker-options, .theme-options { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 10px; }
-.sticker-options button, .theme-options button { min-width: 44px; min-height: 44px; border-radius: 12px; border: 1px solid #e4d6c8; background: #fffcf4; padding: 8px; }
-.sticker-options .asset { width: 28px; height: 28px; }
-.theme-options button { font-size: 11px; padding: 8px 10px; }
-.theme-options [data-theme="rose"] { background: #fff0f1; }
-.theme-options [data-theme="lavender"] { background: #f6f0fc; }
-.theme-options [data-theme="sage"] { background: #f1f6e9; }
-.sticker-options button[aria-pressed="true"], .theme-options button[aria-pressed="true"] { border: 2px solid #c17b91; box-shadow: 0 0 0 2px #fff9; }
 .task-card--done, .task-card--done:nth-child(3n + 2) { background: #f7ecdd9c; }
 .completed-heading { min-height: 44px; color: #927a68; }
 .daily-progress > span { color: #947b67; }

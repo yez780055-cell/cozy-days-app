@@ -2,8 +2,8 @@ import { useCallback, useEffect, useRef, type ReactNode } from 'react';
 import { X } from 'lucide-react';
 import { animateElement, motion } from '../styles/motion';
 
-export function Modal({ title, onClose, children, className = '' }: {
-  title: string; onClose: () => void; children: ReactNode; className?: string;
+export function Modal({ title, onClose, children, className = '', headerAction }: {
+  title: string; onClose: () => void; children: ReactNode; className?: string; headerAction?: ReactNode;
 }) {
   const panel = useRef<HTMLElement>(null);
   const closing = useRef(false);
@@ -37,7 +37,7 @@ export function Modal({ title, onClose, children, className = '' }: {
   }, [close]);
   return <div className="modal-backdrop" onClick={event => { if (event.target === event.currentTarget) void close(); }}>
     <section ref={panel} className={`modal ${className}`} role="dialog" aria-modal="true" aria-label={title}>
-      <header className="modal-header"><h2>{title}</h2><button className="icon-button" aria-label="关闭弹窗" onClick={() => void close()}><X size={20}/></button></header>
+      <header className="modal-header"><h2>{title}</h2>{headerAction}<button className="icon-button" aria-label="关闭弹窗" onClick={() => void close()}><X size={20}/></button></header>
       {children}
     </section>
   </div>;

@@ -4,7 +4,7 @@ import {taskAction} from './task-actions';
 async function add(page:Page,text:string,options:{category?:string;time?:string;date?:string;favorite?:boolean}={}) {
   await page.getByRole('button',{name:'新增待办',exact:true}).click();
   await page.getByRole('textbox',{name:'想做些什么？'}).fill(text);
-  if(options.category)await page.getByRole('combobox',{name:'所属分类'}).selectOption({label:options.category});
+  if(options.category){await page.getByRole('button',{name:'所属分类',exact:true}).click();await page.getByRole('group',{name:'选择所属分类'}).getByRole('button',{name:options.category,exact:true}).click();};
   if(options.date)await page.getByLabel('归属日期',{exact:true}).fill(options.date);
   if(options.time)await page.getByLabel('计划时间',{exact:true}).fill(options.time);
   if(options.favorite)await page.getByRole('button',{name:'收藏这件小事',exact:true}).click();
@@ -32,7 +32,7 @@ test('默认分类与自定义分类新增/改名/筛选持久化，拒绝重名
   await manager(page);await page.getByRole('button',{name:'修改分类：灵感',exact:true}).click();await page.getByRole('textbox',{name:'分类名称'}).fill('创意');await page.getByRole('button',{name:'保存分类',exact:true}).click();
   await expect(page.getByRole('button',{name:'修改分类：创意',exact:true})).toBeVisible();
   await page.getByRole('textbox',{name:'分类名称'}).fill('工作');await page.getByRole('button',{name:'添加分类',exact:true}).click();await expect(page.getByRole('alert')).toContainText('已经有这个分类');
-  await expect(page.getByRole('button',{name:'删除分类：工作',exact:true})).toHaveCount(0);await close(page);
+  await expect(page.getByRole('button',{name:'删除分类：工作',exact:true})).toHaveCount(1);await close(page);
   await expect(page.getByRole('button',{name:'分类：创意',exact:true})).toHaveAttribute('aria-pressed','true');
   await page.reload();await page.getByRole('button',{name:'分类：创意',exact:true}).click();await expect(card(page,'记下一个想法')).toBeVisible();
   expect((await read(page)).todos.find(t=>t.id===before.id)).toEqual(before);
@@ -62,7 +62,7 @@ test('可选时间、跨日期编辑和分类筛选组合即时更新，未设�
   await page.getByRole('button',{name:'编辑：十点工作计划',exact:true}).click();
   const originalDate=await page.getByLabel('归属日期',{exact:true}).inputValue();
   const next=await page.evaluate(value=>{const d=new Date(value+'T12:00:00');d.setDate(d.getDate()+1);return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;},originalDate);
-  await page.getByLabel('归属日期',{exact:true}).fill(next);await page.getByLabel('计划时间',{exact:true}).fill('14:20');await page.getByRole('combobox',{name:'所属分类'}).selectOption('study');
+  await page.getByLabel('归属日期',{exact:true}).fill(next);await page.getByLabel('计划时间',{exact:true}).fill('14:20');await page.getByRole('button',{name:'所属分类',exact:true}).click();await page.getByRole('group',{name:'选择所属分类'}).getByRole('button',{name:'学习',exact:true}).click();
   await page.getByRole('button',{name:'保存',exact:true}).click();await expect(page.getByRole('dialog')).not.toBeVisible();await expect(card(page,'十点工作计划')).toHaveCount(0);
   await page.getByRole('button',{name:'分类：学习',exact:true}).click();await expect(card(page,'十点工作计划')).toHaveCount(0);
   await page.getByRole('button',{name:'后一天',exact:true}).click();await expect(card(page,'十点工作计划').locator('time')).toHaveText('14:20');
@@ -100,6 +100,11 @@ for(const [width,height] of [[360,740],[393,852],[430,932]])test(`奶油卡片�
   const first=card(page,'准备设计稿'),rect=(await first.boundingBox())!;expect(rect.height).toBeLessThanOrEqual(66);await expect(first).toHaveCSS('background-color','rgb(255, 250, 240)');
   await expect(page.locator('.task-bottom-fade')).toHaveCSS('pointer-events','none');const fade=(await page.locator('.task-bottom-fade').boundingBox())!,navBefore=(await page.locator('.bottom-nav').boundingBox())!;
   // Position a card's center in the fade and hit-test/click through the overlay.
+  await page.locator('.task-area').evaluate(el=>{el.scrollTop=40;});
+  await expect(page.locator('.task-top-fade')).toHaveCSS('opacity','1');
+  await expect(page.locator('.task-top-fade')).toHaveCSS('pointer-events','none');
+  expect((await page.locator('.task-top-fade').boundingBox())!.y).toBeGreaterThanOrEqual((await page.locator('.date-section').boundingBox())!.y+(await page.locator('.date-section').boundingBox())!.height-1);
+  await page.locator('.task-area').evaluate(el=>{el.scrollTop=0;});
   const y=fade.y+12;
   await page.locator('.task-area').evaluate((el,target)=>{const more=el.querySelector('.card-more')!.getBoundingClientRect();el.scrollTop+=more.y+more.height/2-target;},y);
   // Scroll can only move forward; select an actual lower card and align it precisely.

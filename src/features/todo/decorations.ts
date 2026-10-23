@@ -4,8 +4,7 @@ export const cardThemes = { cream: '奶油', rose: '蜜桃粉', lavender: '浅�
 export type CardTheme = keyof typeof cardThemes;
 export const stickerOptions = [
   { id: 'flower', label: '粉色小花' }, { id: 'cherries', label: '樱桃' },
-  { id: 'star', label: '奶油星星' }, { id: 'heart', label: '粉色爱心' },
-  { id: 'sparkle', label: '金色闪星' },
+  { id: 'heart', label: '粉色爱心' },
 ] as const satisfies readonly { id: AssetName; label: string }[];
 export type StickerId = typeof stickerOptions[number]['id'];
 
@@ -17,7 +16,7 @@ export const illustrationRules = [
   { id: 'study', category: '学习', keywords: ['学习', '复习', '作业', '背单词', '课程', '考试', '练习', '笔记', 'study', 'studying', 'homework', 'lesson', 'exam'] },
   { id: 'work', category: '工作', keywords: ['工作', '会议', '设计', '报告', '项目', '邮件', '开会', '办公', '代码', 'work', 'meeting', 'project', 'email', 'coding'] },
 ] as const satisfies readonly { id: AssetName; category: string; keywords: readonly string[]; patterns?: readonly RegExp[] }[];
-const fallbackIllustrations = ['flower', 'cherries', 'star', 'heart', 'sparkle'] as const;
+const fallbackIllustrations = ['flower', 'cherries', 'heart'] as const;
 export type IllustrationId = typeof illustrationRules[number]['id'] | typeof fallbackIllustrations[number];
 export interface TaskDecoration {
   version: 1;

@@ -15,7 +15,7 @@ import { DEFAULT_CATEGORY } from '../../data/categories';
 
 export type TodoStore = ReturnType<typeof useTodos>;
 export type InitialDialog = 'add' | 'edit' | 'delete' | 'undo' | undefined;
-type UndoRecord = { token: number; snapshot: Todo; label: string };
+type UndoRecord = { token: number; snapshot: Todo; label: string; kind: 'toggle'|'delete'; expiresAt: number; undone?: boolean };
 
 export default function TodoPage() {
   const store = useTodos();
@@ -31,12 +31,14 @@ export function TodoView({ store, initialDialog }: { store: TodoStore; initialDi
   );
   const [editing, setEditing] = useState<Todo | null>(store.todos[0] ?? null);
   const [completedOpen, setCompletedOpen] = useState(false);
-  const [undo, setUndo] = useState<UndoRecord | null>(
-    initialDialog === 'undo' && store.todos[0]?.id ? { token: 0, snapshot: {...store.todos[0],completed:false}, label: '完成一件小事啦' } : null,
+  const [undos, setUndos] = useState<UndoRecord[]>(
+    initialDialog === 'undo' && store.todos[0]?.id ? [{ token: 0, snapshot: {...store.todos[0],completed:false}, label: '完成一件小事啦', kind:'toggle', expiresAt:Date.now()+5000 }] : [],
   );
   const [deleting, setDeleting] = useState(false);
-  const undoRef = useRef(undo);
-  const sequence = useRef(0), undoBusy = useRef(false), alive = useRef(true);
+  const [listScrolled,setListScrolled]=useState(false);
+  const undoRef = useRef(undos);
+  const history = useRef<UndoRecord[]>([...undos]);
+  const sequence = useRef(0), undoBusy = useRef(new Set<number>()), alive = useRef(true);
   const scopedTodos=useMemo(()=>store.todos.filter(todo=>categoryId==='all'||(todo.categoryId??DEFAULT_CATEGORY)===categoryId),[store.todos,categoryId]);
   const dateTodos = useMemo(() => scopedTodos.filter(todo => todo.date === date), [scopedTodos, date]);
   const pending = useMemo(() => scopedTodos
@@ -46,38 +48,57 @@ export function TodoView({ store, initialDialog }: { store: TodoStore; initialDi
   const categoryCount=(id:string)=>store.todos.filter(todo=>!todo.completed&&(view==='all'||todo.date===date)&&(id==='all'||(todo.categoryId??DEFAULT_CATEGORY)===id)).length;
   const totalForDate = dateTodos.length;
   const completedForDate = dateTodos.filter(todo => todo.completed).length;
-  useEffect(() => { alive.current=true; return () => { alive.current=false; undoRef.current=null; }; }, []);
+  useEffect(() => { alive.current=true; return () => { alive.current=false; undoRef.current=[]; }; }, []);
   useEffect(() => { window.dispatchEvent(new CustomEvent('cozy-card-open',{detail:null})); },[date,view,dialog]);
   useEffect(()=>{window.dispatchEvent(new CustomEvent('cozy-card-open',{detail:null}));if(categoryId!=='all'&&!store.loading&&!store.categories.some(c=>c.id===categoryId))setCategoryId('all');},[categoryId,store.categories,store.loading]);
-  function remember(snapshot: Todo, label: string) {
+  function remember(snapshot: Todo, label: string, kind: UndoRecord['kind']) {
     if (!alive.current) return;
-    const record={token:++sequence.current,snapshot,label};
-    undoRef.current=record; setUndo(record);
+    const record={token:++sequence.current,snapshot,label,kind,expiresAt:Date.now()+5000};
+    history.current.push(record);
+    undoRef.current=[...undoRef.current,record]; setUndos(undoRef.current);
   }
   async function toggle(todo: Todo) {
     if (todo.id === undefined) return false;
     const snapshot=structuredClone(todo);
     const success = await store.complete(todo.id, !todo.completed);
-    if (success) remember(snapshot,todo.completed ? '又放回小计划啦' : '完成一件小事啦');
+    if (success) remember(snapshot,todo.completed ? '又放回小计划啦' : '完成一件小事啦','toggle');
     return success;
   }
   async function remove(todo: Todo) {
     if (todo.id === undefined) return false;
     const snapshot=structuredClone(todo);
     const success=await store.remove(todo.id);
-    if (success) remember(snapshot,'哎呀点错了');
+    if (success) remember(snapshot,'哎呀点错了','delete');
     return success;
   }
-  async function undoOperation() {
-    const record=undoRef.current;
-    if (!record || undoBusy.current) return;
-    undoBusy.current=true; undoRef.current=null; setUndo(null);
-    const success=await store.restore(record.snapshot);
-    undoBusy.current=false;
-    if (!success && alive.current && !undoRef.current) remember(record.snapshot,record.label);
+  function expire(token:number) {
+    undoRef.current=undoRef.current.filter(record=>record.token!==token);
+    setUndos(undoRef.current);
+    // Expired operations remain committed while another undo for the task is live.
+    const liveIds=new Set(undoRef.current.map(record=>record.snapshot.id));
+    if(!undoBusy.current.size) history.current=history.current.filter(record=>liveIds.has(record.snapshot.id));
+  }
+  async function undoOperation(token:number) {
+    const record=undoRef.current.find(record=>record.token===token);
+    if (!record || Date.now()>=record.expiresAt || undoBusy.current.size) return;
+    undoBusy.current.add(token);
+    // Replay this task's surviving operations. Undoing an earlier completion must
+    // not resurrect a later deletion or overwrite a later restore.
+    const operations=history.current.filter(item=>item.snapshot.id===record.snapshot.id);
+    let target:Todo|null=operations[0].snapshot;
+    for(const item of operations) {
+      if(item.undone || item.token===token) continue;
+      target=item.kind==='delete'?null:{...item.snapshot,completed:!item.snapshot.completed};
+    }
+    const current=store.todos.find(todo=>todo.id===record.snapshot.id);
+    const success=target===null ? (!current || await store.remove(current.id!))
+      : current ? await store.complete(current.id!,target.completed)
+      : await store.restore({...record.snapshot,completed:target.completed});
+    if(success) {record.undone=true;expire(token);}
+    undoBusy.current.delete(token);
   }
   function openEdit(todo: Todo) { setEditing(todo); setDialog('edit'); }
-  const selectDate = (value: string) => { undoRef.current=null; setUndo(null); setDate(value); setView('date'); setDialog(null); };
+  const selectDate = (value: string) => { setDate(value); setView('date'); setDialog(null); };
 
   return <>
     <header className="hero">
@@ -104,8 +125,8 @@ export function TodoView({ store, initialDialog }: { store: TodoStore; initialDi
       <div className="category-row"><div className="category-tabs" role="group" aria-label="任务分类">{[{id:'all',name:'全部'},...store.categories].map((category,index)=><button type="button" key={category.id} aria-label={`分类：${category.name}`} aria-pressed={categoryId===category.id} data-tone={index%4} onClick={()=>setCategoryId(category.id)}><span>{category.name}<small>{categoryCount(category.id)}</small></span></button>)}</div>
         <button type="button" className="category-add" aria-label="添加或管理分类" onClick={()=>setDialog('categories')}><Plus size={19}/></button></div>
     </section>
-    <div className={`task-list-viewport ${pending.length||completed.length?'task-list-viewport--populated':''}`}>
-    <section className={`task-area ${pending.length || completed.length ? 'task-area--populated' : ''}`} aria-label="待办列表">
+    <div className={`task-list-viewport ${pending.length||completed.length?'task-list-viewport--populated':''} ${listScrolled?'is-scrolled':''}`}>
+    <section className={`task-area ${pending.length || completed.length ? 'task-area--populated' : ''}`} aria-label="待办列表" onScroll={event=>setListScrolled(event.currentTarget.scrollTop>8)}>
       {store.error && <p className="error-message" role="alert">{store.error}</p>}
       {store.loading ? <p className="loading-message" role="status">正在翻开你的小日子…</p> : <>
         <div className="list-heading"><h2><Asset name="tape"/>{view === 'all' ? '每一件小事' : date === todayKey() ? '今天的小计划' : '这天的小计划'}</h2><span>{pending.length ? `${pending.length} 件待办` : '慢慢来，也很好'}</span></div>
@@ -119,12 +140,11 @@ export function TodoView({ store, initialDialog }: { store: TodoStore; initialDi
       </>}
       <div className="list-footer" aria-hidden="true"><Asset name="book"/><span>小小的进步，也值得被记住。</span><Asset name="cherries"/></div>
     </section>
+    <div className="task-top-fade" aria-hidden="true"/>
     <div className="task-bottom-fade" aria-hidden="true"/>
     </div>
     <button className="fab" aria-label="新增待办" onClick={() => { setEditing(null); setDialog('add'); }}><Plus size={32} strokeWidth={1.8}/></button>
-    {undo && <UndoToast key={undo.token} label={undo.label} onUndo={()=>void undoOperation()} onExpire={()=>{
-      if(undoRef.current?.token===undo.token){undoRef.current=null;setUndo(null);}
-    }}/>}
+    <div className="undo-stack" aria-label="操作撤销">{undos.map(record=><UndoToast key={record.token} label={record.label} task={record.snapshot.text} expiresAt={record.expiresAt} onUndo={()=>void undoOperation(record.token)} onExpire={()=>expire(record.token)}/>)}</div>
     {(dialog === 'add' || dialog === 'edit') && <TodoForm todo={dialog === 'edit' ? editing : null} date={date} categories={store.categories} defaultCategoryId={categoryId==='all'?DEFAULT_CATEGORY:categoryId} onSave={store.save} onClose={() => setDialog(null)}/>}
     {dialog==='categories'&&<CategoryManager categories={store.categories} onSave={store.saveCategory} onRemove={store.removeCategory} onClose={()=>setDialog(null)}/>}
     {dialog === 'calendar' && <CalendarPicker value={date} onSelect={selectDate} onClose={() => setDialog(null)}/>}

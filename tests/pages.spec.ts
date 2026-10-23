@@ -39,7 +39,7 @@ for (const [width, height] of [[360, 740], [393, 852], [430, 932]]) {
     expect(await page.locator('img').evaluateAll(imgs => imgs.every(img => !img.src.startsWith('data:') && img.naturalWidth > 0))).toBe(true);
     expect(await page.evaluate(() => document.body.scrollWidth)).toBe(width);
     const background = await page.locator('.phone').evaluate(el => getComputedStyle(el).backgroundImage);
-    expect(background).toContain('/cozy-days-app/');
+    expect(background).toContain(new URL('assets/',baseURL!).pathname);
     await expect(page.getByRole('button', { name: '新增待办', exact: true })).toBeInViewport();
     await expect(page.getByRole('button', { name: '纪念日', exact: true })).toBeInViewport();
     await page.screenshot({ path: `artifacts/pages-${width}x${height}.png` });
@@ -76,5 +76,8 @@ test('Pages static review route serves evidence, video controls, and build metad
     expect(asset.headers()['content-type'], path).toMatch(type);
   }
   await expect(page.locator('#screens img')).toHaveCount(3);
+  await expect(page.locator('#controls img')).toHaveCount(12);
+  const source=await request.get(new URL('evidence/source.json',reviewURL).href);expect(source.ok()).toBe(true);expect((await source.json()).sourceCommit).toMatch(/^[a-f0-9]{40}$/);
+  for(const size of ['360x740','393x852','430x932'])for(const type of ['date','category','time','undo'])expect((await request.get(new URL('evidence/screenshots/'+type+'-'+size+'.png',reviewURL).href)).ok()).toBe(true);
   await expect(page.locator('#videos video[controls]')).toHaveCount(3);
 });

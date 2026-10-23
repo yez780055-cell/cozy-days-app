@@ -14,19 +14,29 @@ export interface Todo {
   time?: string;
 }
 
+// Never leave dangling references; reuse 生活 or the oldest surviving category.
+async function fallbackCategory(categories: Table<Category,string>, excluding?: string): Promise<string> {
+  const rows=(await categories.orderBy('createdAt').toArray()).filter(row=>row.id!==excluding);
+  const fallback=rows.find(row=>row.key===categoryKey('生活')) ?? rows[0];
+  if(fallback) return fallback.id;
+  const id=excluding===DEFAULT_CATEGORY ? 'life-fallback' : DEFAULT_CATEGORY;
+  await categories.put({id,name:'生活',key:categoryKey('生活'),builtin:false,createdAt:Date.now()});
+  return id;
+}
+
 async function categoryFor(todo: Todo, categories: Table<Category,string>): Promise<string> {
-  if (todo.categoryId) return await categories.get(todo.categoryId) ? todo.categoryId : DEFAULT_CATEGORY;
+  if (todo.categoryId) return await categories.get(todo.categoryId) ? todo.categoryId : fallbackCategory(categories);
   const legacy=(todo as Todo & {category?:unknown}).category;
   if(typeof legacy==='string' && legacy.trim()) {
     const key=categoryKey(legacy), existing=await categories.where('key').equals(key).first();
-    if(key==='全部') return DEFAULT_CATEGORY;
+    if(key==='全部') return fallbackCategory(categories);
     if(existing) return existing.id;
     // Keep old named categories instead of discarding their association.
     const id='legacy-'+encodeURIComponent(key);
     await categories.put({id,name:legacy.trim(),key,builtin:false,createdAt:todo.createdAt});
     return id;
   }
-  return DEFAULT_CATEGORY;
+  return fallbackCategory(categories);
 }
 
 class LocalDatabase extends Dexie {
@@ -58,15 +68,16 @@ export const categoryRepository = {
     const existing=await database.categories.where('key').equals(key).first();
     if(existing && existing.id!==id) throw new CategoryError('已经有这个分类啦，换一个名字吧。');
     const current=id ? await database.categories.get(id) : undefined;
-    if(id && (!current || current.builtin)) throw new CategoryError('默认分类不能修改。');
+    if(id && !current) throw new CategoryError('这个分类已不存在。');
     const row:Category={id:current?.id ?? `category-${Date.now().toString(36)}-${createSeed().toString(36)}`,
       name,key,builtin:false,createdAt:current?.createdAt ?? Date.now()};
     await database.categories.put(row);
   }),
   remove: (id:string) => database.transaction('rw',database.categories,database.todos,async()=>{
     const row=await database.categories.get(id);
-    if(!row || row.builtin) throw new CategoryError('默认分类不能删除。');
-    await database.todos.where('categoryId').equals(id).modify({categoryId:DEFAULT_CATEGORY});
+    if(!row) throw new CategoryError('这个分类已不存在。');
+    const fallback=await fallbackCategory(database.categories,id);
+    await database.todos.where('categoryId').equals(id).modify({categoryId:fallback});
     await database.categories.delete(id);
   }),
 };

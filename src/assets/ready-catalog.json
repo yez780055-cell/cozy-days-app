@@ -260,5 +260,61 @@
     "notes": "从烘焙棋盘底逐项拆分；保留浅色填充与手绘描边；已检查白/深灰/粉底，人物及叶片负空间另行挖空。",
     "sha256": "60ad0c46a2c5afa2c24994e18ee496f27c9c76c66b894916b88cef3174ebba77",
     "use": "独立装饰贴纸"
+  },
+  {
+    "name": "original_plant",
+    "file": "raster/original/plant.png",
+    "source": "01-top-left-plant/edge-asset-needs-review.png",
+    "width": 66,
+    "height": 117,
+    "alpha": "RGBA: true transparency",
+    "status": "ready",
+    "group": "original edge decorations",
+    "notes": "User approved intentional occlusion and stage-2 integration. Visible silhouette retained; only faint alpha dust and localized bubble fringe repaired.",
+    "removed_faint_pixels": 0,
+    "neutralized_rim_pixels": 0,
+    "sha256": "6e2e2cd3b1ed10f1e23d36026973f4d428218dd667b620cdda4d91e7d168b916"
+  },
+  {
+    "name": "original_cheer",
+    "file": "raster/original/cheer.png",
+    "source": "02-top-right-bubble/edge-asset-needs-review.png",
+    "width": 91,
+    "height": 77,
+    "alpha": "RGBA: true transparency",
+    "status": "ready",
+    "group": "original edge decorations",
+    "notes": "User approved intentional occlusion and stage-2 integration. Visible silhouette retained; only faint alpha dust and localized bubble fringe repaired.",
+    "removed_faint_pixels": 0,
+    "neutralized_rim_pixels": 374,
+    "sha256": "a2c3119ddaf09f4936e79a4b5b5db55bf809f9a0d09e06fb8e9483e2e82ba2d0"
+  },
+  {
+    "name": "original_books_bubble",
+    "file": "raster/original/books-bubble.png",
+    "source": "03-bottom-left-books-bubble/edge-asset-needs-review.png",
+    "width": 192,
+    "height": 76,
+    "alpha": "RGBA: true transparency",
+    "status": "ready",
+    "group": "original edge decorations",
+    "notes": "User approved intentional occlusion and stage-2 integration. Visible silhouette retained; only faint alpha dust and localized bubble fringe repaired.",
+    "removed_faint_pixels": 0,
+    "neutralized_rim_pixels": 0,
+    "sha256": "009726937676e55be84b722e089c5c5cb653aaa2f4f258cf65496553d0e14053"
+  },
+  {
+    "name": "original_peeking_cat",
+    "file": "raster/original/peeking-cat.png",
+    "source": "04-bottom-right-cat/edge-asset-needs-review.png",
+    "width": 50,
+    "height": 56,
+    "alpha": "RGBA: true transparency",
+    "status": "ready",
+    "group": "original edge decorations",
+    "notes": "User approved intentional occlusion and stage-2 integration. Visible silhouette retained; only faint alpha dust and localized bubble fringe repaired.",
+    "removed_faint_pixels": 1,
+    "neutralized_rim_pixels": 0,
+    "sha256": "ca8dc6a3f80e92bd8727a10e00437d61083dee6bea49ed6263c5684110d7119c"
   }
 ]

@@ -1,0 +1,63 @@
+{
+  "original_design_sha256": "bf2eb322ccaa2736222770bcfeb4ca1d34da4bb8b2f0aa11d623be729da86b51",
+  "approval": "User approved stage-1 edge layout and explicitly requested stage-2 integration on 2026-10-23.",
+  "hidden_regions_repainted": false,
+  "items": [
+    {
+      "name": "original_plant",
+      "file": "raster/original/plant.png",
+      "source": "01-top-left-plant/edge-asset-needs-review.png",
+      "width": 66,
+      "height": 117,
+      "alpha": "RGBA: true transparency",
+      "status": "ready",
+      "group": "original edge decorations",
+      "notes": "User approved intentional occlusion and stage-2 integration. Visible silhouette retained; only faint alpha dust and localized bubble fringe repaired.",
+      "removed_faint_pixels": 0,
+      "neutralized_rim_pixels": 0,
+      "sha256": "6e2e2cd3b1ed10f1e23d36026973f4d428218dd667b620cdda4d91e7d168b916"
+    },
+    {
+      "name": "original_cheer",
+      "file": "raster/original/cheer.png",
+      "source": "02-top-right-bubble/edge-asset-needs-review.png",
+      "width": 91,
+      "height": 77,
+      "alpha": "RGBA: true transparency",
+      "status": "ready",
+      "group": "original edge decorations",
+      "notes": "User approved intentional occlusion and stage-2 integration. Visible silhouette retained; only faint alpha dust and localized bubble fringe repaired.",
+      "removed_faint_pixels": 0,
+      "neutralized_rim_pixels": 374,
+      "sha256": "a2c3119ddaf09f4936e79a4b5b5db55bf809f9a0d09e06fb8e9483e2e82ba2d0"
+    },
+    {
+      "name": "original_books_bubble",
+      "file": "raster/original/books-bubble.png",
+      "source": "03-bottom-left-books-bubble/edge-asset-needs-review.png",
+      "width": 192,
+      "height": 76,
+      "alpha": "RGBA: true transparency",
+      "status": "ready",
+      "group": "original edge decorations",
+      "notes": "User approved intentional occlusion and stage-2 integration. Visible silhouette retained; only faint alpha dust and localized bubble fringe repaired.",
+      "removed_faint_pixels": 0,
+      "neutralized_rim_pixels": 0,
+      "sha256": "009726937676e55be84b722e089c5c5cb653aaa2f4f258cf65496553d0e14053"
+    },
+    {
+      "name": "original_peeking_cat",
+      "file": "raster/original/peeking-cat.png",
+      "source": "04-bottom-right-cat/edge-asset-needs-review.png",
+      "width": 50,
+      "height": 56,
+      "alpha": "RGBA: true transparency",
+      "status": "ready",
+      "group": "original edge decorations",
+      "notes": "User approved intentional occlusion and stage-2 integration. Visible silhouette retained; only faint alpha dust and localized bubble fringe repaired.",
+      "removed_faint_pixels": 1,
+      "neutralized_rim_pixels": 0,
+      "sha256": "ca8dc6a3f80e92bd8727a10e00437d61083dee6bea49ed6263c5684110d7119c"
+    }
+  ]
+}

@@ -1,0 +1,151 @@
+{
+  "sourceCommit": "04b650d96baa78a178bd4eeac656e097549f255e",
+  "capturedAt": "2026-10-23T06:28:01.313Z",
+  "source": "Real production Vite build; Playwright Chrome; fresh browser contexts with synthetic tasks.",
+  "checks": {
+    "full_e2e": {
+      "passed": 51,
+      "failed": 0
+    },
+    "pages": {
+      "passed": 4,
+      "failed": 0
+    },
+    "production_capture": {
+      "passed": 6,
+      "failed": 0
+    },
+    "build": "passed",
+    "build_pages": "passed"
+  },
+  "visual_review": "All three full viewports, empty, scrolled, multi-undo and simulated safe-area screenshots inspected. No visible rectangular matte, stretched illustration, or blocked FAB.",
+  "intentional_clipped_edges_preserved": true,
+  "original_task_data_or_logic_changed": false,
+  "screenshots": [
+    {
+      "file": "screenshots/illustrations-360x740.png",
+      "size": [
+        360,
+        740
+      ],
+      "sha256": "96f3f83d8013308f6e91361e31a724a58d0f910fe94c3db37bd26076e329e6c5"
+    },
+    {
+      "file": "screenshots/illustrations-393x852.png",
+      "size": [
+        393,
+        852
+      ],
+      "sha256": "6a823c77c4669c4fc6526981f8d4b2ca56c2dd8c118fdbf7a40b63bfd7c757cd"
+    },
+    {
+      "file": "screenshots/illustrations-430x932.png",
+      "size": [
+        430,
+        932
+      ],
+      "sha256": "fbde2017a0a89b9f472ddff6e7c5034e89f002ebb0f4048d3c79389be626f5d8"
+    },
+    {
+      "file": "screenshots/illustrations-empty-360x740.png",
+      "size": [
+        360,
+        740
+      ],
+      "sha256": "5ff9bfb6c033ea6f4f851600b1c73dea6fec4f97df8e0b48c689032c47b19185"
+    },
+    {
+      "file": "screenshots/illustrations-empty-393x852.png",
+      "size": [
+        393,
+        852
+      ],
+      "sha256": "dce3bd94a9e9d402cd485e25408de4dfd911f7e268e412787534df14e0f7d1d5"
+    },
+    {
+      "file": "screenshots/illustrations-empty-430x932.png",
+      "size": [
+        430,
+        932
+      ],
+      "sha256": "4916bb4fa2f64061a17bd00aebe6a7e6d6042fb1e3093f82443e2b2ac613e0b3"
+    },
+    {
+      "file": "screenshots/illustrations-safe-area-360x740.png",
+      "size": [
+        360,
+        740
+      ],
+      "sha256": "d745847b57ac241b707af1df5dbc458ee39bcc065a0a447f4b31689218f299cb"
+    },
+    {
+      "file": "screenshots/illustrations-safe-area-393x852.png",
+      "size": [
+        393,
+        852
+      ],
+      "sha256": "7ca87a7c45a332b024cde9d35dd111f19048cbde59d35a829c22b0491e441e78"
+    },
+    {
+      "file": "screenshots/illustrations-safe-area-430x932.png",
+      "size": [
+        430,
+        932
+      ],
+      "sha256": "733136aab2902a1541612f1fb9ea6d123a581f6afb8944aa6f648b8afb766ac8"
+    },
+    {
+      "file": "screenshots/illustrations-scrolled-360x740.png",
+      "size": [
+        360,
+        740
+      ],
+      "sha256": "d7e1a3f5cf86adc91e45979b4cb81de3e10bef29f83e18f8019aed6a614122fc"
+    },
+    {
+      "file": "screenshots/illustrations-scrolled-393x852.png",
+      "size": [
+        393,
+        852
+      ],
+      "sha256": "a70bd319f436ab4800b56e9f95627271a92ce456d02a97a6383d6efa6d72f4a3"
+    },
+    {
+      "file": "screenshots/illustrations-scrolled-430x932.png",
+      "size": [
+        430,
+        932
+      ],
+      "sha256": "b16de0e9dbeb17f3079f1c14511a8eda6a9643f7b350747252bacf9b38cb7a2f"
+    },
+    {
+      "file": "screenshots/illustrations-undo-360x740.png",
+      "size": [
+        360,
+        740
+      ],
+      "sha256": "526a099e651d58746c6eb782003a2c98187245be428f08f613d037fdac8294fd"
+    },
+    {
+      "file": "screenshots/illustrations-undo-393x852.png",
+      "size": [
+        393,
+        852
+      ],
+      "sha256": "b3d447db0518396509dd862f39d5c5f8f9b6837efa7c6e748a37fc6738a960ec"
+    },
+    {
+      "file": "screenshots/illustrations-undo-430x932.png",
+      "size": [
+        430,
+        932
+      ],
+      "sha256": "515a1559a88fcb6a9005bde86d0279a0b8ae7dd94127b07ed4e86d58584075ef"
+    }
+  ],
+  "limitations": [
+    "Original raster resolution and soft hand-drawn edges retained; not suitable for arbitrary enlargement.",
+    "34px bottom safe area verified by browser CSS simulation, not Android hardware.",
+    "Evidence-only follow-up commit may differ from the runtime source commit above; runtime code is unchanged."
+  ]
+}

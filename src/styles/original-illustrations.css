@@ -1,0 +1,46 @@
+/* Original visible silhouettes, anchored to the existing hero and FAB lane. */
+.original-plant,
+.original-cheer,
+.original-bottom-decor,
+.original-bottom-decor * {
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+.original-plant {
+  position: absolute;
+  z-index: 1;
+  left: 0;
+  bottom: 0;
+  width: auto;
+  height: clamp(32px, calc(100% - 164px), 78px);
+  max-width: 14.04%;
+}
+.original-cheer {
+  position: absolute;
+  z-index: 1;
+  right: 4%;
+  top: 14px;
+  width: 19.36%;
+  max-width: 91px;
+}
+.original-bottom-decor {
+  position: absolute;
+  z-index: 0;
+  left: 0;
+  right: 0;
+  bottom: calc(var(--nav-height) + env(safe-area-inset-bottom));
+  height: 82px;
+  overflow: hidden;
+}
+.original-books,
+.original-peeking-cat { position: absolute; bottom: 0; }
+.original-books { left: 0; width: 40.85%; max-width: 192px; }
+.original-peeking-cat { right: 0; width: 10.64%; max-width: 50px; }
+.phone:has(.original-bottom-decor) .task-list-viewport { isolation: isolate; }
+/* Keep the existing vertical touch lane; leave the cat a separate right edge. */
+.phone:has(.original-bottom-decor) .fab { right: calc(10.64% + 12px); }
+.phone:has(.original-bottom-decor) .undo-stack { right: calc(10.64% + 84px); }
+@media (max-height: 700px) {
+  .original-cheer { top: 6px; width: 16%; }
+}

@@ -6,6 +6,7 @@ import './styles/global.css';
 import './styles/cozy.css';
 import './styles/swipe.css';
 import './styles/round2.css';
+import './styles/original-illustrations.css';
 
 createRoot(document.getElementById('root')!).render(
   <React.StrictMode><App/></React.StrictMode>,

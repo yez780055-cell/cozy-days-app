@@ -9,7 +9,7 @@ void (async () => {
   for (const size of sizes) {
     const screenshot = document.createElement('figure');
     const image = document.createElement('img');
-    image.src = `./evidence/screenshots/${size}.png`;
+    image.src = `./evidence/screenshots/illustrations-${size}.png`;
     image.alt = `${size.replace('x', ' × ')} 实际浏览器截图`;
     screenshot.append(image, Object.assign(document.createElement('figcaption'), {
       textContent: size.replace('x', ' × '),
@@ -38,6 +38,13 @@ void (async () => {
   fetch('./evidence/source.json').then(response=>response.json()).then(source=>{
     document.querySelector('#evidence-source').textContent='Playwright · 源码 '+source.sourceCommit.slice(0,12)+' · '+new Date(source.capturedAt).toLocaleString('zh-CN');
   }).catch(()=>{});
+
+  for (const size of sizes) for (const [state,label] of [['empty','空任务'],['scrolled','多任务滚动'],['undo','三条独立撤销'],['safe-area','34px 模拟安全区']]) {
+    const figure=document.createElement('figure');
+    const img=Object.assign(document.createElement('img'),{src:`./evidence/screenshots/illustrations-${state}-${size}.png`,alt:`原创插画 · ${label} · ${size}`,loading:'lazy'});
+    figure.append(img,Object.assign(document.createElement('figcaption'),{textContent:`${label} · ${size}`}));
+    document.querySelector('#illustration-states').append(figure);
+  }
 
   const read = async (path) => {
     const response = await fetch(path);

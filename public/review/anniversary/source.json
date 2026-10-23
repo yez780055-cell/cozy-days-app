@@ -1,10 +1,10 @@
 {
-  "sourceCommit": "066037bff48c1323e8e91807089efce86544e4aa",
-  "capturedAt": "2026-10-23T09:24:04.0386007Z",
+  "sourceCommit": "d4adc9d1e7f3bd85f402159b857455b7e82f02b3",
+  "capturedAt": "2026-10-23",
   "clock": "2026-10-23T12:00:00+08:00",
-  "tool": "Playwright with system Chrome",
+  "tool": "Playwright Chromium",
   "command": "npx playwright test --config playwright.anniversary.config.ts",
-  "result": "28 passed (13 anniversary + 15 existing todo/category regressions)",
+  "result": "35 passed (anniversary specialist suite; exit 0)",
   "viewports": [
     "360x740",
     "393x852",
@@ -15,9 +15,16 @@
     "Card theme icons use temporary emoji/characters"
   ],
   "notRun": [
-    "Full E2E suite",
-    "Android hardware keyboard and system safe areas",
-    "APK build"
+    "Full integration E2E suite (reserved for M5)",
+    "APK build",
+    "Physical Android device acceptance",
+    "Visual comparison against an approved reference"
   ],
-  "notes": "Only synthetic test data in fresh browser contexts; no runtime changes after sourceCommit"
+  "additionalChecks": {
+    "npm run build": "exit 0",
+    "npm run build:pages": "exit 0",
+    "existingMainRegressionSuite": "17 passed, exit 0",
+    "npm run test:pages": "4 passed, exit 0"
+  },
+  "notes": "Synthetic test data in fresh browser contexts. Screenshots are automated review evidence and do not imply visual approval. See docs/integration/m1.md for scope and limitations."
 }

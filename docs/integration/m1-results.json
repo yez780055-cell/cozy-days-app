@@ -1,0 +1,82 @@
+{
+  "sourceCommit": "d4adc9d1e7f3bd85f402159b857455b7e82f02b3",
+  "node": "22.23.4",
+  "npm": "11.10.1",
+  "commands": [
+    {
+      "command": "npm run build",
+      "exitCode": 0
+    },
+    {
+      "command": "npm run build:pages",
+      "exitCode": 0
+    },
+    {
+      "exitCode": 0,
+      "passed": 35,
+      "command": "npx playwright test --config playwright.anniversary.config.ts"
+    },
+    {
+      "exitCode": 0,
+      "passed": 17,
+      "command": "npx playwright test tests/swipe.spec.ts tests/audit-regressions.spec.ts tests/font-switcher.spec.ts"
+    },
+    {
+      "exitCode": 0,
+      "passed": 4,
+      "command": "npm run test:pages"
+    }
+  ],
+  "logs": [
+    {
+      "file": "final-build.log",
+      "sha256": "69CD85FE38C84BA351C471A3F0A9F6A91AB4FE31A706A4F9A7ACC5A159F8FF38"
+    },
+    {
+      "file": "final-build-pages.log",
+      "sha256": "AA2187C2F801A99E3745073FCB6586C3AE0657ECAB3A2F87E06A1E7196200CD9"
+    },
+    {
+      "file": "final-specialist.log",
+      "sha256": "C0F756739B2DC268350E3BC51416C80BC813E9713DD90DCCF3FAF72D4BA9171A"
+    },
+    {
+      "file": "final-todo-regression.log",
+      "sha256": "3363FF036C8256263B13C8074768364122410EB4A89E707D41FCE7A870023626"
+    },
+    {
+      "file": "final-test-pages.log",
+      "sha256": "031AAD77290581348B9EB0B42404EBDDA47365D27A0BD1C6B9173233F95AFDD5"
+    },
+    {
+      "file": "final-source.txt",
+      "sha256": "B67F466BC8BCAC857F6693C80C8213240AE05CCEDEBDAD8C02D9B91BA2C4D915"
+    },
+    {
+      "file": "diagnostics.txt",
+      "sha256": "DECE95CF1DDC657A3BD5C231F61EAF043859EB831806C91A7C75CF25E82B96CF"
+    },
+    {
+      "file": "storage-before-fix.log",
+      "sha256": "A39B9B9E1040328CA6AE7A7DD7C63CEE3FA745301C8337F2CD10AE88EE3A0989"
+    },
+    {
+      "file": "double-submit-before-fix.log",
+      "sha256": "5CF009CEEE0BF5AF77611B71B573FFDBDE24E99A8A0BFD2DDEFFE4BFCD2F8F88"
+    },
+    {
+      "file": "specialist-after-fix.log",
+      "sha256": "E2B73E12A71F6B7C0DF399E7A289EBC8327C367189EE04B2F846DDEA1DC53FFF"
+    },
+    {
+      "file": "todo-regression.log",
+      "sha256": "D67C55D2D3D13F76F1C260FC406E2341AC22A870B197CFF33D006B69B7F5A943"
+    }
+  ],
+  "limitations": [
+    "Android physical device not accepted",
+    "Visual reference comparison belongs to M3",
+    "Full integration E2E belongs to M5",
+    "Existing npm advisories: one moderate and one high; M5 review pending"
+  ]
+}

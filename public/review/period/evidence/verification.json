@@ -1,0 +1,14 @@
+{
+  "sourceCommit": "b17d259bea1beff47e8e60c50c2d69fd90891f09",
+  "evidenceCommitNote": "The following delivery commit adds only this static review page, verification metadata and Playwright PNG evidence.",
+  "generatedOn": "2026-10-23",
+  "timezone": "Asia/Shanghai",
+  "browser": "Playwright, system Chrome, fresh contexts, synthetic data",
+  "screenshotViewport": "393x852",
+  "layoutViewports": ["360x740", "393x852", "430x932"],
+  "tests": {"command": "PLAYWRIGHT_CHANNEL=chrome npx playwright test --config playwright.period.config.ts", "passed": 19, "failed": 0},
+  "builds": ["npm run build", "npm run build:pages"],
+  "screenshots": ["01-home.png", "02-calendar-selected.png", "03-daily-selected.png", "04-empty.png", "05-cycle-updated.png"],
+  "scope": "period module, separate Dexie storage, public Checkbox/Modal reuse, existing todo navigation assertion updated",
+  "limitations": ["Placeholder cat art", "No Android real-device verification", "No system notifications or cloud sync", "No simultaneous-tab conflict merge", "Predictions are estimates, not contraception or diagnosis"]
+}

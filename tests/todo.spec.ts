@@ -81,7 +81,7 @@ test('空内容不能保存，弹窗焦点与模块入口', async ({page}) => {
   await page.keyboard.press('Escape');
   await expect(page.getByRole('dialog')).not.toBeVisible();
   await page.getByRole('button',{name:'生理期',exact:true}).click();
-  await expect(page.getByRole('heading',{name:'生理期日历'})).toBeVisible();
+  await expect(page.getByRole('region',{name:'生理期日历',exact:true})).toBeVisible();
   await page.getByRole('button',{name:'纪念日',exact:true}).click();
   await expect(page.getByRole('heading',{name:'纪念日'})).toBeVisible();
   await page.getByRole('button',{name:'待办',exact:true}).click();

@@ -1,19 +1,6 @@
-@font-face {
-  font-family: "Yozai";
-  src: url("../assets/fonts/yozai-v0.868/Yozai-Regular.woff2") format("woff2");
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Yozai";
-  src: url("../assets/fonts/yozai-v0.868/Yozai-Medium.woff2") format("woff2");
-  font-style: normal;
-  font-weight: 500;
-  font-display: swap;
-}
 :root {
-  font-family: "Yozai", "Microsoft YaHei", "PingFang SC", "Noto Sans CJK SC", system-ui, sans-serif;
+  --app-font-family: "Yozai", "Microsoft YaHei", "PingFang SC", "Noto Sans CJK SC", system-ui, sans-serif;
+  font-family: var(--app-font-family);
   color: #4b4441;
   background: #eee9e3;
   font-synthesis: none;

@@ -6,7 +6,7 @@
 - Remote checkpoint: `checkpoint/pre-integration-20261023T141904Z` was independently read back at the baseline SHA.
 - Worktree: `D:\cozy-days-integration-20261023T141904Z`; clean at start.
 - Main protection: ruleset `25687265` requires PR and latest `verify`; no bypass. Do not force-push or delete refs. PRs #7/#8/#9/#10 are open; each has `verify` and Cloudflare success (as prevalidated for M0; refresh before any later merge).
-- M0 state: inventory and baseline checks complete. M1 has not started because the primary-session model configuration is not yet verified. This record does not mark the features, assets, copyright, or visual quality as accepted.
+- M0 state: inventory and baseline checks complete. The primary-session model was subsequently verified from its current local `turn_context`: `gpt-6.1-sol`, effort `high`, timestamp `2026-10-23T14:31:54.207Z`. M1 is now in progress. This record does not mark the features, assets, copyright, or visual quality as accepted.
 - M0 checkpoint reference: `checkpoint/m0-baseline-20261023T143021Z`; the coordinator must push and read it back before reporting the checkpoint as available remotely.
 - Asset inventory: manifest available 6/8; needs-redraw 9/11. Refer to `asset-map.md`; paths exist. Copyright/permission status remains under review.
 - Protected original-workspace files were not edited. SHA-256: `D:\daylight-app\README.md` = `6546A211B931E151FC5D1472589B0D4C1B401C6A5EA435D73B0A960C6AAC296D`; `D:\daylight-app\tests\swipe.spec.ts` = `E93D93F71332DD12F00C381B2926F7E3AD50DA563CE5D7F1A50894AD3E9E4145`.
@@ -18,7 +18,7 @@
 | Milestone | Scope | State / entry gate |
 |---|---|---|
 | M0 | Inventory, protection, baseline, task/asset map | Complete; both builds, 59 E2E and 4 Pages tests passed |
-| M1 | Anniversary functionality | Not started; primary-session 6.1 Sol High configuration awaits user verification because tools cannot inspect or change it |
+| M1 | Anniversary functionality | In progress; model configuration verified from current session runtime metadata; integrate #9 by three-way merge |
 | M2 | Period functionality and failed-save behavior | Not started; requires M1 completion |
 | M3 | Anniversary assets and visual comparison | Not started; copyright/asset review required |
 | M4 | Period assets and responsive review | Not started; copyright/asset review required |
@@ -43,5 +43,5 @@
 - Static source review (not a reproduced failure): M2 pending period edits live only in component state/ref and can be lost on page unmount; `PeriodPage.tsx` closes the dialog immediately after update. Add cross-unmount draft recovery and failed-save retry coverage during M2.
 - PR #9/#10 merge-base against the base is `24a413bf914675d3c2f2fdb4e10525febcf87e26`; #9 contributes 23 files and #10 24. Their changed-file inventories do not include `App`, `TodoForm`, todo date code, or main audit/font tests. Three-way integration should retain main fixes when file-level edits are reviewed; never overlay the full tree. See `source-audit.md`.
 - Test-generated modifications were observed after Playwright: 40 files under `public/review/evidence/screenshots/`, `public/review/evidence/videos/`, and `public/review/evidence/source.json`. The coordinator archived and hash-verified all 40, then restored only these generated paths in the isolated integration worktree. The user's original worktree and file hashes remain unchanged.
-- Agent orchestration was performed by the parent. The parent reports successful gpt-6-luna low and gpt-6.1-sol medium read-only agents. The primary session has no tool to change/read its own model or reasoning setting; do not claim a switch to gpt-6.1-sol high. M0 baseline is complete; M1 is gated on the parent resolving its model configuration question.
+- Agent orchestration was performed by the parent. Successful gpt-6-luna low and gpt-6.1-sol medium read-only agents were used. A later inspection of the current primary session's local runtime metadata proved `model=gpt-6.1-sol`, `effort=high` (turn timestamp `2026-10-23T14:31:54.207Z`). No model switch was performed. The earlier inability-to-verify assumption was incorrect; the configuration gate is resolved without further user confirmation.
 - M0 is an inventory/baseline result only. It does not approve source code, feature behavior, asset quality/licensing, or PR merge readiness.

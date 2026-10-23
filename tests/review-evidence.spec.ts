@@ -24,6 +24,7 @@ for (const [width, height] of sizes) {
     const page = await context.newPage();
     const errors: string[] = [];
     page.on('pageerror', error => errors.push(error.message));
+    await page.clock.install();
     await page.goto('/');
     await page.getByRole('button', { name: '新增待办', exact: true }).click();
     await page.getByRole('textbox', { name: '想做些什么？' }).fill(`验收演示：${width} × ${height} 的小计划`);
@@ -52,8 +53,11 @@ for (const [width, height] of sizes) {
     const completedCard=page.getByRole('button',{name:'编辑：准备明天的工作报告',exact:true});
     await expect(completedCard).toHaveCSS('text-decoration-line','none');
     await page.screenshot({path:resolve(screenshotDir,'completed-'+width+'x'+height+'.png')});
+    // Keep the real five-second product window intact while CI captures the multi-toast evidence.
+    await page.clock.runFor(5_300);
+    await expect(page.locator('.undo-toast')).toHaveCount(0);
+    await page.clock.pauseAt(await page.evaluate(() => Date.now() + 1_000));
     await taskAction(page,'准备明天的工作报告','restore');
-    await taskAction(page,'准备明天的工作报告','delete');
     await taskAction(page,'午后读几页喜欢的书','complete');
     await taskAction(page,'晚上散步十分钟','delete');
     await expect(page.locator('.undo-toast')).toHaveCount(3);

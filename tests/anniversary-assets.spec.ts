@@ -72,14 +72,22 @@ for (const viewport of viewports) {
     const tapeBox = await card.locator('.ann-card-tape').boundingBox();
     const countBox = await card.locator('.ann-count').boundingBox();
     const flowerBox = await card.locator('.ann-card-flower').boundingBox();
-    const controls = await card.locator('.ann-card-bottom button').evaluateAll(buttons => buttons.map(button => { const r = button.getBoundingClientRect(); return { x:r.x, y:r.y, right:r.right, bottom:r.bottom }; }));
-    const overlaps = (a: {x:number;y:number;width:number;height:number}, b: {x:number;y:number;right:number;bottom:number}) => a.x < b.right && a.x+a.width > b.x && a.y < b.bottom && a.y+a.height > b.y;
+    const controls = await card.locator('.ann-card-bottom button').evaluateAll(buttons => buttons.map(button => { const r = button.getBoundingClientRect(); return { x:r.x, y:r.y, width:r.width, height:r.height }; }));
+    const overlaps = (a: {x:number;y:number;width:number;height:number}, b: {x:number;y:number;width:number;height:number}) => a.x < b.x+b.width && a.x+a.width > b.x && a.y < b.y+b.height && a.y+a.height > b.y;
     expect(overlaps(tapeBox!, countBox!)).toBe(false);
     expect(controls.every(control => !overlaps(flowerBox!, control))).toBe(true);
     const viewportSize = page.viewportSize()!;
     expect(cardBox!.y).toBeGreaterThanOrEqual(0);
     expect(cardBox!.y + cardBox!.height).toBeLessThanOrEqual(viewportSize.height);
     await page.screenshot({ path:`artifacts/integration/m3/card-${viewport.width}.png` });
+    await card.getByRole('button', { name:/编辑：/ }).click();
+    const editor = page.getByRole('dialog', { name:'编辑纪念日', exact:true });
+    await expect(editor).toBeVisible();
+    await editor.getByRole('button', { name:'关闭弹窗' }).click();
+    await card.getByRole('button', { name:/删除：/ }).click();
+    const confirm = page.getByRole('dialog', { name:'删除纪念日', exact:true });
+    await expect(confirm).toContainText('确定删除');
+    await confirm.getByRole('button', { name:'再想想' }).click();
   });
 }
 

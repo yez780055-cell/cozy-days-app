@@ -1,4 +1,5 @@
 import Dexie, { type Table } from 'dexie';
+import { validDate, themes, colors, type Anniversary } from '../features/anniversary/model';
 import { createSeed, decorationIdentity, resolveDecoration, reviseDecoration, type TaskDecoration } from '../features/todo/decorations';
 import { CategoryError, DEFAULT_CATEGORY, canonicalTime, categoryKey, cleanCategoryName, defaultCategories, type Category } from './categories';
 
@@ -40,6 +41,7 @@ async function categoryFor(todo: Todo, categories: Table<Category,string>): Prom
 }
 
 class LocalDatabase extends Dexie {
+  anniversaries!: Table<Anniversary, number>;
   todos!: Table<Todo, number>;
   categories!: Table<Category,string>;
   constructor() {
@@ -55,10 +57,26 @@ class LocalDatabase extends Dexie {
       const todos=transaction.table<Todo,number>('todos');
       for(const todo of await todos.toArray()) await todos.update(todo.id!,{categoryId:await categoryFor(todo,categories)});
     });
+    this.version(4).stores({ anniversaries: '++id,date,createdAt' });
     this.on('populate',transaction=>transaction.table('categories').bulkPut(defaultCategories));
   }
 }
 const database = new LocalDatabase();
+
+export const anniversaryRepository = {
+  all: () => database.anniversaries.orderBy('createdAt').toArray(),
+  save: (value: Anniversary) => database.transaction('rw', database.anniversaries, async () => {
+    const name = value.name.trim();
+    if (!name || name.length > 60 || !validDate(value.date) || !themes.includes(value.theme) || !colors.includes(value.color)) {
+      throw new Error('请填写名称和有效日期。');
+    }
+    const current = value.id === undefined ? undefined : await database.anniversaries.get(value.id);
+    if (value.id !== undefined && !current) throw new Error('这条纪念日已不存在，请重新打开页面。');
+    return database.anniversaries.put({ ...value, name, note: value.note.trim().slice(0, 500),
+      icon: value.icon.slice(0, 16), createdAt: current?.createdAt ?? Date.now(), updatedAt: Date.now() });
+  }),
+  remove: (id: number) => database.anniversaries.delete(id),
+};
 
 // Keep storage details behind repositories; no view directly reads IndexedDB.
 export const categoryRepository = {

@@ -47,6 +47,12 @@ for (const [width, height] of sizes) {
     await page.getByRole('textbox', { name: '想做些什么？' }).fill(`验收演示：${width} × ${height} · 已编辑`);
     await page.getByRole('button', { name: '保存', exact: true }).click();
     await expect(page.getByRole('button', { name: '编辑：验收演示：' + `${width} × ${height} · 已编辑`, exact: true })).toBeVisible();
+    await taskAction(page,'准备明天的工作报告','complete');
+    await page.getByRole('button',{name:'已完成 1',exact:true}).click();
+    const completedCard=page.getByRole('button',{name:'编辑：准备明天的工作报告',exact:true});
+    await expect(completedCard).toHaveCSS('text-decoration-line','none');
+    await page.screenshot({path:resolve(screenshotDir,'completed-'+width+'x'+height+'.png')});
+    await taskAction(page,'准备明天的工作报告','restore');
     await taskAction(page,'准备明天的工作报告','delete');
     await taskAction(page,'午后读几页喜欢的书','complete');
     await taskAction(page,'晚上散步十分钟','delete');
@@ -58,5 +64,12 @@ for (const [width, height] of sizes) {
     const video = page.video();
     await context.close();
     if (video) await video.saveAs(resolve(videoDir, `${width}x${height}.webm`));
+    const emptyContext=await browser.newContext({viewport:{width,height},deviceScaleFactor:1});
+    const emptyPage=await emptyContext.newPage();await emptyPage.goto('/');
+    await expect(emptyPage.locator('.empty-art')).toBeVisible();
+    await expect(emptyPage.locator('.empty-state').getByRole('button',{name:'新增待办',exact:true})).toHaveCount(0);
+    await expect(emptyPage.locator('.fab')).toBeVisible();
+    await emptyPage.screenshot({path:resolve(screenshotDir,'empty-'+width+'x'+height+'.png')});
+    await emptyContext.close();
   });
 }

@@ -76,8 +76,8 @@ test('Pages static review route serves evidence, video controls, and build metad
     expect(asset.headers()['content-type'], path).toMatch(type);
   }
   await expect(page.locator('#screens img')).toHaveCount(3);
-  await expect(page.locator('#controls img')).toHaveCount(12);
+  await expect(page.locator('#controls img')).toHaveCount(18);
   const source=await request.get(new URL('evidence/source.json',reviewURL).href);expect(source.ok()).toBe(true);expect((await source.json()).sourceCommit).toMatch(/^[a-f0-9]{40}$/);
-  for(const size of ['360x740','393x852','430x932'])for(const type of ['date','category','time','undo'])expect((await request.get(new URL('evidence/screenshots/'+type+'-'+size+'.png',reviewURL).href)).ok()).toBe(true);
+  for(const size of ['360x740','393x852','430x932'])for(const type of ['date','category','time','undo','completed','empty'])expect((await request.get(new URL('evidence/screenshots/'+type+'-'+size+'.png',reviewURL).href)).ok()).toBe(true);
   await expect(page.locator('#videos video[controls]')).toHaveCount(3);
 });

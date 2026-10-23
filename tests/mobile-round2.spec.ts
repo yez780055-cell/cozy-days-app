@@ -81,3 +81,20 @@ test('已保存的分类列表不会被新预设覆盖或补回',async({page})=>
   await page.goto('/');await expect(page.getByRole('button',{name:'分类：我的日常',exact:true})).toBeVisible();for(const name of ['工作','生活','学习','购物'])await expect(page.getByRole('button',{name:`分类：${name}`,exact:true})).toHaveCount(0);
   await add(page,'使用自己的分类');expect((await rows(page))[0].categoryId).toBe('mine');await page.reload();await expect(page.getByRole('button',{name:'分类：我的日常',exact:true})).toBeVisible();
 });
+
+
+for(const [width,height] of [[360,740],[393,852],[430,932]])test('空状态、完成文字及多条撤销不遮挡 '+width+'x'+height,async({page})=>{
+  await page.setViewportSize({width,height});await page.goto('/');
+  await expect(page.locator('.empty-art')).toBeVisible();await expect(page.locator('.empty-state').getByRole('button',{name:'新增待办',exact:true})).toHaveCount(0);
+  await expect(page.locator('.fab')).toBeVisible();
+  for(const text of ['一号任务','二号任务','三号任务'])await add(page,text);
+  await taskAction(page,'一号任务','complete');await page.getByRole('button',{name:'已完成 1',exact:true}).click();
+  const done=page.getByRole('button',{name:'编辑：一号任务',exact:true});await expect(done).toHaveCSS('text-decoration-line','none');
+  await taskAction(page,'二号任务','delete');await taskAction(page,'三号任务','delete');await expect(page.locator('.undo-toast')).toHaveCount(2);
+  const fab=await page.locator('.fab').boundingBox();expect(fab).not.toBeNull();
+  for(const item of await page.locator('.undo-toast').all()){
+    const rect=await item.boundingBox();expect(rect).not.toBeNull();expect(rect!.x+rect!.width).toBeLessThanOrEqual(fab!.x-4);
+    const button=await item.getByRole('button',{name:'撤销'}).boundingBox();expect(button!.x+button!.width).toBeLessThanOrEqual(fab!.x-4);
+  }
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBe(width);
+});

@@ -29,7 +29,7 @@ void (async () => {
     videos.append(recording);
   }
 
-  for(const size of sizes) for(const [type,label] of [['date','日期'],['category','分类'],['time','时间'],['undo','独立撤销']]) {
+  for(const size of sizes) for(const [type,label] of [['date','日期'],['category','分类'],['time','时间'],['undo','独立撤销'],['completed','已完成'],['empty','空状态']]) {
     const figure=document.createElement('figure');
     const img=Object.assign(document.createElement('img'),{src:'./evidence/screenshots/'+type+'-'+size+'.png',alt:label+'面板 '+size,loading:'lazy'});
     figure.append(img,Object.assign(document.createElement('figcaption'),{textContent:label+' · '+size}));

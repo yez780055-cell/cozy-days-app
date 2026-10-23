@@ -99,7 +99,11 @@
 .paper-select:focus-visible,.favorite-star:focus-visible,.paper-panel button:focus-visible { outline: 2px solid #ab81a3; outline-offset: 2px; }
 .task-top-fade { position: absolute; z-index: 2; top: 0; left: 0; right: 0; height: 22px; background: linear-gradient(to bottom,#fff7e9,#fff7e900); pointer-events: none; opacity: 0; transition: opacity 180ms ease; }
 .is-scrolled .task-top-fade { opacity: 1; }
-.undo-stack { position: absolute; z-index: 7; left: 12px; right: 78px; bottom: calc(var(--nav-height) + 12px + env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 5px; max-height: min(32%,220px); overflow-y: auto; overscroll-behavior: contain; pointer-events: none; scrollbar-width: thin; }
+.undo-stack { position: absolute; z-index: 1; left: 12px; right: 91px; bottom: calc(var(--nav-height) + 12px + env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 5px; max-height: min(32%,220px); overflow-y: auto; overscroll-behavior: contain; pointer-events: none; scrollbar-width: thin; }
+.undo-stack:before { content:""; position:absolute; inset:0; pointer-events:none; }
+.undo-stack .undo-toast { touch-action:pan-y; }
+@media(max-width:375px) { .undo-stack { left:10px; right:91px; max-height:min(30%,205px); } }
+@media(max-height:760px) { .undo-stack { max-height:min(29%,205px); } }
 .undo-stack:empty { display: none; }
 .undo-stack .undo-toast { position: relative; left: auto; right: auto; bottom: auto; flex: none; min-height: 49px; padding: 0 10px 3px; gap: 5px; font-size: 11px; pointer-events: auto; box-shadow: 0 2px 6px #735c4015; }
 .undo-toast > span { min-width: 0; }

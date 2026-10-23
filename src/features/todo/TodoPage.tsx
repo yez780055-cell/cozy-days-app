@@ -132,7 +132,7 @@ export function TodoView({ store, initialDialog }: { store: TodoStore; initialDi
         <div className="list-heading"><h2><Asset name="tape"/>{view === 'all' ? '每一件小事' : date === todayKey() ? '今天的小计划' : '这天的小计划'}</h2><span>{pending.length ? `${pending.length} 件待办` : '慢慢来，也很好'}</span></div>
         {pending.length > 0 ? <div className="task-list">{pending.map(todo => <TodoCard key={todo.id} todo={todo} showDate={view === 'all'} onToggle={toggle} onEdit={openEdit} onDelete={remove}/>)}</div>
           : <div className="empty-state"><div className="empty-art"><Asset name="flower" className="empty-flower"/><Asset name="empty"/><Asset name="star" className="empty-star"/></div><h2>{completed.length ? '太棒了，都完成啦！' : view === 'all' ? '还没有未完成的待办' : '今天，轻轻开始'}</h2>
-            <p>{completed.length ? '去做点喜欢的事吧，休息也很重要。' : '把心里的小计划，放到这里吧。'}</p><Button variant="ghost" onClick={() => { setEditing(null); setDialog('add'); }}><Plus size={16}/>添加一件小事</Button></div>}
+            <p>{completed.length ? '去做点喜欢的事吧，休息也很重要。' : '把心里的小计划，放到这里吧。'}</p></div>}
         {completed.length > 0 && <div className="completed-section"><button className="completed-heading" aria-expanded={completedOpen} onClick={() => setCompletedOpen(!completedOpen)}>
           <ChevronDown size={16} className={completedOpen ? '' : 'is-collapsed'}/><span>已完成</span><span className="completed-count">{completed.length}</span>
         </button>{completedOpen && completed.map(todo => <TodoCard key={todo.id} todo={todo} showDate={view === 'all'} onToggle={toggle} onEdit={openEdit} onDelete={remove}/>)}</div>}
@@ -144,7 +144,7 @@ export function TodoView({ store, initialDialog }: { store: TodoStore; initialDi
     <div className="task-bottom-fade" aria-hidden="true"/>
     </div>
     <button className="fab" aria-label="新增待办" onClick={() => { setEditing(null); setDialog('add'); }}><Plus size={32} strokeWidth={1.8}/></button>
-    <div className="undo-stack" aria-label="操作撤销">{undos.map(record=><UndoToast key={record.token} label={record.label} task={record.snapshot.text} expiresAt={record.expiresAt} onUndo={()=>void undoOperation(record.token)} onExpire={()=>expire(record.token)}/>)}</div>
+    <div className="undo-stack" aria-label="操作撤销" data-count={undos.length}>{undos.map(record=><UndoToast key={record.token} label={record.label} task={record.snapshot.text} expiresAt={record.expiresAt} onUndo={()=>void undoOperation(record.token)} onExpire={()=>expire(record.token)}/>)}</div>
     {(dialog === 'add' || dialog === 'edit') && <TodoForm todo={dialog === 'edit' ? editing : null} date={date} categories={store.categories} defaultCategoryId={categoryId==='all'?DEFAULT_CATEGORY:categoryId} onSave={store.save} onClose={() => setDialog(null)}/>}
     {dialog==='categories'&&<CategoryManager categories={store.categories} onSave={store.saveCategory} onRemove={store.removeCategory} onClose={()=>setDialog(null)}/>}
     {dialog === 'calendar' && <CalendarPicker value={date} onSelect={selectDate} onClose={() => setDialog(null)}/>}

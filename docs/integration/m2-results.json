@@ -1,0 +1,210 @@
+{
+  "milestone": "M2",
+  "status": "functional_pass_checkpoint_pending_coordinator_push_readback",
+  "sourceSha": "88fa1b7f313410cb16fcf124015452314889ea44",
+  "baseSha": "74bf1c62fc885d7ec8c8155773420128e06a8329",
+  "sourceWorktree": "D:\\cozy-days-m2-period-20261023T150338Z",
+  "artifactDirectory": "D:\\cozy-days-m2-period-20261023T150338Z\\artifacts\\integration\\m2\\88fa1b7f313410cb16fcf124015452314889ea44",
+  "node": "v22.23.4",
+  "createdUtc": "2026-10-23T23:33:09.5732238Z",
+  "checks": [
+    {
+      "command": "npm ci",
+      "exitCode": 0,
+      "passed": null,
+      "log": "npm-ci.log",
+      "logPath": "D:\\cozy-days-m2-period-20261023T150338Z\\artifacts\\integration\\m2\\npm-ci.log",
+      "logSha256": "5B616D2913A5E5AC76DE42221101B1229E3F231555D9F5ED35EB885A0CA75C02"
+    },
+    {
+      "command": "npx playwright test --config playwright.period.config.ts",
+      "exitCode": 0,
+      "passed": 45,
+      "log": "period.log",
+      "logPath": "D:\\cozy-days-m2-period-20261023T150338Z\\artifacts\\integration\\m2\\88fa1b7f313410cb16fcf124015452314889ea44\\period.log",
+      "logSha256": "531B9E81A901D6D00DCA75D633F21A74F04405D748BFF0D420DE9729B6804277"
+    },
+    {
+      "command": "npx playwright test --config playwright.anniversary.config.ts",
+      "exitCode": 0,
+      "passed": 35,
+      "log": "anniversary.log",
+      "logPath": "D:\\cozy-days-m2-period-20261023T150338Z\\artifacts\\integration\\m2\\88fa1b7f313410cb16fcf124015452314889ea44\\anniversary.log",
+      "logSha256": "47657893820A0D07F4703434B0715036E55088141E788CD0F3E76A9873769AE6"
+    },
+    {
+      "command": "npx playwright test tests/swipe.spec.ts tests/audit-regressions.spec.ts tests/font-switcher.spec.ts",
+      "exitCode": 0,
+      "passed": 17,
+      "log": "regressions.log",
+      "logPath": "D:\\cozy-days-m2-period-20261023T150338Z\\artifacts\\integration\\m2\\88fa1b7f313410cb16fcf124015452314889ea44\\regressions.log",
+      "logSha256": "2CB830E187952E214DC1BABC385F38128633B2366794DF9DC2ED994B05D19F5F"
+    },
+    {
+      "command": "npm run build",
+      "exitCode": 0,
+      "passed": null,
+      "log": "build.log",
+      "logPath": "D:\\cozy-days-m2-period-20261023T150338Z\\artifacts\\integration\\m2\\88fa1b7f313410cb16fcf124015452314889ea44\\build.log",
+      "logSha256": "0318A2FB34B2B80380B876513C9E80EA9C99833BB0C56ECCD29340E23732FC03"
+    },
+    {
+      "command": "npm run build:pages",
+      "exitCode": 0,
+      "passed": null,
+      "log": "build-pages.log",
+      "logPath": "D:\\cozy-days-m2-period-20261023T150338Z\\artifacts\\integration\\m2\\88fa1b7f313410cb16fcf124015452314889ea44\\build-pages.log",
+      "logSha256": "EBCF1FE3192446159F48570F36D4EE6205F70B58D8EDF58E3E5F0E00D9C3E3E0"
+    },
+    {
+      "command": "npm run test:pages",
+      "exitCode": 0,
+      "passed": 4,
+      "log": "pages.log",
+      "logPath": "D:\\cozy-days-m2-period-20261023T150338Z\\artifacts\\integration\\m2\\88fa1b7f313410cb16fcf124015452314889ea44\\pages.log",
+      "logSha256": "CF3B60A1F5E62195C000C809FBF15AAEE4FF286A00ACBCB07DB09ADA527BCF73"
+    },
+    {
+      "command": "npx playwright test --config artifacts/integration/m2/88fa1b7f313410cb16fcf124015452314889ea44/evidence.config.mjs --output artifacts/integration/m2/88fa1b7f313410cb16fcf124015452314889ea44/evidence-test-results",
+      "exitCode": 0,
+      "passed": 1,
+      "log": "recovery-evidence.log",
+      "logPath": "D:\\cozy-days-m2-period-20261023T150338Z\\artifacts\\integration\\m2\\88fa1b7f313410cb16fcf124015452314889ea44\\recovery-evidence.log",
+      "logSha256": "AAEF2ACB10D608432053859A88F7281F1D5C92D2502FE33DA8206987A9791E22"
+    }
+  ],
+  "earlyFailedAttempts": [
+    {
+      "file": "before-failure.log",
+      "sha256": "4EF11A9FE12B2AD6672E12B351B65BBF09CDC5F36B23892A4FA54E40C7D63903"
+    },
+    {
+      "file": "before-cas-sparse.log",
+      "sha256": "E3A8682A91753A28D8540A2201B5ECACB210C6D06B5A11D2778C7F127245AC0F"
+    },
+    {
+      "file": "before-restore-window.log",
+      "sha256": "8BE6FAB7C8E0282E8A2D53FE6ECC382A72AE7F5D25AFF115ADDF67BCFB1ACEE0"
+    },
+    {
+      "file": "before-multitab-backup.log",
+      "sha256": "13CA5EAADD8FA71E87B5D05AD88225B395680C4B49852F35A18F0CFE578E952B"
+    }
+  ],
+  "failureEvidence": [
+    {
+      "failed": 2,
+      "baseSha": "74bf1c62fc885d7ec8c8155773420128e06a8329",
+      "reason": null,
+      "log": "D:\\cozy-days-m2-period-20261023T150338Z\\artifacts\\integration\\m2\\88fa1b7f313410cb16fcf124015452314889ea44\\..\\before-failure.log",
+      "logSha256": "4EF11A9FE12B2AD6672E12B351B65BBF09CDC5F36B23892A4FA54E40C7D63903"
+    },
+    {
+      "failed": 2,
+      "baseSha": "7fc37e8300ef8cf9998e3153c2a2fdc36579ba59",
+      "reason": null,
+      "log": "D:\\cozy-days-m2-period-20261023T150338Z\\artifacts\\integration\\m2\\88fa1b7f313410cb16fcf124015452314889ea44\\..\\before-cas-sparse.log",
+      "logSha256": "E3A8682A91753A28D8540A2201B5ECACB210C6D06B5A11D2778C7F127245AC0F"
+    },
+    {
+      "failed": 2,
+      "baseSha": "ef4b860fdf84df0a2bba601fffe6d7d0f2f653f2",
+      "reason": null,
+      "log": "D:\\cozy-days-m2-period-20261023T150338Z\\artifacts\\integration\\m2\\88fa1b7f313410cb16fcf124015452314889ea44\\..\\before-restore-window.log",
+      "logSha256": "8BE6FAB7C8E0282E8A2D53FE6ECC382A72AE7F5D25AFF115ADDF67BCFB1ACEE0"
+    },
+    {
+      "failed": 1,
+      "baseSha": "8b5d31843f7ed4cba5ec7c93062c3f6867a92e3f",
+      "reason": null,
+      "log": "D:\\cozy-days-m2-period-20261023T150338Z\\artifacts\\integration\\m2\\88fa1b7f313410cb16fcf124015452314889ea44\\..\\before-multitab-backup.log",
+      "logSha256": "13CA5EAADD8FA71E87B5D05AD88225B395680C4B49852F35A18F0CFE578E952B"
+    },
+    {
+      "failed": 2,
+      "baseSha": "7fc37e8300ef8cf9998e3153c2a2fdc36579ba59",
+      "reason": "Frozen font navigation assertions expected accessible heading 生理期日历; fixed actual period h1 aria-label without modifying old tests",
+      "log": "D:\\cozy-days-m2-period-20261023T150338Z\\artifacts\\integration\\m2\\88fa1b7f313410cb16fcf124015452314889ea44\\..\\7fc37e8300ef8cf9998e3153c2a2fdc36579ba59\\regressions.log",
+      "logSha256": "09756370BD8255495B1157862F14B365E5F6192122BC149D4B89B60A0C7D5375"
+    }
+  ],
+  "screenshots": [
+    {
+      "file": "01-home.png",
+      "sha256": "0353A5DE0F3E63AD3B92C2AC3F19DB6F20EA59967ADF2A0750FBD1457CF5A98C",
+      "source": "D:\\cozy-days-m2-period-20261023T150338Z\\artifacts\\integration\\m2\\88fa1b7f313410cb16fcf124015452314889ea44\\screenshots\\01-home.png",
+      "copiedHashVerified": true
+    },
+    {
+      "file": "02-calendar-selected.png",
+      "sha256": "C6BBF20F7C881668868D0C1E6C5B715C7F9C520CAF6C89024458EB99E457086E",
+      "source": "D:\\cozy-days-m2-period-20261023T150338Z\\artifacts\\integration\\m2\\88fa1b7f313410cb16fcf124015452314889ea44\\screenshots\\02-calendar-selected.png",
+      "copiedHashVerified": true
+    },
+    {
+      "file": "03-daily-selected.png",
+      "sha256": "0893D60CE305F76474C9BC38ECB178158670E0A9EFD942410F5B4F879E102267",
+      "source": "D:\\cozy-days-m2-period-20261023T150338Z\\artifacts\\integration\\m2\\88fa1b7f313410cb16fcf124015452314889ea44\\screenshots\\03-daily-selected.png",
+      "copiedHashVerified": true
+    },
+    {
+      "file": "04-empty.png",
+      "sha256": "D305939D5CA485B5C554FE2F60233E49561B601796E4AA9B5F44D79BEC417408",
+      "source": "D:\\cozy-days-m2-period-20261023T150338Z\\artifacts\\integration\\m2\\88fa1b7f313410cb16fcf124015452314889ea44\\screenshots\\04-empty.png",
+      "copiedHashVerified": true
+    },
+    {
+      "file": "05-cycle-updated.png",
+      "sha256": "9BF947FDAE1C57A24705EBBAA011D2C02589809DB0C87702A8653668DD414447",
+      "source": "D:\\cozy-days-m2-period-20261023T150338Z\\artifacts\\integration\\m2\\88fa1b7f313410cb16fcf124015452314889ea44\\screenshots\\05-cycle-updated.png",
+      "copiedHashVerified": true
+    },
+    {
+      "file": "period-360x480-editor.png",
+      "sha256": "4A18F76713C6BF651853107414EDBC47E85CFBA9CE1E59A54B78A48DC2301D12",
+      "source": "D:\\cozy-days-m2-period-20261023T150338Z\\artifacts\\integration\\m2\\88fa1b7f313410cb16fcf124015452314889ea44\\screenshots\\period-360x480-editor.png",
+      "copiedHashVerified": true
+    },
+    {
+      "file": "period-360x480-settings.png",
+      "sha256": "3D010D94A792C8126F6F872AA539FB5149F9C0C20CAA37A06535A1744811F77C",
+      "source": "D:\\cozy-days-m2-period-20261023T150338Z\\artifacts\\integration\\m2\\88fa1b7f313410cb16fcf124015452314889ea44\\screenshots\\period-360x480-settings.png",
+      "copiedHashVerified": true
+    },
+    {
+      "file": "recovery-save-failure.png",
+      "sha256": "438D722F1D24A0D50736778BF33AC8026777E8841BDAB7D51EAE0B9EF8214477",
+      "source": "D:\\cozy-days-m2-period-20261023T150338Z\\artifacts\\integration\\m2\\88fa1b7f313410cb16fcf124015452314889ea44\\screenshots\\recovery-save-failure.png",
+      "copiedHashVerified": true
+    },
+    {
+      "file": "recovery-closed-tab-backup.png",
+      "sha256": "8063ABEAC1AB58C6BB1A6251DC85CEC68BE4881D3C3A51C97D4D81F6E8132117",
+      "source": "D:\\cozy-days-m2-period-20261023T150338Z\\artifacts\\integration\\m2\\88fa1b7f313410cb16fcf124015452314889ea44\\screenshots\\recovery-closed-tab-backup.png",
+      "copiedHashVerified": true
+    },
+    {
+      "file": "recovery-explicit-confirmation.png",
+      "sha256": "57CD235F261BB1C8CDC7FD4FB3735AE9E3962B421157BFCECB77EA346233EE66",
+      "source": "D:\\cozy-days-m2-period-20261023T150338Z\\artifacts\\integration\\m2\\88fa1b7f313410cb16fcf124015452314889ea44\\screenshots\\recovery-explicit-confirmation.png",
+      "copiedHashVerified": true
+    },
+    {
+      "file": "recovery-restored-persisted.png",
+      "sha256": "CF998436664C559E21E98A9270917C329604E404F8B19B4554CB32C912905173",
+      "source": "D:\\cozy-days-m2-period-20261023T150338Z\\artifacts\\integration\\m2\\88fa1b7f313410cb16fcf124015452314889ea44\\screenshots\\recovery-restored-persisted.png",
+      "copiedHashVerified": true
+    }
+  ],
+  "excludedScreenshots": [
+    "editor-393.png",
+    "month-393.png"
+  ],
+  "limits": [
+    "No Android device acceptance performed",
+    "No design reference or M3/M4 visual asset acceptance claimed",
+    "Historical recovery slots are retained; storage exhaustion is explicitly reported with session or memory fallback, and replacement requires reliable local backup",
+    "No remote push, tags, main modifications, or controller docs changes"
+  ],
+  "remotePushOrMainWrite": false
+}

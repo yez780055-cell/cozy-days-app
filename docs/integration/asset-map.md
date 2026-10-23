@@ -2,8 +2,8 @@
 
 This is an inventory for integration planning, not a quality, licensing, or copyright approval. Existing source manifests and files remain authoritative; re-check actual paths and provenance before each visual integration milestone.
 
-- Manifest availability reported at M0: 6 of 8 available.
-- Needs-redraw entries reported at M0: 9 of 11.
+- Anniversary manifest availability: 6 assets available; 9 missing.
+- Period manifest availability: 8 assets available; 11 missing, including 3 icons.
 - Asset file paths exist in this worktree. Presence alone does not establish source rights, suitability, transparency quality, or visual acceptance. Copyright/permission is still under review.
 - Existing `src/assets/manifest.ts` maps the registered assets used by the app. `src/assets/ready-catalog.json` provides dimensions, alpha metadata, source names and hashes for catalogued assets.
 

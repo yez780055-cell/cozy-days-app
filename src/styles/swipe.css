@@ -13,9 +13,6 @@
 .card-menu-copy { font-size: 12px; line-height: 1.8; color: #947861; margin: 0 0 15px; }
 .card-menu-actions { display: grid; gap: 10px; }
 .card-menu-actions .button { width: 100%; }
-.favorite-control { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; margin: -8px 0 15px; padding: 6px 12px; font-size: 12px; color: #927057; border: 1px dashed #dfcab2; border-radius: 12px; background: #fff9ef; }
-.favorite-control .asset { width: 23px; height: 23px; }
-.favorite-control[aria-pressed="true"] { border-style: solid; border-color: #e8c692; background: #fff0d2; }
 .undo-toast { position: absolute; left: 16px; right: 16px; bottom: calc(var(--nav-height) + 15px + env(safe-area-inset-bottom)); z-index: 7; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 4px 15px 8px; min-height: 58px; background: #fff5df; background-image: var(--paper-texture); background-size: 320px 320px; border: 1px solid #e4cdb2; border-radius: 17px 15px 16px 18px; color: #7c5e49; box-shadow: 0 5px 18px #735c4020; font-size: 12px; overflow: hidden; animation: toast-enter 300ms ease-out; }
 .undo-toast button { border: 0; background: transparent; min-height: 44px; min-width: 44px; padding: 8px 0; color: #bd6683; font-weight: 600; }
 .undo-toast--leaving { animation: toast-exit 300ms ease-out forwards; pointer-events: none; }

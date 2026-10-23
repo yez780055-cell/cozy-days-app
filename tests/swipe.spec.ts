@@ -24,7 +24,7 @@ async function rows(page:Page) {
     };
   }));
 }
-async function undo(page:Page) { await page.getByRole('button',{name:'撤销',exact:true}).click();await expect(page.locator('.undo-toast')).toHaveCount(0); }
+async function undo(page:Page) { const count=await page.locator('.undo-toast').count();await page.getByRole('button',{name:'撤销',exact:true}).last().click();await expect(page.locator('.undo-toast')).toHaveCount(count-1); }
 
 for(const [width,height] of [[360,740],[393,852],[430,932]]) {
   test(`滑动阈值、跟手与删除/完成/恢复撤销 ${width}x${height}`,async({page})=>{
@@ -70,7 +70,7 @@ for(const [width,height] of [[360,740],[393,852],[430,932]]) {
     await expect(first).toHaveClass(/task-card--done/);
     await drag(page,first,w*.62);
     await expect(page.getByRole('button',{name:'已完成 1',exact:true})).toHaveCount(0);
-    await expect(page.locator('.undo-toast')).toContainText('又放回小计划啦');
+    await expect(page.locator('.undo-toast').last()).toContainText('又放回小计划啦');
     expect((await rows(page))[0].completed).toBe(false);
     await undo(page);
     await expect(page.getByRole('button',{name:'已完成 1',exact:true})).toBeVisible();
@@ -125,11 +125,11 @@ test('完整快照撤销保留 ID/分类/日期/时间/收藏/贴纸与原始排
   expect((await rows(page))[0].favorite).toBe(false);
 });
 
-test('快速连续操作只撤销最新任务，同一任务删除后撤销不重复创建',async({page})=>{
+test('快速连续操作支持独立撤销，同一任务删除后撤销不重复创建',async({page})=>{
   await page.goto('/');await add(page,'甲');await add(page,'乙');await add(page,'丙');
   await taskAction(page,'甲','delete');await expect(card(page,'甲')).toHaveCount(0);
   await taskAction(page,'乙','complete');await expect(page.getByRole('button',{name:'已完成 1',exact:true})).toBeVisible();
-  await expect(page.locator('.undo-toast')).toHaveCount(1);await undo(page);await expect(card(page,'乙')).toBeVisible();
+  await expect(page.locator('.undo-toast')).toHaveCount(2);await undo(page);await expect(card(page,'乙')).toBeVisible();
   expect((await rows(page)).map(r=>r.text)).toEqual(['乙','丙']);
   await taskAction(page,'乙','delete');await expect(card(page,'乙')).toHaveCount(0);await undo(page);await expect(card(page,'乙')).toBeVisible();
   const ids=(await rows(page)).map(r=>r.id);expect(ids).toEqual([2,3]);

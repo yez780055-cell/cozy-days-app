@@ -22,7 +22,7 @@ export function CategoryManager({categories,onSave,onRemove,onClose}:{
   }
   return <Modal title="管理分类" onClose={onClose}>
     {deleting ? <section className="category-delete">
-      <p>删除「{deleting.name}」分类？</p><p>其中的任务都会移入「生活」，不会删除任务。</p>
+      <p>删除「{deleting.name}」分类？</p><p>{categories.some(c=>c.id!==deleting.id&&c.key===categoryKey('生活')) ? '其中的任务都会移入「生活」，不会删除任务。' : categories.some(c=>c.id!==deleting.id) ? '其中的任务都会移入「'+categories.find(c=>c.id!==deleting.id)!.name+'」，不会删除任务。' : '将建立新的「生活」分类接收任务，不会删除任务。'}</p>
       <div className="confirm-actions"><Button variant="soft" onClick={()=>setDeleting(undefined)} disabled={busy}>取消</Button>
         <Button variant="danger" disabled={busy} onClick={async()=>{setBusy(true);setError('');const success=await onRemove(deleting.id);setBusy(false);if(success){if(editing===deleting.id){setEditing(undefined);setName('');}setDeleting(undefined);}else setError('分类暂时无法删除，请重试。');}}>确认删除分类</Button></div>
     </section> : <>
@@ -31,8 +31,8 @@ export function CategoryManager({categories,onSave,onRemove,onClose}:{
           <Button type="submit" disabled={busy||!name.trim()}>{editing?'保存分类':'添加分类'}</Button></div>
         {editing && <button className="category-cancel" type="button" onClick={()=>{setEditing(undefined);setName('');setError('');}}>取消修改</button>}
       </form>
-      <p className="category-note">工作、生活、学习是默认分类。自定义分类可以改名或删除。</p>
-      <ul className="category-manager-list">{categories.map(category=><li key={category.id}><span>{category.name}</span>{category.builtin?<small>默认</small>:<div>
+      <p className="category-note">所有分类都可以改名或删除。没有生活时，任务移入最早的剩余分类；删除最后一个分类时建立新的生活分类。</p>
+      <ul className="category-manager-list">{categories.map(category=><li key={category.id}><span>{category.name}</span>{<div>
         <button type="button" className="icon-button" aria-label={`修改分类：${category.name}`} onClick={()=>{setEditing(category.id);setName(category.name);setError('');}}><Pencil size={16}/></button>
         <button type="button" className="icon-button" aria-label={`删除分类：${category.name}`} onClick={()=>{setDeleting(category);setError('');}}><Trash2 size={16}/></button>
       </div>}</li>)}</ul>

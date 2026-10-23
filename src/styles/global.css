@@ -71,7 +71,7 @@ button:disabled { opacity: .42; }
 .task-actions .icon-button { min-width:28px;min-height:36px;padding:5px; }
 .task-card:hover .task-actions { opacity:1; }
 .task-card--done { box-shadow:none;background:#f8f2eb;border-color:#eee7dd;margin-bottom:8px; }
-.task-card--done .task-content > span { text-decoration:line-through;color:#b0a59a; }
+.task-card--done .task-content > span { text-decoration:none;color:#786e65; }
 .task-card--done .checkbox { background:#d7c9bf;border-color:#d7c9bf; }
 .is-completing .checkbox { background:var(--rose);border-color:var(--rose);color:white; }
 .is-completing .checkbox svg { opacity:1;transform:scale(1); }

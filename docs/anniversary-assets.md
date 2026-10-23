@@ -36,7 +36,7 @@
 - PNG 使用 RGBA 通道；SVG 使用矢量透明背景。图册可在浅色和深色棋盘对照底色间切换观察边缘。
 - 不对纹理截图执行色键抠图，因此没有引入白边、锯齿、去色偏或锐化伪影。
 - `needs-redraw` 项在图册中仅展示参考图局部定位，并显著注明“原图局部 / 非透明素材”。
-- 没有可供 PR 独立预览部署的 Cloudflare Pages 工作流；仓库现有流程仅含 GitHub Pages main 部署和 PR 快速验证。验收图册可从分支静态预览或本地打开。
+- PR 的 Cloudflare Pages 独立预览已部署成功；分支验收图册地址为 `https://feature-anniversary-assets.cozy-days-app.pages.dev/review/anniversary-assets/`。正式 Pages 部署仍只使用 main。
 
 ## 资源映射
 

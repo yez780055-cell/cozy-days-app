@@ -34,7 +34,8 @@ test('素材注册表只包含 ready，文件真实存在且哈希一致', () =>
   const catalog = JSON.parse(fs.readFileSync('src/assets/ready-catalog.json','utf8').replace(/^\uFEFF/,''));
   for (const row of catalog) {
     expect(row.status).toBe('ready');
-    const bytes = fs.readFileSync('public/assets/cozy_days/'+row.file);
+    const raw = fs.readFileSync('public/assets/cozy_days/'+row.file);
+    const bytes = row.file.endsWith('.svg') ? Buffer.from(raw.toString('utf8').replace(/\r\n/g, '\n')) : raw;
     expect(crypto.createHash('sha256').update(bytes).digest('hex')).toBe(row.sha256);
   }
   expect(new Set(catalog.map((r:{name:string})=>r.name)).size).toBe(catalog.length);

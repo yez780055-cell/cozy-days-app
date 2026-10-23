@@ -52,3 +52,29 @@ for (const [width, height] of [[360, 740], [393, 852], [430, 932]]) {
     expect(errors).toEqual([]);
   });
 }
+
+test('Pages static review route serves evidence, video controls, and build metadata', async ({ page, request, baseURL }) => {
+  const reviewURL = new URL('review/', baseURL!).href;
+  const response = await page.goto(reviewURL);
+  expect(response?.ok()).toBe(true);
+  await expect(page.getByRole('heading', { name: '小饱日常 在线验收' })).toBeVisible();
+  await expect(page.getByRole('link', { name: /打开当前开发版本/ })).toHaveAttribute('href', '../');
+  const resources = [
+    ['review.css', /^text\/css/], ['review.js', /javascript/],
+    ['build-info.json', /application\/json/],
+    ['evidence/screenshots/360x740.png', /^image\/png/],
+    ['evidence/screenshots/393x852.png', /^image\/png/],
+    ['evidence/screenshots/430x932.png', /^image\/png/],
+    ['evidence/reference/original-design.png', /^image\/png/],
+    ['evidence/videos/360x740.webm', /^video\/webm/],
+    ['evidence/videos/393x852.webm', /^video\/webm/],
+    ['evidence/videos/430x932.webm', /^video\/webm/],
+  ] as const;
+  for (const [path, type] of resources) {
+    const asset = await request.get(new URL(path, reviewURL).href);
+    expect(asset.ok(), path).toBe(true);
+    expect(asset.headers()['content-type'], path).toMatch(type);
+  }
+  await expect(page.locator('#screens img')).toHaveCount(3);
+  await expect(page.locator('#videos video[controls]')).toHaveCount(3);
+});

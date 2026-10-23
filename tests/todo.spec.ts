@@ -36,7 +36,7 @@ test('编辑多行内容、修改日期、删除取消和确认', async ({page})
   const editor=page.getByRole('dialog',{name:'编辑待办'});
   await editor.getByRole('textbox', {name:'想做些什么？'}).fill('修改后的第一行\n这是一段会自动换行的第二行任务内容');
   await editor.getByRole('button',{name:'保存',exact:true}).click();
-  await expect(page.getByText('修改后的第一行', {exact:false})).toBeVisible();
+  await expect(page.locator('.task-content').filter({hasText:'修改后的第一行'})).toBeVisible();
   await page.getByRole('button',{name:/^更多操作：修改后的第一行/}).click();
   await page.getByRole('button',{name:'关闭弹窗',exact:true}).click();
   await expect(page.getByRole('dialog')).not.toBeVisible();

@@ -12,12 +12,14 @@ function reviewBuildInfo() {
       outDir = resolve(config.root, config.build.outDir);
     },
     closeBundle() {
+      const cloudflarePages = ['1', 'true'].includes((process.env.CF_PAGES || '').toLowerCase());
+      const branch = process.env.CF_PAGES_BRANCH || process.env.GITHUB_REF_NAME || 'local';
       const info = {
-        commit: process.env.VERCEL_GIT_COMMIT_SHA || process.env.GITHUB_SHA || 'local',
-        branch: process.env.VERCEL_GIT_COMMIT_REF || process.env.GITHUB_REF_NAME || 'local',
-        pullRequest: process.env.VERCEL_GIT_PULL_REQUEST_ID || null,
+        commit: process.env.CF_PAGES_COMMIT_SHA || process.env.GITHUB_SHA || 'local',
+        branch,
+        mode: cloudflarePages ? (branch === 'main' ? 'production' : 'preview') : (process.env.CI ? 'ci' : 'local'),
         builtAt: new Date().toISOString(),
-        mode: process.env.VERCEL_ENV || (process.env.CI ? 'ci' : 'local'),
+        previewUrl: process.env.CF_PAGES_URL || null,
       };
       const path = resolve(outDir, 'review', 'build-info.json');
       mkdirSync(resolve(outDir, 'review'), { recursive: true });

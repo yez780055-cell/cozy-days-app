@@ -1,22 +1,17 @@
-import { useEffect, useState } from 'react';
-import { Check, Type } from 'lucide-react';
+import { ArrowLeft, Check, Type } from 'lucide-react';
 import type { FontId } from '../../styles/fontRegistry';
-import { fontRegistry, getFontOption, loadFont } from '../../styles/fontRegistry';
+import { fontRegistry, getFontOption } from '../../styles/fontRegistry';
 
-export function SettingsPage({ fontId, pendingFontId, onSelect }: {
+export function SettingsPage({ fontId, pendingFontId, onSelect, onBack }: {
   fontId: FontId;
   pendingFontId: FontId | null;
   onSelect: (id: FontId) => void;
+  onBack: () => void;
 }) {
   const selected = getFontOption(fontId);
-  const [previewsReady, setPreviewsReady] = useState(false);
-  useEffect(() => {
-    let active = true;
-    void Promise.all(fontRegistry.map(option => loadFont(option.id))).catch(() => undefined).finally(() => { if (active) setPreviewsReady(true); });
-    return () => { active = false; };
-  }, []);
   return <section className="settings-page" aria-label="应用设置">
     <header className="settings-header">
+      <button type="button" className="settings-back icon-button" aria-label="返回上一页" onClick={onBack}><ArrowLeft size={19}/></button>
       <span className="settings-icon"><Type size={20}/></span>
       <div><span className="eyebrow">MAKE IT YOURS</span><h1>字体设置</h1></div>
     </header>
@@ -39,11 +34,11 @@ export function SettingsPage({ fontId, pendingFontId, onSelect }: {
         onClick={() => onSelect(option.id)}
       >
         <span className="font-option-copy"><strong>{option.name}</strong><small>{option.description}</small></span>
-        <span className="font-option-preview" style={{ fontFamily: option.familyStack }}>小日子 Cozy 123</span>
+        <span className="font-option-preview" style={{ fontFamily: fontId === option.id ? option.familyStack : undefined }}>小日子 Cozy 123</span>
         <span className="font-option-check" aria-hidden="true">{fontId === option.id && (pendingFontId === option.id ? '…' : <Check size={16}/>)}</span>
       </button>)}
     </div>
-    {(pendingFontId || !previewsReady) && <p className="font-loading" role="status">正在准备{pendingFontId ? getFontOption(pendingFontId).name : '字体预览'}…</p>}
+    {pendingFontId && <p className="font-loading" role="status">正在准备{getFontOption(pendingFontId).name}…</p>}
     <p className="font-settings-note">字体设置仅保存在这台设备上，离线也可以使用。</p>
   </section>;
 }

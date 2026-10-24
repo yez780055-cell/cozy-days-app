@@ -21,6 +21,7 @@ for (const viewport of viewports) {
   test(`period artwork is legible and contained at ${viewport.width}x${viewport.height}`, async ({ page }) => {
     await page.clock.install({ time: new Date('2026-10-23T04:00:00Z') });
     await page.setViewportSize(viewport);
+    await page.addInitScript(() => localStorage.setItem('cozy-days.settings-hint-seen', '1'));
     await page.goto('/');
     await page.getByRole('navigation').getByRole('button', { name: '生理期', exact: true }).click();
     const period = page.locator('.period-page');
@@ -49,7 +50,8 @@ for (const viewport of viewports) {
     expect(copyLayer).toBeGreaterThan(1);
 
     await page.evaluate(() => document.fonts.ready);
-    await page.screenshot({ path: `artifacts/integration/m4/period-${viewport.width}x${viewport.height}.png`, animations: 'disabled' });
+    await page.evaluate(async () => { await Promise.all([...document.images].map(image => image.decode().catch(() => {}))); });
+    await page.screenshot({ path: `artifacts/v021-g4/period-${viewport.width}-top.png`, animations: 'disabled' });
     const overlaps = (a: { x:number; y:number; width:number; height:number }, b: { x:number; y:number; width:number; height:number }) => a.x < b.x + b.width && a.x + a.width > b.x && a.y < b.y + b.height && a.y + a.height > b.y;
     const flower = await period.locator('.period-calendar-flower').boundingBox();
     const calendarControls = await period.locator('.period-calendar header button').evaluateAll(buttons => buttons.map(button => { const rect = button.getBoundingClientRect(); return { x:rect.x, y:rect.y, width:rect.width, height:rect.height }; }));
@@ -62,7 +64,10 @@ for (const viewport of viewports) {
     const diaryDate = await diary.locator('header>span').boundingBox();
     expect(overlaps(tape!, diaryHeading!)).toBe(false);
     expect(overlaps(tape!, diaryDate!)).toBe(false);
-    await page.screenshot({ path: `artifacts/integration/m4/diary-${viewport.width}x${viewport.height}.png`, animations: 'disabled' });
+    await page.screenshot({ path: `artifacts/v021-g4/period-${viewport.width}-record.png`, animations: 'disabled' });
+    const moodFaces = await page.locator('.period-record-options fieldset').nth(2).locator('.period-cat-face').evaluateAll(faces => faces.map(face => face.innerHTML));
+    expect(moodFaces).toHaveLength(5);
+    expect(new Set(moodFaces).size).toBe(5);
 
   });
 }

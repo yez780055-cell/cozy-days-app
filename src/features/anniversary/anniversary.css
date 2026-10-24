@@ -1,5 +1,5 @@
 .ann-page {
-  flex: 1; min-height: 0; margin: 0; padding: 0 0 calc(var(--nav-height) + 96px + env(safe-area-inset-bottom));
+  flex: 1; min-height: 0; margin: 0; padding: 0 0 calc(var(--nav-height) + 32px + env(safe-area-inset-bottom));
   overflow-y: auto; overscroll-behavior: contain; color: #493d37;
   background-color: #fff8ed; background-image: radial-gradient(#d9b99420 .7px,transparent .7px),linear-gradient(145deg,#fff8ed,#fff0ec 48%,#fff9ed); background-size: 7px 7px,auto;
 }
@@ -11,6 +11,14 @@
 .ann-title-heart { width: 28px; height: 28px; color: #ea82a0; }
 .ann-hero p { position: relative; z-index: 1; margin: 0; color: #604f47; font-size: 14px; letter-spacing: 1.5px; line-height: 1.65; }
 .ann-hero .ann-cats { position: absolute; z-index: 1; width: min(64vw,245px); height: 137px; right: -2px; bottom: -3px; object-fit: contain; filter: drop-shadow(0 3px 3px #825f5140); }
+.ann-photo { position: absolute; z-index: 2; top: 13px; display: grid; place-items: center; width: 31px; height: 35px; padding-top: 2px; border: 3px solid #fffdf7; background: #f9e7dc; box-shadow: 0 2px 5px #79584935; color: #d4879a; font: 23px/1 Georgia,serif; transform: rotate(-8deg); }
+.ann-photo--flower { right: 72px; }
+.ann-photo--heart { right: 34px; top: 21px; background: #f9dfe5; color: #c76e89; font-size: 25px; transform: rotate(8deg); }
+.ann-bow { position: absolute; z-index: 2; right: 94px; bottom: 76px; width: 31px; height: 16px; transform: rotate(9deg); }
+.ann-bow i { position: absolute; top: 1px; width: 14px; height: 12px; border: 1px solid #d58b99; border-radius: 80% 30% 70% 35%; background: #f7c6ce; }
+.ann-bow i:first-child { left: 0; transform: rotate(24deg); }
+.ann-bow i:nth-child(2) { right: 0; transform: scaleX(-1) rotate(24deg); }
+.ann-bow b { position: absolute; z-index: 1; top: 5px; left: 12px; width: 7px; height: 7px; border-radius: 50%; background: #d98999; }
 .ann-sparkle,.ann-hero-flower,.ann-hero-star { position: absolute; pointer-events: none; }
 .ann-sparkle { z-index: 2; right: 26px; top: 17px; width: 20px; }
 .ann-hero-flower { z-index: 2; right: 139px; bottom: 20px; width: 20px; }
@@ -115,6 +123,8 @@
   .ann-hero { min-height: 180px; padding-left: 20px; }
   .ann-hero h1 { font-size: 36px; }
   .ann-hero .ann-cats { width: 63vw; height: 127px; }
+  .ann-photo--flower { right: 66px; }
+  .ann-photo--heart { right: 28px; }
   .ann-date-title strong { font-size: 20px; }
   .ann-week-layout { grid-template-columns: minmax(0,1fr) 73px; gap: 5px; }
   .ann-week span { font-size: 14px; }

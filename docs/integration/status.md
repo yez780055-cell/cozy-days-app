@@ -1,7 +1,7 @@
 # Integration status — release record (2026-10-24)
 
 - Goal/version: Cozy Days integration, package candidate version `0.2.0` (not yet tagged or released).
-- Integration branch: `integration/release-record-20261024T0245Z`; this documentation-record worktree starts at `6c477f1a4d7b952bc81920026f3fe18f01c9edcb`.
+- Integration branch: `integration/cozy-next-20261023T141904Z`. Documentation-record worktree: `D:\cozy-days-release-record-20261024T0245Z`, branch `integration/release-record-20261024T0245Z`, based on `6c477f1a4d7b952bc81920026f3fe18f01c9edcb`.
 - M0–M4 acceptance is complete. M5's local full matrix and independent follow-up review are complete with P0/P1 = 0. M5 is locally accepted; final-HEAD GitHub CI and Preview remain coordinator gates.
 - M6 and M7 are not complete. No release-candidate tag, integration PR, merge SHA, or delivery completion is claimed.
 - Pixel evidence: latest strict comparison is 3/16/0 changed pixels at 360/393/430, maximum channel delta 3/3/0. It is not an all-zero result. All 16 image geometries and served asset bytes match at the compared sizes; antialiasing is an inference, not proof of pixel identity.
@@ -19,6 +19,15 @@
 | M5 | Cross-feature audit and regression | Local full matrix and independent review complete; P0/P1=0. Final-HEAD CI and Preview pending coordinator. |
 | M6 | Release candidate and protected PR merge | Not complete; see `release-candidate.md` |
 | M7 | Delivery and stop for user feedback | Not complete |
+
+## Historical M0 safeguards and baseline (2026-10-23)
+
+- M0 baseline HEAD: `b059b6d9982062958f0a866e763f84383d69430d`; original integration worktree `D:\cozy-days-integration-20261023T141904Z`, clean at start. The remote `checkpoint/pre-integration-20261023T141904Z` was read back at this commit.
+- At the time of M0, main ruleset `25687265` required a PR and latest `verify`, with no bypass. PRs #7–#10 were open; their then-current verify and Cloudflare results were historical prevalidation and required refresh before merge.
+- M0 inventory and baseline checks completed. The original M0 milestone reference was `checkpoint/m0-baseline-20261023T143021Z`; later coordinator read-back resolved the annotated tag to peeled commit `22b4235e65345b86e1722258d0e0eb1e88b86364`. The anniversary functional checkpoint resolves to `75e7de3a7a2811c3d0ccd5c766f2e8979012e387`.
+- Original-workspace protected files were not edited. Recorded SHA-256: `D:\daylight-app\README.md` = `6546A211B931E151FC5D1472589B0D4C1B401C6A5EA435D73B0A960C6AAC296D`; `D:\daylight-app\tests\swipe.spec.ts` = `E93D93F71332DD12F00C381B2926F7E3AD50DA563CE5D7F1A50894AD3E9E4145`.
+- M0 commands ran serially in order; transcripts and exit codes were recorded under `artifacts/integration/m0/`. Forty generated evidence files were copied and SHA-256 verified; generated index binds them to `b059b6d9982062958f0a866e763f84383d69430d`. Logs and generated media were local ignored artifacts and excluded from the documentation commit. Historical M0 baseline: both builds, 59 E2E and 4 Pages tests passed.
+- Rollback and database safeguards are recorded in [rollback.md](rollback.md); Git rollback cannot restore browser/device data or reverse a Dexie migration.
 ## Baseline command record
 
 | Order | Command | Exit code | Outcome |
@@ -66,7 +75,7 @@ The earlier M5 matrix remains bound to functional source `ab0b533d380dbcd543f3eb
 
 The follow-up product source `30bfaa033ad055cd15b3524bf2779e7617225507` passed both builds, 42 anniversary tests and 17 frozen regressions. Screenshot/helper build `b4fb7727a78586acbe4c9d0536fe6406c6da5f60` also passed both builds; it is evidence-helper-only after product source, and did not rerun the 42/17 tests. Its latest strict pixel result is 3/16/0 changed pixels (max channel delta 3/3/0), not zero. The 360/393 comparisons report identical geometry for all 16 images and identical served bytes; antialiasing is an interpretation only. Details and limitations are in `m5-modal-guard.md` and its result JSON.
 
-An independent Sol Medium review of `6c477f1a4d7b952bc81920026f3fe18f01c9edcb` passed. It covered a sync-ref guard race around modal close and left `defaultTodo` unchanged. No new tests were run for this documentation record. The prior GitHub CI run `40045183751` succeeded historically with 127 E2E, 4 Pages, and two builds; it is not evidence for current final HEAD. Local review found the two 30bf product builds, anniversary 42 tests, historical 17 regressions, and b4fb helper's two builds as recorded above. Current final-HEAD CI and Preview are still pending.
+An independent Sol Medium review of `6c477f1a4d7b952bc81920026f3fe18f01c9edcb` passed. It covered a sync-ref guard race around modal close and left the default Todo Modal unchanged. No new tests were run for this documentation record. The prior GitHub CI run `40045183751` succeeded historically with 127 E2E, 4 Pages, and two builds; it is not evidence for current final HEAD. Local review found the two 30bf product builds, anniversary 42 tests, historical 17 regressions, and b4fb helper's two builds as recorded above. Current final-HEAD CI and Preview are still pending.
 
 Historical checkpoint `pre-modal-guard-20261024T003504Z` points to `1b5b9fa4e24adc509daa839111466e171d859179`; retain earlier checkpoint/source SHA entries as historical records. Android real-device behavior remains **未验收**.
-Remote checkpoint reconciliation (coordinator read-back, 2026-10-24): all seven checkpoint tags are present remotely. Annotated tags were resolved to their peeled commits: `pre-integration` → `b059b6d9982062958f0a866e763f84383d69430d`, `m0-baseline` → `22b4235` (short SHA as reported by coordinator), and `anniversary-functional` → `75e7de3` (short SHA as reported by coordinator). Other lightweight checkpoint references match the commit SHAs already recorded above. PRs #7–#10 remain open; their current heads match the previously recorded SHAs and each is an ancestor of `6c477f1a4d7b952bc81920026f3fe18f01c9edcb`. No integration PR has been created.
+Remote checkpoint reconciliation (coordinator read-back, 2026-10-24): all seven checkpoint tags are present remotely. Annotated tags were resolved to their peeled commits: `pre-integration` → `b059b6d9982062958f0a866e763f84383d69430d`, `m0-baseline` → `22b4235e65345b86e1722258d0e0eb1e88b86364`, and `anniversary-functional` → `75e7de3a7a2811c3d0ccd5c766f2e8979012e387`. Other lightweight checkpoint references match the commit SHAs already recorded above. PRs #7–#10 remain open; their current heads match the previously recorded SHAs and each is an ancestor of `6c477f1a4d7b952bc81920026f3fe18f01c9edcb`. No integration PR has been created.

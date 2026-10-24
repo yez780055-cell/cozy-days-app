@@ -36,6 +36,8 @@ def main():
     require("CN=Android Debug" not in signature, "Refusing Android debug certificate")
     fingerprints = re.findall(r"Signer #\d+ certificate SHA-256 digest: ([0-9a-fA-F]+)", signature)
     require(len(fingerprints) == 1, "Expected exactly one verified signer")
+    require(fingerprints[0].upper() == "C85FE70FFF2425AD2B95D3DFA8F28EF7173027E744B03F57B721896FCA40D3D8",
+            "Release certificate differs from the pinned long-term signing identity")
     badging = run(aapt, "dump", "badging", str(args.apk))
     package = re.search(r"^package: name='([^']+)' versionCode='([^']+)' versionName='([^']+)'", badging, re.M)
     require(package and package.groups() == ("com.littledays.app", code, "0.2.1"),

@@ -5,7 +5,7 @@ import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 const [baselineURL,candidateURL]=process.argv.slice(2);
-const out='artifacts/integration/m5/visual';mkdirSync(out,{recursive:true});
+const out=process.env.M5_VISUAL_OUT || 'artifacts/integration/m5/visual';mkdirSync(out,{recursive:true});
 const sizes=[[360,740],[393,852],[430,932]], time='2026-10-23T04:00:00Z';
 const browser=await chromium.launch();const files=[], comparisons=[], builds={};
 async function shot(page,name){const path=`${out}/${name}.png`;await page.screenshot({path,animations:'disabled'});files.push({path,sha256:createHash('sha256').update(readFileSync(path)).digest('hex')});}
@@ -28,5 +28,5 @@ for(const [width,height] of sizes){
  writeFileSync(`${out}/todo-diff-${width}x${height}.png`,Buffer.from(result.diff,'base64'));delete result.diff;comparisons.push({width,height,...result});await page.close();
 }
 await browser.close();
-writeFileSync(`${out}/source.json`,JSON.stringify({sourceCommit:builds.candidate.commit,actualBuildCommit:builds.candidate.commit,appLogicSourceSha:'ab0b533d380dbcd543f3eb9b95aaf1205ae542cd',builds,baselineCommit:'b059b6d9982062958f0a866e763f84383d69430d',time,timezone:'Asia/Shanghai',font:'yozai',deviceScaleFactor:1,seeds:[100,101,102],synthetic:true,files,comparisons},null,2)+'\n');
+writeFileSync(`${out}/source.json`,JSON.stringify({sourceCommit:builds.candidate.commit,actualBuildCommit:builds.candidate.commit,appLogicSourceSha:builds.candidate.commit,builds,baselineCommit:'b059b6d9982062958f0a866e763f84383d69430d',time,timezone:'Asia/Shanghai',font:'yozai',deviceScaleFactor:1,seeds:[100,101,102],synthetic:true,files,comparisons},null,2)+'\n');
 console.log(JSON.stringify(comparisons,null,2));

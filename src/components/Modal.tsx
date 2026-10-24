@@ -2,18 +2,24 @@ import { useCallback, useEffect, useRef, type ReactNode } from 'react';
 import { X } from 'lucide-react';
 import { animateElement, motion } from '../styles/motion';
 
-export function Modal({ title, onClose, children, className = '', headerAction }: {
-  title: string; onClose: () => void; children: ReactNode; className?: string; headerAction?: ReactNode;
+export function Modal({ title, onClose, children, className = '', headerAction, canClose }: {
+  title: string; onClose: () => void; children: ReactNode; className?: string; headerAction?: ReactNode; canClose?: () => boolean;
 }) {
   const panel = useRef<HTMLElement>(null);
   const closing = useRef(false);
   const closeRef = useRef(onClose);
   closeRef.current = onClose;
+  const canCloseRef = useRef(canClose);
+  canCloseRef.current = canClose;
   const close = useCallback(async () => {
-    if (closing.current) return;
+    if (closing.current || canCloseRef.current?.() === false) return;
     closing.current = true;
     const animation = animateElement(panel.current, [{ opacity: 1, transform: 'translateY(0)' }, { opacity: 0, transform: 'translateY(32px)' }], motion.modal);
     if (animation) await animation.finished.catch(() => {});
+    if (canCloseRef.current?.() === false) {
+      closing.current = false;
+      return;
+    }
     closeRef.current();
   }, []);
   useEffect(() => {

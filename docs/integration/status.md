@@ -110,3 +110,8 @@ Remote checkpoint reconciliation (coordinator read-back, 2026-10-24): all seven 
 - Medium f72b0de: build + 13 targeted tests pass. Initial actual 360 render had week overflow/deletion clipping; repaired render shows controls and notes but still has flower over note text, tape close to titles, date panel roughly 260px and flat hero/empty photo frames rather than the requested collage hierarchy.
 - Evidence D:/cozy-days-v021-g3/artifacts/v021-g3/anniversary-360-{top,scroll}.png reviewed. Functional PASS does not imply final visual PASS.
 - Sole writer Luna High assigned anniversary visual calibration after this narrowed Medium repair; no persistence/model/global/todo edits, no Extra High.
+
+## v0.2.1 G3 complete / G4 integrated visual review
+- Reviewed 5bdabeff: real 360/393/430 captures show full hero background/cats, real counters, notes, icon/theme/recurrence and both operations; terminal-card scroll avoids FAB. Build and 13/13 targeted tests pass. Date panel 207–214px retained to preserve 44px navigation/today controls.
+- Immutable anniversary anchor checkpoint/v0.2.1-g3-anniversary. No data/date/CRUD/recovery logic changes.
+- G4 sole Luna Medium writer: bounded final visual refinements (minor period CatFace variation, anniversary photos/bow decoration and empty scroll tail), isolate existing test-port change; final combined Playwright evidence and original-reference review page. No model/repository/global/todo changes. Source logic SHA recorded separately from later evidence-only commits. Use synthetic fixtures in new contexts only.

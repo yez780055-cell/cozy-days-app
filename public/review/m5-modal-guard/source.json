@@ -1,0 +1,177 @@
+{
+  "sourceCommit": "b4fb7727a78586acbe4c9d0536fe6406c6da5f60",
+  "actualBuildCommit": "b4fb7727a78586acbe4c9d0536fe6406c6da5f60",
+  "appLogicSourceSha": "b4fb7727a78586acbe4c9d0536fe6406c6da5f60",
+  "builds": {
+    "baseline": {
+      "commit": "b059b6d9982062958f0a866e763f84383d69430d",
+      "branch": "local",
+      "mode": "local",
+      "builtAt": "2026-10-24T00:24:12.414Z",
+      "previewUrl": null
+    },
+    "candidate": {
+      "commit": "b4fb7727a78586acbe4c9d0536fe6406c6da5f60",
+      "branch": "local",
+      "mode": "local",
+      "builtAt": "2026-10-24T02:39:57.117Z",
+      "previewUrl": null
+    }
+  },
+  "baselineCommit": "b059b6d9982062958f0a866e763f84383d69430d",
+  "time": "2026-10-23T04:00:00Z",
+  "timezone": "Asia/Shanghai",
+  "font": "yozai",
+  "deviceScaleFactor": 1,
+  "seeds": [
+    100,
+    101,
+    102
+  ],
+  "synthetic": true,
+  "files": [
+    {
+      "file": "todo-baseline-360x740.png",
+      "sha256": "dc31435ac7fe64e291f4236bfcf00fcb7c477486da7cc6be4896f07dbb1ed1d4"
+    },
+    {
+      "file": "todo-candidate-360x740.png",
+      "sha256": "dc028b00120df8576d480903b3c597b486f9bccbf3904dfb9dad931bcc67e333"
+    },
+    {
+      "file": "anniversary-360x740.png",
+      "sha256": "a3bcc782503ae3e5fd38183e2b3638bc50809d3b35eb2884bbee7ccefd3ecaea"
+    },
+    {
+      "file": "anniversary-card-360x740.png",
+      "sha256": "6d979599e176fe5153dcf023f09cc51ecd202672de5db608864a86fe6f4ae45b"
+    },
+    {
+      "file": "period-header-360x740.png",
+      "sha256": "4674746e8caea722327a86c432d6f7e655e371012aba0cbbccba0508638b0278"
+    },
+    {
+      "file": "period-diary-360x740.png",
+      "sha256": "be5d3af2e3dab04aa53638370e917225fdfebf619177cafe4f2e4e8a053aff1f"
+    },
+    {
+      "file": "todo-baseline-393x852.png",
+      "sha256": "7a558ff573124d1bb7f749a2f67404bb29ea38417aa123f28f3edf069fa70209"
+    },
+    {
+      "file": "todo-candidate-393x852.png",
+      "sha256": "d242acb1bf1fb2c5cc24b61b3c590e8c1a91e56081146f78be2a49dbe6565f99"
+    },
+    {
+      "file": "anniversary-393x852.png",
+      "sha256": "5ab176d163f45a594c541dcd88dbc1a1d7e82750ac905d7a57adbaf2a97e8227"
+    },
+    {
+      "file": "anniversary-card-393x852.png",
+      "sha256": "5ab176d163f45a594c541dcd88dbc1a1d7e82750ac905d7a57adbaf2a97e8227"
+    },
+    {
+      "file": "period-header-393x852.png",
+      "sha256": "8d6e24d5a96b2656e096becb779d61bf4bfd7059a96b87a5828bc4176a4b0937"
+    },
+    {
+      "file": "period-diary-393x852.png",
+      "sha256": "7467107139ab280434f59fb05bc61817e99bb2c8e3e4c5e485aded7f9242d58c"
+    },
+    {
+      "file": "todo-baseline-430x932.png",
+      "sha256": "ba9384d25dcd2ed4cde68d0c73fde79bd3aa2eafde3c08ae7933756638107219"
+    },
+    {
+      "file": "todo-candidate-430x932.png",
+      "sha256": "ba9384d25dcd2ed4cde68d0c73fde79bd3aa2eafde3c08ae7933756638107219"
+    },
+    {
+      "file": "anniversary-430x932.png",
+      "sha256": "c07c9ae53c7648159dac32979e37a9288da964e4ee04260b0842e12fd9079c43"
+    },
+    {
+      "file": "anniversary-card-430x932.png",
+      "sha256": "c07c9ae53c7648159dac32979e37a9288da964e4ee04260b0842e12fd9079c43"
+    },
+    {
+      "file": "period-header-430x932.png",
+      "sha256": "204ffb12882293681986157fcef21a11ecc620225ae43b5e22f7b811f3df48c7"
+    },
+    {
+      "file": "period-diary-430x932.png",
+      "sha256": "2e8e91129a6448b1be269a63840b1e1fc59a34074a7f1116c533bb8845532cdc"
+    },
+    {
+      "file": "todo-diff-360x740.png",
+      "sha256": "c368eb924efca4fc184d8b204439d99adbbb5df40106afa619f0b7fcf15284a4"
+    },
+    {
+      "file": "todo-diff-393x852.png",
+      "sha256": "fc9b587c374964bbac46cb13698a15a9776f81633bd1cf9d0d4b942c6d64dd38"
+    },
+    {
+      "file": "todo-diff-430x932.png",
+      "sha256": "61b093d35fd7d8e828003427d67dae4e93d4347ca0b7439917c07bdb772b2445"
+    }
+  ],
+  "comparisons": [
+    {
+      "width": 360,
+      "height": 740,
+      "changedPixels": 3,
+      "totalPixels": 266400,
+      "maxChannelDelta": 3
+    },
+    {
+      "width": 393,
+      "height": 852,
+      "changedPixels": 16,
+      "totalPixels": 334836,
+      "maxChannelDelta": 3
+    },
+    {
+      "width": 430,
+      "height": 932,
+      "changedPixels": 0,
+      "totalPixels": 400760,
+      "maxChannelDelta": 0
+    }
+  ],
+  "modalFailureStates": [
+    {
+      "file": "save-failure.png",
+      "sha256": "6a50c4bb001b8e31918ce7d8e9e588f819c9a3b397fad0da395ae4cdf25315f9",
+      "sourceCommit": "30bfaa033ad055cd15b3524bf2779e7617225507",
+      "clock": "system browser date, not mocked"
+    },
+    {
+      "file": "remove-failure.png",
+      "sha256": "2c23fcad2a0c6ad51c6b53a152eda815ba4a64feab4db04e32f8bf2fdd87b1bb",
+      "sourceCommit": "30bfaa033ad055cd15b3524bf2779e7617225507",
+      "clock": "system browser date, not mocked"
+    }
+  ],
+  "supplementFiles": [
+    {
+      "file": "pixel-diagnostic.json",
+      "sha256": "3fb655f338ee85fabc31485928ac0d1ebf2cec9a20f4a9e3da9135d6d0ecf06e"
+    },
+    {
+      "file": "geometry-assets-diagnostic.json",
+      "sha256": "7025dfadc59603b74f41bbc413cab7987624a521ab56d187da25acc041a9f9a2"
+    },
+    {
+      "file": "historical-09-source.json",
+      "sha256": "e6bb899ba5d34f8eb9e160782ec3dbad789ac92f2decd935076d73ed4d1ef221"
+    },
+    {
+      "file": "first-missing-baseline-360x740.png",
+      "sha256": "e2bd7e2c2e330f9ec97816f0ab0b030eec5e3689b99885c225511521b5f6bc69"
+    },
+    {
+      "file": "first-missing-candidate-360x740.png",
+      "sha256": "dc028b00120df8576d480903b3c597b486f9bccbf3904dfb9dad931bcc67e333"
+    }
+  ]
+}

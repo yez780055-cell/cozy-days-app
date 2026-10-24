@@ -1,0 +1,1726 @@
+[
+  {
+    "kind": "baseline",
+    "width": 360,
+    "height": 740,
+    "nodes": [
+      {
+        "x": 246,
+        "y": 398,
+        "chain": [
+          {
+            "tag": "ARTICLE",
+            "class": "task-card ",
+            "text": "午后读几页喜欢的书15:30",
+            "src": null,
+            "rect": {
+              "x": 14,
+              "y": 378.796875,
+              "width": 332,
+              "height": 64
+            },
+            "font": "Yozai, \"Microsoft YaHei\", \"PingFang SC\", \"Noto Sans CJK SC\", system-ui, sans-serif",
+            "borderRadius": "17px 15px 18px 16px",
+            "transform": "matrix(1, 0, 0, 1, 0, 0)"
+          },
+          {
+            "tag": "DIV",
+            "class": "swipe-shell",
+            "text": "完成删除午后读几页喜欢的书15:30",
+            "src": null,
+            "rect": {
+              "x": 14,
+              "y": 378.796875,
+              "width": 332,
+              "height": 72
+            },
+            "font": "Yozai, \"Microsoft YaHei\", \"PingFang SC\", \"Noto Sans CJK SC\", system-ui, sans-serif",
+            "borderRadius": "0px",
+            "transform": "none"
+          },
+          {
+            "tag": "DIV",
+            "class": "task-list",
+            "text": "完成删除午后读几页喜欢的书15:30完成删除晚上散步十分钟完成删除整理桌面，给自",
+            "src": null,
+            "rect": {
+              "x": 14,
+              "y": 378.796875,
+              "width": 332,
+              "height": 216
+            },
+            "font": "Yozai, \"Microsoft YaHei\", \"PingFang SC\", \"Noto Sans CJK SC\", system-ui, sans-serif",
+            "borderRadius": "0px",
+            "transform": "none"
+          }
+        ]
+      },
+      {
+        "x": 247,
+        "y": 398,
+        "chain": [
+          {
+            "tag": "ARTICLE",
+            "class": "task-card ",
+            "text": "午后读几页喜欢的书15:30",
+            "src": null,
+            "rect": {
+              "x": 14,
+              "y": 378.796875,
+              "width": 332,
+              "height": 64
+            },
+            "font": "Yozai, \"Microsoft YaHei\", \"PingFang SC\", \"Noto Sans CJK SC\", system-ui, sans-serif",
+            "borderRadius": "17px 15px 18px 16px",
+            "transform": "matrix(1, 0, 0, 1, 0, 0)"
+          },
+          {
+            "tag": "DIV",
+            "class": "swipe-shell",
+            "text": "完成删除午后读几页喜欢的书15:30",
+            "src": null,
+            "rect": {
+              "x": 14,
+              "y": 378.796875,
+              "width": 332,
+              "height": 72
+            },
+            "font": "Yozai, \"Microsoft YaHei\", \"PingFang SC\", \"Noto Sans CJK SC\", system-ui, sans-serif",
+            "borderRadius": "0px",
+            "transform": "none"
+          },
+          {
+            "tag": "DIV",
+            "class": "task-list",
+            "text": "完成删除午后读几页喜欢的书15:30完成删除晚上散步十分钟完成删除整理桌面，给自",
+            "src": null,
+            "rect": {
+              "x": 14,
+              "y": 378.796875,
+              "width": 332,
+              "height": 216
+            },
+            "font": "Yozai, \"Microsoft YaHei\", \"PingFang SC\", \"Noto Sans CJK SC\", system-ui, sans-serif",
+            "borderRadius": "0px",
+            "transform": "none"
+          }
+        ]
+      },
+      {
+        "x": 246,
+        "y": 399,
+        "chain": [
+          {
+            "tag": "ARTICLE",
+            "class": "task-card ",
+            "text": "午后读几页喜欢的书15:30",
+            "src": null,
+            "rect": {
+              "x": 14,
+              "y": 378.796875,
+              "width": 332,
+              "height": 64
+            },
+            "font": "Yozai, \"Microsoft YaHei\", \"PingFang SC\", \"Noto Sans CJK SC\", system-ui, sans-serif",
+            "borderRadius": "17px 15px 18px 16px",
+            "transform": "matrix(1, 0, 0, 1, 0, 0)"
+          },
+          {
+            "tag": "DIV",
+            "class": "swipe-shell",
+            "text": "完成删除午后读几页喜欢的书15:30",
+            "src": null,
+            "rect": {
+              "x": 14,
+              "y": 378.796875,
+              "width": 332,
+              "height": 72
+            },
+            "font": "Yozai, \"Microsoft YaHei\", \"PingFang SC\", \"Noto Sans CJK SC\", system-ui, sans-serif",
+            "borderRadius": "0px",
+            "transform": "none"
+          },
+          {
+            "tag": "DIV",
+            "class": "task-list",
+            "text": "完成删除午后读几页喜欢的书15:30完成删除晚上散步十分钟完成删除整理桌面，给自",
+            "src": null,
+            "rect": {
+              "x": 14,
+              "y": 378.796875,
+              "width": 332,
+              "height": 216
+            },
+            "font": "Yozai, \"Microsoft YaHei\", \"PingFang SC\", \"Noto Sans CJK SC\", system-ui, sans-serif",
+            "borderRadius": "0px",
+            "transform": "none"
+          }
+        ]
+      }
+    ],
+    "imageGeometry": [
+      {
+        "class": "asset ",
+        "src": "/assets/cozy_days/vectors/symbols/heart_pink_outline.svg",
+        "rect": {
+          "x": 117.11608123779297,
+          "y": 62.17858123779297,
+          "width": 36.767845153808594,
+          "height": 36.76783752441406
+        }
+      },
+      {
+        "class": "asset ",
+        "src": "/assets/cozy_days/raster/backgrounds/bedroom_header.png",
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 360,
+          "height": 208.796875
+        }
+      },
+      {
+        "class": "asset hero-cat",
+        "src": "/assets/cozy_days/raster/characters/cats_header.png",
+        "rect": {
+          "x": 107.8125,
+          "y": 70.78125,
+          "width": 259.1875,
+          "height": 143.015625
+        }
+      },
+      {
+        "class": "asset hero-sparkle",
+        "src": "/assets/cozy_days/vectors/symbols/sparkle_gold.svg",
+        "rect": {
+          "x": 116.56416320800781,
+          "y": 144.7672882080078,
+          "width": 28.465423583984375,
+          "height": 28.465423583984375
+        }
+      },
+      {
+        "class": "asset hero-star",
+        "src": "/assets/cozy_days/vectors/symbols/star_cream.svg",
+        "rect": {
+          "x": 33.986358642578125,
+          "y": 167.78323364257812,
+          "width": 21.02728271484375,
+          "height": 21.02728271484375
+        }
+      },
+      {
+        "class": "asset original-plant",
+        "src": "/assets/cozy_days/raster/original/plant.png",
+        "rect": {
+          "x": 0,
+          "y": 164,
+          "width": 25.265625,
+          "height": 44.796875
+        }
+      },
+      {
+        "class": "asset original-cheer",
+        "src": "/assets/cozy_days/raster/original/cheer.png",
+        "rect": {
+          "x": 275.921875,
+          "y": 14,
+          "width": 69.6875,
+          "height": 58.953125
+        }
+      },
+      {
+        "class": "asset ",
+        "src": "/assets/cozy_days/raster/decor/washi_pink.png",
+        "rect": {
+          "x": 8.445243835449219,
+          "y": 340.03759765625,
+          "width": 68.10951232910156,
+          "height": 44.0341796875
+        }
+      },
+      {
+        "class": "asset task-illustration",
+        "src": "/assets/cozy_days/raster/tasks/task_book.png",
+        "rect": {
+          "x": 247.17298889160156,
+          "y": 397.17315673828125,
+          "width": 33.63841247558594,
+          "height": 20.7474365234375
+        }
+      },
+      {
+        "class": "asset task-sticker",
+        "src": "/assets/cozy_days/raster/decor/flower_pink.png",
+        "rect": {
+          "x": 239.9483642578125,
+          "y": 387.734619140625,
+          "width": 12.103271484375,
+          "height": 12.04638671875
+        }
+      },
+      {
+        "class": "asset task-illustration",
+        "src": "/assets/cozy_days/raster/tasks/task_stretch.png",
+        "rect": {
+          "x": 239.4200439453125,
+          "y": 460.2126159667969,
+          "width": 35.144287109375,
+          "height": 35.07476806640625
+        }
+      },
+      {
+        "class": "asset task-sticker",
+        "src": "/assets/cozy_days/raster/decor/flower_pink.png",
+        "rect": {
+          "x": 241.3582305908203,
+          "y": 494.2274169921875,
+          "width": 11.283538818359375,
+          "height": 11.217041015625
+        }
+      },
+      {
+        "class": "asset task-illustration",
+        "src": "/assets/cozy_days/raster/decor/sprout.png",
+        "rect": {
+          "x": 246,
+          "y": 533.796875,
+          "width": 31.96875,
+          "height": 20.078125
+        }
+      },
+      {
+        "class": "asset task-sticker",
+        "src": "/assets/cozy_days/raster/decor/flower_pink.png",
+        "rect": {
+          "x": 274.2145080566406,
+          "y": 566.0821533203125,
+          "width": 11.57098388671875,
+          "height": 11.507568359375
+        }
+      },
+      {
+        "class": "asset original-books",
+        "src": "/assets/cozy_days/raster/original/books-bubble.png",
+        "rect": {
+          "x": 0,
+          "y": 609.796875,
+          "width": 147.046875,
+          "height": 58.203125
+        }
+      },
+      {
+        "class": "asset original-peeking-cat",
+        "src": "/assets/cozy_days/raster/original/peeking-cat.png",
+        "rect": {
+          "x": 321.703125,
+          "y": 625.109375,
+          "width": 38.296875,
+          "height": 42.890625
+        }
+      }
+    ],
+    "assets": [
+      {
+        "src": "/assets/cozy_days/vectors/symbols/heart_pink_outline.svg",
+        "sha256": "d85097dde592cff0ea27227bbbf7ecd3dc2d3f4d6e47b572cb38257b3aae0c16"
+      },
+      {
+        "src": "/assets/cozy_days/raster/backgrounds/bedroom_header.png",
+        "sha256": "81a9a0f06760ac474e1865d8c88c52984eb547b298995c319bf23e1ab541cba6"
+      },
+      {
+        "src": "/assets/cozy_days/raster/characters/cats_header.png",
+        "sha256": "01c839801c4a78ce4c37433db0ee63e4a171fe3b19645c3b5756d37dde05e59a"
+      },
+      {
+        "src": "/assets/cozy_days/vectors/symbols/sparkle_gold.svg",
+        "sha256": "50e8ae3b016d0dbd60ae9b6b9c213310a33f338ffd39a700210436bd18bbb887"
+      },
+      {
+        "src": "/assets/cozy_days/vectors/symbols/star_cream.svg",
+        "sha256": "c725117c9e0860cd89d4c6c205003cc60f8dbdf7dc236b55d65bd6c280df0494"
+      },
+      {
+        "src": "/assets/cozy_days/raster/original/plant.png",
+        "sha256": "6e2e2cd3b1ed10f1e23d36026973f4d428218dd667b620cdda4d91e7d168b916"
+      },
+      {
+        "src": "/assets/cozy_days/raster/original/cheer.png",
+        "sha256": "a2c3119ddaf09f4936e79a4b5b5db55bf809f9a0d09e06fb8e9483e2e82ba2d0"
+      },
+      {
+        "src": "/assets/cozy_days/raster/decor/washi_pink.png",
+        "sha256": "67d472011ab6ed8e0df6876308fe9dbceb03e210246ecb7e5b03b01c12d7b3cb"
+      },
+      {
+        "src": "/assets/cozy_days/raster/tasks/task_book.png",
+        "sha256": "f6a9849fc81c08c6205dd5d61be74fbf3112eabf24a674ad6798e4995a043446"
+      },
+      {
+        "src": "/assets/cozy_days/raster/decor/flower_pink.png",
+        "sha256": "563d9fe84ad9482987dcad02852c3fa80326fb084f1a500cfb7a3c6231e6f5f5"
+      },
+      {
+        "src": "/assets/cozy_days/raster/tasks/task_stretch.png",
+        "sha256": "590862edc674dce928aaf28cf58510668868543de4fab44dcf30501af06c56ec"
+      },
+      {
+        "src": "/assets/cozy_days/raster/decor/sprout.png",
+        "sha256": "60ad0c46a2c5afa2c24994e18ee496f27c9c76c66b894916b88cef3174ebba77"
+      },
+      {
+        "src": "/assets/cozy_days/raster/original/books-bubble.png",
+        "sha256": "009726937676e55be84b722e089c5c5cb653aaa2f4f258cf65496553d0e14053"
+      },
+      {
+        "src": "/assets/cozy_days/raster/original/peeking-cat.png",
+        "sha256": "ca8dc6a3f80e92bd8727a10e00437d61083dee6bea49ed6263c5684110d7119c"
+      }
+    ]
+  },
+  {
+    "kind": "candidate",
+    "width": 360,
+    "height": 740,
+    "nodes": [
+      {
+        "x": 246,
+        "y": 398,
+        "chain": [
+          {
+            "tag": "ARTICLE",
+            "class": "task-card ",
+            "text": "午后读几页喜欢的书15:30",
+            "src": null,
+            "rect": {
+              "x": 14,
+              "y": 378.796875,
+              "width": 332,
+              "height": 64
+            },
+            "font": "Yozai, \"Microsoft YaHei\", \"PingFang SC\", \"Noto Sans CJK SC\", system-ui, sans-serif",
+            "borderRadius": "17px 15px 18px 16px",
+            "transform": "matrix(1, 0, 0, 1, 0, 0)"
+          },
+          {
+            "tag": "DIV",
+            "class": "swipe-shell",
+            "text": "完成删除午后读几页喜欢的书15:30",
+            "src": null,
+            "rect": {
+              "x": 14,
+              "y": 378.796875,
+              "width": 332,
+              "height": 72
+            },
+            "font": "Yozai, \"Microsoft YaHei\", \"PingFang SC\", \"Noto Sans CJK SC\", system-ui, sans-serif",
+            "borderRadius": "0px",
+            "transform": "none"
+          },
+          {
+            "tag": "DIV",
+            "class": "task-list",
+            "text": "完成删除午后读几页喜欢的书15:30完成删除晚上散步十分钟完成删除整理桌面，给自",
+            "src": null,
+            "rect": {
+              "x": 14,
+              "y": 378.796875,
+              "width": 332,
+              "height": 216
+            },
+            "font": "Yozai, \"Microsoft YaHei\", \"PingFang SC\", \"Noto Sans CJK SC\", system-ui, sans-serif",
+            "borderRadius": "0px",
+            "transform": "none"
+          }
+        ]
+      },
+      {
+        "x": 247,
+        "y": 398,
+        "chain": [
+          {
+            "tag": "ARTICLE",
+            "class": "task-card ",
+            "text": "午后读几页喜欢的书15:30",
+            "src": null,
+            "rect": {
+              "x": 14,
+              "y": 378.796875,
+              "width": 332,
+              "height": 64
+            },
+            "font": "Yozai, \"Microsoft YaHei\", \"PingFang SC\", \"Noto Sans CJK SC\", system-ui, sans-serif",
+            "borderRadius": "17px 15px 18px 16px",
+            "transform": "matrix(1, 0, 0, 1, 0, 0)"
+          },
+          {
+            "tag": "DIV",
+            "class": "swipe-shell",
+            "text": "完成删除午后读几页喜欢的书15:30",
+            "src": null,
+            "rect": {
+              "x": 14,
+              "y": 378.796875,
+              "width": 332,
+              "height": 72
+            },
+            "font": "Yozai, \"Microsoft YaHei\", \"PingFang SC\", \"Noto Sans CJK SC\", system-ui, sans-serif",
+            "borderRadius": "0px",
+            "transform": "none"
+          },
+          {
+            "tag": "DIV",
+            "class": "task-list",
+            "text": "完成删除午后读几页喜欢的书15:30完成删除晚上散步十分钟完成删除整理桌面，给自",
+            "src": null,
+            "rect": {
+              "x": 14,
+              "y": 378.796875,
+              "width": 332,
+              "height": 216
+            },
+            "font": "Yozai, \"Microsoft YaHei\", \"PingFang SC\", \"Noto Sans CJK SC\", system-ui, sans-serif",
+            "borderRadius": "0px",
+            "transform": "none"
+          }
+        ]
+      },
+      {
+        "x": 246,
+        "y": 399,
+        "chain": [
+          {
+            "tag": "ARTICLE",
+            "class": "task-card ",
+            "text": "午后读几页喜欢的书15:30",
+            "src": null,
+            "rect": {
+              "x": 14,
+              "y": 378.796875,
+              "width": 332,
+              "height": 64
+            },
+            "font": "Yozai, \"Microsoft YaHei\", \"PingFang SC\", \"Noto Sans CJK SC\", system-ui, sans-serif",
+            "borderRadius": "17px 15px 18px 16px",
+            "transform": "matrix(1, 0, 0, 1, 0, 0)"
+          },
+          {
+            "tag": "DIV",
+            "class": "swipe-shell",
+            "text": "完成删除午后读几页喜欢的书15:30",
+            "src": null,
+            "rect": {
+              "x": 14,
+              "y": 378.796875,
+              "width": 332,
+              "height": 72
+            },
+            "font": "Yozai, \"Microsoft YaHei\", \"PingFang SC\", \"Noto Sans CJK SC\", system-ui, sans-serif",
+            "borderRadius": "0px",
+            "transform": "none"
+          },
+          {
+            "tag": "DIV",
+            "class": "task-list",
+            "text": "完成删除午后读几页喜欢的书15:30完成删除晚上散步十分钟完成删除整理桌面，给自",
+            "src": null,
+            "rect": {
+              "x": 14,
+              "y": 378.796875,
+              "width": 332,
+              "height": 216
+            },
+            "font": "Yozai, \"Microsoft YaHei\", \"PingFang SC\", \"Noto Sans CJK SC\", system-ui, sans-serif",
+            "borderRadius": "0px",
+            "transform": "none"
+          }
+        ]
+      }
+    ],
+    "imageGeometry": [
+      {
+        "class": "asset ",
+        "src": "/assets/cozy_days/vectors/symbols/heart_pink_outline.svg",
+        "rect": {
+          "x": 117.11608123779297,
+          "y": 62.17858123779297,
+          "width": 36.767845153808594,
+          "height": 36.76783752441406
+        }
+      },
+      {
+        "class": "asset ",
+        "src": "/assets/cozy_days/raster/backgrounds/bedroom_header.png",
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 360,
+          "height": 208.796875
+        }
+      },
+      {
+        "class": "asset hero-cat",
+        "src": "/assets/cozy_days/raster/characters/cats_header.png",
+        "rect": {
+          "x": 107.8125,
+          "y": 70.78125,
+          "width": 259.1875,
+          "height": 143.015625
+        }
+      },
+      {
+        "class": "asset hero-sparkle",
+        "src": "/assets/cozy_days/vectors/symbols/sparkle_gold.svg",
+        "rect": {
+          "x": 116.56416320800781,
+          "y": 144.7672882080078,
+          "width": 28.465423583984375,
+          "height": 28.465423583984375
+        }
+      },
+      {
+        "class": "asset hero-star",
+        "src": "/assets/cozy_days/vectors/symbols/star_cream.svg",
+        "rect": {
+          "x": 33.986358642578125,
+          "y": 167.78323364257812,
+          "width": 21.02728271484375,
+          "height": 21.02728271484375
+        }
+      },
+      {
+        "class": "asset original-plant",
+        "src": "/assets/cozy_days/raster/original/plant.png",
+        "rect": {
+          "x": 0,
+          "y": 164,
+          "width": 25.265625,
+          "height": 44.796875
+        }
+      },
+      {
+        "class": "asset original-cheer",
+        "src": "/assets/cozy_days/raster/original/cheer.png",
+        "rect": {
+          "x": 275.921875,
+          "y": 14,
+          "width": 69.6875,
+          "height": 58.953125
+        }
+      },
+      {
+        "class": "asset ",
+        "src": "/assets/cozy_days/raster/decor/washi_pink.png",
+        "rect": {
+          "x": 8.445243835449219,
+          "y": 340.03759765625,
+          "width": 68.10951232910156,
+          "height": 44.0341796875
+        }
+      },
+      {
+        "class": "asset task-illustration",
+        "src": "/assets/cozy_days/raster/tasks/task_book.png",
+        "rect": {
+          "x": 247.17298889160156,
+          "y": 397.17315673828125,
+          "width": 33.63841247558594,
+          "height": 20.7474365234375
+        }
+      },
+      {
+        "class": "asset task-sticker",
+        "src": "/assets/cozy_days/raster/decor/flower_pink.png",
+        "rect": {
+          "x": 239.9483642578125,
+          "y": 387.734619140625,
+          "width": 12.103271484375,
+          "height": 12.04638671875
+        }
+      },
+      {
+        "class": "asset task-illustration",
+        "src": "/assets/cozy_days/raster/tasks/task_stretch.png",
+        "rect": {
+          "x": 239.4200439453125,
+          "y": 460.2126159667969,
+          "width": 35.144287109375,
+          "height": 35.07476806640625
+        }
+      },
+      {
+        "class": "asset task-sticker",
+        "src": "/assets/cozy_days/raster/decor/flower_pink.png",
+        "rect": {
+          "x": 241.3582305908203,
+          "y": 494.2274169921875,
+          "width": 11.283538818359375,
+          "height": 11.217041015625
+        }
+      },
+      {
+        "class": "asset task-illustration",
+        "src": "/assets/cozy_days/raster/decor/sprout.png",
+        "rect": {
+          "x": 246,
+          "y": 533.796875,
+          "width": 31.96875,
+          "height": 20.078125
+        }
+      },
+      {
+        "class": "asset task-sticker",
+        "src": "/assets/cozy_days/raster/decor/flower_pink.png",
+        "rect": {
+          "x": 274.2145080566406,
+          "y": 566.0821533203125,
+          "width": 11.57098388671875,
+          "height": 11.507568359375
+        }
+      },
+      {
+        "class": "asset original-books",
+        "src": "/assets/cozy_days/raster/original/books-bubble.png",
+        "rect": {
+          "x": 0,
+          "y": 609.796875,
+          "width": 147.046875,
+          "height": 58.203125
+        }
+      },
+      {
+        "class": "asset original-peeking-cat",
+        "src": "/assets/cozy_days/raster/original/peeking-cat.png",
+        "rect": {
+          "x": 321.703125,
+          "y": 625.109375,
+          "width": 38.296875,
+          "height": 42.890625
+        }
+      }
+    ],
+    "assets": [
+      {
+        "src": "/assets/cozy_days/vectors/symbols/heart_pink_outline.svg",
+        "sha256": "d85097dde592cff0ea27227bbbf7ecd3dc2d3f4d6e47b572cb38257b3aae0c16"
+      },
+      {
+        "src": "/assets/cozy_days/raster/backgrounds/bedroom_header.png",
+        "sha256": "81a9a0f06760ac474e1865d8c88c52984eb547b298995c319bf23e1ab541cba6"
+      },
+      {
+        "src": "/assets/cozy_days/raster/characters/cats_header.png",
+        "sha256": "01c839801c4a78ce4c37433db0ee63e4a171fe3b19645c3b5756d37dde05e59a"
+      },
+      {
+        "src": "/assets/cozy_days/vectors/symbols/sparkle_gold.svg",
+        "sha256": "50e8ae3b016d0dbd60ae9b6b9c213310a33f338ffd39a700210436bd18bbb887"
+      },
+      {
+        "src": "/assets/cozy_days/vectors/symbols/star_cream.svg",
+        "sha256": "c725117c9e0860cd89d4c6c205003cc60f8dbdf7dc236b55d65bd6c280df0494"
+      },
+      {
+        "src": "/assets/cozy_days/raster/original/plant.png",
+        "sha256": "6e2e2cd3b1ed10f1e23d36026973f4d428218dd667b620cdda4d91e7d168b916"
+      },
+      {
+        "src": "/assets/cozy_days/raster/original/cheer.png",
+        "sha256": "a2c3119ddaf09f4936e79a4b5b5db55bf809f9a0d09e06fb8e9483e2e82ba2d0"
+      },
+      {
+        "src": "/assets/cozy_days/raster/decor/washi_pink.png",
+        "sha256": "67d472011ab6ed8e0df6876308fe9dbceb03e210246ecb7e5b03b01c12d7b3cb"
+      },
+      {
+        "src": "/assets/cozy_days/raster/tasks/task_book.png",
+        "sha256": "f6a9849fc81c08c6205dd5d61be74fbf3112eabf24a674ad6798e4995a043446"
+      },
+      {
+        "src": "/assets/cozy_days/raster/decor/flower_pink.png",
+        "sha256": "563d9fe84ad9482987dcad02852c3fa80326fb084f1a500cfb7a3c6231e6f5f5"
+      },
+      {
+        "src": "/assets/cozy_days/raster/tasks/task_stretch.png",
+        "sha256": "590862edc674dce928aaf28cf58510668868543de4fab44dcf30501af06c56ec"
+      },
+      {
+        "src": "/assets/cozy_days/raster/decor/sprout.png",
+        "sha256": "60ad0c46a2c5afa2c24994e18ee496f27c9c76c66b894916b88cef3174ebba77"
+      },
+      {
+        "src": "/assets/cozy_days/raster/original/books-bubble.png",
+        "sha256": "009726937676e55be84b722e089c5c5cb653aaa2f4f258cf65496553d0e14053"
+      },
+      {
+        "src": "/assets/cozy_days/raster/original/peeking-cat.png",
+        "sha256": "ca8dc6a3f80e92bd8727a10e00437d61083dee6bea49ed6263c5684110d7119c"
+      }
+    ]
+  },
+  {
+    "kind": "baseline",
+    "width": 393,
+    "height": 852,
+    "nodes": [
+      {
+        "x": 74,
+        "y": 295,
+        "chain": [
+          {
+            "tag": "SPAN",
+            "class": "",
+            "text": "3",
+            "src": null,
+            "rect": {
+              "x": 72,
+              "y": 293.9375,
+              "width": 16,
+              "height": 16
+            },
+            "font": "Yozai, \"Microsoft YaHei\", \"PingFang SC\", \"Noto Sans CJK SC\", system-ui, sans-serif",
+            "borderRadius": "10px",
+            "transform": "none"
+          },
+          {
+            "tag": "BUTTON",
+            "class": "active",
+            "text": "当前日期 3",
+            "src": null,
+            "rect": {
+              "x": 18,
+              "y": 279.9375,
+              "width": 79,
+              "height": 44
+            },
+            "font": "Yozai, \"Microsoft YaHei\", \"PingFang SC\", \"Noto Sans CJK SC\", system-ui, sans-serif",
+            "borderRadius": "14px",
+            "transform": "none"
+          },
+          {
+            "tag": "DIV",
+            "class": "view-tabs",
+            "text": "当前日期 3全部未完成 3",
+            "src": null,
+            "rect": {
+              "x": 18,
+              "y": 279.9375,
+              "width": 263,
+              "height": 44
+            },
+            "font": "Yozai, \"Microsoft YaHei\", \"PingFang SC\", \"Noto Sans CJK SC\", system-ui, sans-serif",
+            "borderRadius": "0px",
+            "transform": "none"
+          }
+        ]
+      },
+      {
+        "x": 75,
+        "y": 295,
+        "chain": [
+          {
+            "tag": "SPAN",
+            "class": "",
+            "text": "3",
+            "src": null,
+            "rect": {
+              "x": 72,
+              "y": 293.9375,
+              "width": 16,
+              "height": 16
+            },
+            "font": "Yozai, \"Microsoft YaHei\", \"PingFang SC\", \"Noto Sans CJK SC\", system-ui, sans-serif",
+            "borderRadius": "10px",
+            "transform": "none"
+          },
+          {
+            "tag": "BUTTON",
+            "class": "active",
+            "text": "当前日期 3",
+            "src": null,
+            "rect": {
+              "x": 18,
+              "y": 279.9375,
+              "width": 79,
+              "height": 44
+            },
+            "font": "Yozai, \"Microsoft YaHei\", \"PingFang SC\", \"Noto Sans CJK SC\", system-ui, sans-serif",
+            "borderRadius": "14px",
+            "transform": "none"
+          },
+          {
+            "tag": "DIV",
+            "class": "view-tabs",
+            "text": "当前日期 3全部未完成 3",
+            "src": null,
+            "rect": {
+              "x": 18,
+              "y": 279.9375,
+              "width": 263,
+              "height": 44
+            },
+            "font": "Yozai, \"Microsoft YaHei\", \"PingFang SC\", \"Noto Sans CJK SC\", system-ui, sans-serif",
+            "borderRadius": "0px",
+            "transform": "none"
+          }
+        ]
+      },
+      {
+        "x": 275,
+        "y": 417,
+        "chain": [
+          {
+            "tag": "ARTICLE",
+            "class": "task-card ",
+            "text": "午后读几页喜欢的书15:30",
+            "src": null,
+            "rect": {
+              "x": 18,
+              "y": 397.9375,
+              "width": 357,
+              "height": 64
+            },
+            "font": "Yozai, \"Microsoft YaHei\", \"PingFang SC\", \"Noto Sans CJK SC\", system-ui, sans-serif",
+            "borderRadius": "17px 15px 18px 16px",
+            "transform": "matrix(1, 0, 0, 1, 0, 0)"
+          },
+          {
+            "tag": "DIV",
+            "class": "swipe-shell",
+            "text": "完成删除午后读几页喜欢的书15:30",
+            "src": null,
+            "rect": {
+              "x": 18,
+              "y": 397.9375,
+              "width": 357,
+              "height": 72
+            },
+            "font": "Yozai, \"Microsoft YaHei\", \"PingFang SC\", \"Noto Sans CJK SC\", system-ui, sans-serif",
+            "borderRadius": "0px",
+            "transform": "none"
+          },
+          {
+            "tag": "DIV",
+            "class": "task-list",
+            "text": "完成删除午后读几页喜欢的书15:30完成删除晚上散步十分钟完成删除整理桌面，给自",
+            "src": null,
+            "rect": {
+              "x": 18,
+              "y": 397.9375,
+              "width": 357,
+              "height": 216
+            },
+            "font": "Yozai, \"Microsoft YaHei\", \"PingFang SC\", \"Noto Sans CJK SC\", system-ui, sans-serif",
+            "borderRadius": "0px",
+            "transform": "none"
+          }
+        ]
+      },
+      {
+        "x": 276,
+        "y": 417,
+        "chain": [
+          {
+            "tag": "ARTICLE",
+            "class": "task-card ",
+            "text": "午后读几页喜欢的书15:30",
+            "src": null,
+            "rect": {
+              "x": 18,
+              "y": 397.9375,
+              "width": 357,
+              "height": 64
+            },
+            "font": "Yozai, \"Microsoft YaHei\", \"PingFang SC\", \"Noto Sans CJK SC\", system-ui, sans-serif",
+            "borderRadius": "17px 15px 18px 16px",
+            "transform": "matrix(1, 0, 0, 1, 0, 0)"
+          },
+          {
+            "tag": "DIV",
+            "class": "swipe-shell",
+            "text": "完成删除午后读几页喜欢的书15:30",
+            "src": null,
+            "rect": {
+              "x": 18,
+              "y": 397.9375,
+              "width": 357,
+              "height": 72
+            },
+            "font": "Yozai, \"Microsoft YaHei\", \"PingFang SC\", \"Noto Sans CJK SC\", system-ui, sans-serif",
+            "borderRadius": "0px",
+            "transform": "none"
+          },
+          {
+            "tag": "DIV",
+            "class": "task-list",
+            "text": "完成删除午后读几页喜欢的书15:30完成删除晚上散步十分钟完成删除整理桌面，给自",
+            "src": null,
+            "rect": {
+              "x": 18,
+              "y": 397.9375,
+              "width": 357,
+              "height": 216
+            },
+            "font": "Yozai, \"Microsoft YaHei\", \"PingFang SC\", \"Noto Sans CJK SC\", system-ui, sans-serif",
+            "borderRadius": "0px",
+            "transform": "none"
+          }
+        ]
+      },
+      {
+        "x": 275,
+        "y": 418,
+        "chain": [
+          {
+            "tag": "ARTICLE",
+            "class": "task-card ",
+            "text": "午后读几页喜欢的书15:30",
+            "src": null,
+            "rect": {
+              "x": 18,
+              "y": 397.9375,
+              "width": 357,
+              "height": 64
+            },
+            "font": "Yozai, \"Microsoft YaHei\", \"PingFang SC\", \"Noto Sans CJK SC\", system-ui, sans-serif",
+            "borderRadius": "17px 15px 18px 16px",
+            "transform": "matrix(1, 0, 0, 1, 0, 0)"
+          },
+          {
+            "tag": "DIV",
+            "class": "swipe-shell",
+            "text": "完成删除午后读几页喜欢的书15:30",
+            "src": null,
+            "rect": {
+              "x": 18,
+              "y": 397.9375,
+              "width": 357,
+              "height": 72
+            },
+            "font": "Yozai, \"Microsoft YaHei\", \"PingFang SC\", \"Noto Sans CJK SC\", system-ui, sans-serif",
+            "borderRadius": "0px",
+            "transform": "none"
+          },
+          {
+            "tag": "DIV",
+            "class": "task-list",
+            "text": "完成删除午后读几页喜欢的书15:30完成删除晚上散步十分钟完成删除整理桌面，给自",
+            "src": null,
+            "rect": {
+              "x": 18,
+              "y": 397.9375,
+              "width": 357,
+              "height": 216
+            },
+            "font": "Yozai, \"Microsoft YaHei\", \"PingFang SC\", \"Noto Sans CJK SC\", system-ui, sans-serif",
+            "borderRadius": "0px",
+            "transform": "none"
+          }
+        ]
+      }
+    ],
+    "imageGeometry": [
+      {
+        "class": "asset ",
+        "src": "/assets/cozy_days/vectors/symbols/heart_pink_outline.svg",
+        "rect": {
+          "x": 125.11608123779297,
+          "y": 63.91295623779297,
+          "width": 36.767845153808594,
+          "height": 36.76783752441406
+        }
+      },
+      {
+        "class": "asset ",
+        "src": "/assets/cozy_days/raster/backgrounds/bedroom_header.png",
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 393,
+          "height": 227.9375
+        }
+      },
+      {
+        "class": "asset hero-cat",
+        "src": "/assets/cozy_days/raster/characters/cats_header.png",
+        "rect": {
+          "x": 117.046875,
+          "y": 76.8125,
+          "width": 282.953125,
+          "height": 156.125
+        }
+      },
+      {
+        "class": "asset hero-sparkle",
+        "src": "/assets/cozy_days/vectors/symbols/sparkle_gold.svg",
+        "rect": {
+          "x": 127.45478820800781,
+          "y": 150.7672882080078,
+          "width": 28.465423583984375,
+          "height": 28.465423583984375
+        }
+      },
+      {
+        "class": "asset hero-star",
+        "src": "/assets/cozy_days/vectors/symbols/star_cream.svg",
+        "rect": {
+          "x": 37.283233642578125,
+          "y": 186.92385864257812,
+          "width": 21.02728271484375,
+          "height": 21.02728271484375
+        }
+      },
+      {
+        "class": "asset original-plant",
+        "src": "/assets/cozy_days/raster/original/plant.png",
+        "rect": {
+          "x": 0,
+          "y": 164,
+          "width": 36.0625,
+          "height": 63.9375
+        }
+      },
+      {
+        "class": "asset original-cheer",
+        "src": "/assets/cozy_days/raster/original/cheer.png",
+        "rect": {
+          "x": 301.203125,
+          "y": 14,
+          "width": 76.078125,
+          "height": 64.359375
+        }
+      },
+      {
+        "class": "asset ",
+        "src": "/assets/cozy_days/raster/decor/washi_pink.png",
+        "rect": {
+          "x": 12.445243835449219,
+          "y": 359.17822265625,
+          "width": 68.10951232910156,
+          "height": 44.0341796875
+        }
+      },
+      {
+        "class": "asset task-illustration",
+        "src": "/assets/cozy_days/raster/tasks/task_book.png",
+        "rect": {
+          "x": 276.1729736328125,
+          "y": 416.31378173828125,
+          "width": 33.638427734375,
+          "height": 20.7474365234375
+        }
+      },
+      {
+        "class": "asset task-sticker",
+        "src": "/assets/cozy_days/raster/decor/flower_pink.png",
+        "rect": {
+          "x": 268.9483642578125,
+          "y": 406.875244140625,
+          "width": 12.103271484375,
+          "height": 12.04638671875
+        }
+      },
+      {
+        "class": "asset task-illustration",
+        "src": "/assets/cozy_days/raster/tasks/task_stretch.png",
+        "rect": {
+          "x": 268.4200439453125,
+          "y": 479.3532409667969,
+          "width": 35.144287109375,
+          "height": 35.074737548828125
+        }
+      },
+      {
+        "class": "asset task-sticker",
+        "src": "/assets/cozy_days/raster/decor/flower_pink.png",
+        "rect": {
+          "x": 270.35821533203125,
+          "y": 513.3680419921875,
+          "width": 11.2835693359375,
+          "height": 11.217041015625
+        }
+      },
+      {
+        "class": "asset task-illustration",
+        "src": "/assets/cozy_days/raster/decor/sprout.png",
+        "rect": {
+          "x": 275,
+          "y": 552.9375,
+          "width": 31.96875,
+          "height": 20.078125
+        }
+      },
+      {
+        "class": "asset task-sticker",
+        "src": "/assets/cozy_days/raster/decor/flower_pink.png",
+        "rect": {
+          "x": 303.2145080566406,
+          "y": 585.2227783203125,
+          "width": 11.57098388671875,
+          "height": 11.507568359375
+        }
+      },
+      {
+        "class": "asset original-books",
+        "src": "/assets/cozy_days/raster/original/books-bubble.png",
+        "rect": {
+          "x": 0,
+          "y": 716.46875,
+          "width": 160.53125,
+          "height": 63.53125
+        }
+      },
+      {
+        "class": "asset original-peeking-cat",
+        "src": "/assets/cozy_days/raster/original/peeking-cat.png",
+        "rect": {
+          "x": 351.1875,
+          "y": 733.171875,
+          "width": 41.8125,
+          "height": 46.828125
+        }
+      }
+    ],
+    "assets": [
+      {
+        "src": "/assets/cozy_days/vectors/symbols/heart_pink_outline.svg",
+        "sha256": "d85097dde592cff0ea27227bbbf7ecd3dc2d3f4d6e47b572cb38257b3aae0c16"
+      },
+      {
+        "src": "/assets/cozy_days/raster/backgrounds/bedroom_header.png",
+        "sha256": "81a9a0f06760ac474e1865d8c88c52984eb547b298995c319bf23e1ab541cba6"
+      },
+      {
+        "src": "/assets/cozy_days/raster/characters/cats_header.png",
+        "sha256": "01c839801c4a78ce4c37433db0ee63e4a171fe3b19645c3b5756d37dde05e59a"
+      },
+      {
+        "src": "/assets/cozy_days/vectors/symbols/sparkle_gold.svg",
+        "sha256": "50e8ae3b016d0dbd60ae9b6b9c213310a33f338ffd39a700210436bd18bbb887"
+      },
+      {
+        "src": "/assets/cozy_days/vectors/symbols/star_cream.svg",
+        "sha256": "c725117c9e0860cd89d4c6c205003cc60f8dbdf7dc236b55d65bd6c280df0494"
+      },
+      {
+        "src": "/assets/cozy_days/raster/original/plant.png",
+        "sha256": "6e2e2cd3b1ed10f1e23d36026973f4d428218dd667b620cdda4d91e7d168b916"
+      },
+      {
+        "src": "/assets/cozy_days/raster/original/cheer.png",
+        "sha256": "a2c3119ddaf09f4936e79a4b5b5db55bf809f9a0d09e06fb8e9483e2e82ba2d0"
+      },
+      {
+        "src": "/assets/cozy_days/raster/decor/washi_pink.png",
+        "sha256": "67d472011ab6ed8e0df6876308fe9dbceb03e210246ecb7e5b03b01c12d7b3cb"
+      },
+      {
+        "src": "/assets/cozy_days/raster/tasks/task_book.png",
+        "sha256": "f6a9849fc81c08c6205dd5d61be74fbf3112eabf24a674ad6798e4995a043446"
+      },
+      {
+        "src": "/assets/cozy_days/raster/decor/flower_pink.png",
+        "sha256": "563d9fe84ad9482987dcad02852c3fa80326fb084f1a500cfb7a3c6231e6f5f5"
+      },
+      {
+        "src": "/assets/cozy_days/raster/tasks/task_stretch.png",
+        "sha256": "590862edc674dce928aaf28cf58510668868543de4fab44dcf30501af06c56ec"
+      },
+      {
+        "src": "/assets/cozy_days/raster/decor/sprout.png",
+        "sha256": "60ad0c46a2c5afa2c24994e18ee496f27c9c76c66b894916b88cef3174ebba77"
+      },
+      {
+        "src": "/assets/cozy_days/raster/original/books-bubble.png",
+        "sha256": "009726937676e55be84b722e089c5c5cb653aaa2f4f258cf65496553d0e14053"
+      },
+      {
+        "src": "/assets/cozy_days/raster/original/peeking-cat.png",
+        "sha256": "ca8dc6a3f80e92bd8727a10e00437d61083dee6bea49ed6263c5684110d7119c"
+      }
+    ]
+  },
+  {
+    "kind": "candidate",
+    "width": 393,
+    "height": 852,
+    "nodes": [
+      {
+        "x": 74,
+        "y": 295,
+        "chain": [
+          {
+            "tag": "SPAN",
+            "class": "",
+            "text": "3",
+            "src": null,
+            "rect": {
+              "x": 72,
+              "y": 293.9375,
+              "width": 16,
+              "height": 16
+            },
+            "font": "Yozai, \"Microsoft YaHei\", \"PingFang SC\", \"Noto Sans CJK SC\", system-ui, sans-serif",
+            "borderRadius": "10px",
+            "transform": "none"
+          },
+          {
+            "tag": "BUTTON",
+            "class": "active",
+            "text": "当前日期 3",
+            "src": null,
+            "rect": {
+              "x": 18,
+              "y": 279.9375,
+              "width": 79,
+              "height": 44
+            },
+            "font": "Yozai, \"Microsoft YaHei\", \"PingFang SC\", \"Noto Sans CJK SC\", system-ui, sans-serif",
+            "borderRadius": "14px",
+            "transform": "none"
+          },
+          {
+            "tag": "DIV",
+            "class": "view-tabs",
+            "text": "当前日期 3全部未完成 3",
+            "src": null,
+            "rect": {
+              "x": 18,
+              "y": 279.9375,
+              "width": 263,
+              "height": 44
+            },
+            "font": "Yozai, \"Microsoft YaHei\", \"PingFang SC\", \"Noto Sans CJK SC\", system-ui, sans-serif",
+            "borderRadius": "0px",
+            "transform": "none"
+          }
+        ]
+      },
+      {
+        "x": 75,
+        "y": 295,
+        "chain": [
+          {
+            "tag": "SPAN",
+            "class": "",
+            "text": "3",
+            "src": null,
+            "rect": {
+              "x": 72,
+              "y": 293.9375,
+              "width": 16,
+              "height": 16
+            },
+            "font": "Yozai, \"Microsoft YaHei\", \"PingFang SC\", \"Noto Sans CJK SC\", system-ui, sans-serif",
+            "borderRadius": "10px",
+            "transform": "none"
+          },
+          {
+            "tag": "BUTTON",
+            "class": "active",
+            "text": "当前日期 3",
+            "src": null,
+            "rect": {
+              "x": 18,
+              "y": 279.9375,
+              "width": 79,
+              "height": 44
+            },
+            "font": "Yozai, \"Microsoft YaHei\", \"PingFang SC\", \"Noto Sans CJK SC\", system-ui, sans-serif",
+            "borderRadius": "14px",
+            "transform": "none"
+          },
+          {
+            "tag": "DIV",
+            "class": "view-tabs",
+            "text": "当前日期 3全部未完成 3",
+            "src": null,
+            "rect": {
+              "x": 18,
+              "y": 279.9375,
+              "width": 263,
+              "height": 44
+            },
+            "font": "Yozai, \"Microsoft YaHei\", \"PingFang SC\", \"Noto Sans CJK SC\", system-ui, sans-serif",
+            "borderRadius": "0px",
+            "transform": "none"
+          }
+        ]
+      },
+      {
+        "x": 275,
+        "y": 417,
+        "chain": [
+          {
+            "tag": "ARTICLE",
+            "class": "task-card ",
+            "text": "午后读几页喜欢的书15:30",
+            "src": null,
+            "rect": {
+              "x": 18,
+              "y": 397.9375,
+              "width": 357,
+              "height": 64
+            },
+            "font": "Yozai, \"Microsoft YaHei\", \"PingFang SC\", \"Noto Sans CJK SC\", system-ui, sans-serif",
+            "borderRadius": "17px 15px 18px 16px",
+            "transform": "matrix(1, 0, 0, 1, 0, 0)"
+          },
+          {
+            "tag": "DIV",
+            "class": "swipe-shell",
+            "text": "完成删除午后读几页喜欢的书15:30",
+            "src": null,
+            "rect": {
+              "x": 18,
+              "y": 397.9375,
+              "width": 357,
+              "height": 72
+            },
+            "font": "Yozai, \"Microsoft YaHei\", \"PingFang SC\", \"Noto Sans CJK SC\", system-ui, sans-serif",
+            "borderRadius": "0px",
+            "transform": "none"
+          },
+          {
+            "tag": "DIV",
+            "class": "task-list",
+            "text": "完成删除午后读几页喜欢的书15:30完成删除晚上散步十分钟完成删除整理桌面，给自",
+            "src": null,
+            "rect": {
+              "x": 18,
+              "y": 397.9375,
+              "width": 357,
+              "height": 216
+            },
+            "font": "Yozai, \"Microsoft YaHei\", \"PingFang SC\", \"Noto Sans CJK SC\", system-ui, sans-serif",
+            "borderRadius": "0px",
+            "transform": "none"
+          }
+        ]
+      },
+      {
+        "x": 276,
+        "y": 417,
+        "chain": [
+          {
+            "tag": "ARTICLE",
+            "class": "task-card ",
+            "text": "午后读几页喜欢的书15:30",
+            "src": null,
+            "rect": {
+              "x": 18,
+              "y": 397.9375,
+              "width": 357,
+              "height": 64
+            },
+            "font": "Yozai, \"Microsoft YaHei\", \"PingFang SC\", \"Noto Sans CJK SC\", system-ui, sans-serif",
+            "borderRadius": "17px 15px 18px 16px",
+            "transform": "matrix(1, 0, 0, 1, 0, 0)"
+          },
+          {
+            "tag": "DIV",
+            "class": "swipe-shell",
+            "text": "完成删除午后读几页喜欢的书15:30",
+            "src": null,
+            "rect": {
+              "x": 18,
+              "y": 397.9375,
+              "width": 357,
+              "height": 72
+            },
+            "font": "Yozai, \"Microsoft YaHei\", \"PingFang SC\", \"Noto Sans CJK SC\", system-ui, sans-serif",
+            "borderRadius": "0px",
+            "transform": "none"
+          },
+          {
+            "tag": "DIV",
+            "class": "task-list",
+            "text": "完成删除午后读几页喜欢的书15:30完成删除晚上散步十分钟完成删除整理桌面，给自",
+            "src": null,
+            "rect": {
+              "x": 18,
+              "y": 397.9375,
+              "width": 357,
+              "height": 216
+            },
+            "font": "Yozai, \"Microsoft YaHei\", \"PingFang SC\", \"Noto Sans CJK SC\", system-ui, sans-serif",
+            "borderRadius": "0px",
+            "transform": "none"
+          }
+        ]
+      },
+      {
+        "x": 275,
+        "y": 418,
+        "chain": [
+          {
+            "tag": "ARTICLE",
+            "class": "task-card ",
+            "text": "午后读几页喜欢的书15:30",
+            "src": null,
+            "rect": {
+              "x": 18,
+              "y": 397.9375,
+              "width": 357,
+              "height": 64
+            },
+            "font": "Yozai, \"Microsoft YaHei\", \"PingFang SC\", \"Noto Sans CJK SC\", system-ui, sans-serif",
+            "borderRadius": "17px 15px 18px 16px",
+            "transform": "matrix(1, 0, 0, 1, 0, 0)"
+          },
+          {
+            "tag": "DIV",
+            "class": "swipe-shell",
+            "text": "完成删除午后读几页喜欢的书15:30",
+            "src": null,
+            "rect": {
+              "x": 18,
+              "y": 397.9375,
+              "width": 357,
+              "height": 72
+            },
+            "font": "Yozai, \"Microsoft YaHei\", \"PingFang SC\", \"Noto Sans CJK SC\", system-ui, sans-serif",
+            "borderRadius": "0px",
+            "transform": "none"
+          },
+          {
+            "tag": "DIV",
+            "class": "task-list",
+            "text": "完成删除午后读几页喜欢的书15:30完成删除晚上散步十分钟完成删除整理桌面，给自",
+            "src": null,
+            "rect": {
+              "x": 18,
+              "y": 397.9375,
+              "width": 357,
+              "height": 216
+            },
+            "font": "Yozai, \"Microsoft YaHei\", \"PingFang SC\", \"Noto Sans CJK SC\", system-ui, sans-serif",
+            "borderRadius": "0px",
+            "transform": "none"
+          }
+        ]
+      }
+    ],
+    "imageGeometry": [
+      {
+        "class": "asset ",
+        "src": "/assets/cozy_days/vectors/symbols/heart_pink_outline.svg",
+        "rect": {
+          "x": 125.11608123779297,
+          "y": 63.91295623779297,
+          "width": 36.767845153808594,
+          "height": 36.76783752441406
+        }
+      },
+      {
+        "class": "asset ",
+        "src": "/assets/cozy_days/raster/backgrounds/bedroom_header.png",
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 393,
+          "height": 227.9375
+        }
+      },
+      {
+        "class": "asset hero-cat",
+        "src": "/assets/cozy_days/raster/characters/cats_header.png",
+        "rect": {
+          "x": 117.046875,
+          "y": 76.8125,
+          "width": 282.953125,
+          "height": 156.125
+        }
+      },
+      {
+        "class": "asset hero-sparkle",
+        "src": "/assets/cozy_days/vectors/symbols/sparkle_gold.svg",
+        "rect": {
+          "x": 127.45478820800781,
+          "y": 150.7672882080078,
+          "width": 28.465423583984375,
+          "height": 28.465423583984375
+        }
+      },
+      {
+        "class": "asset hero-star",
+        "src": "/assets/cozy_days/vectors/symbols/star_cream.svg",
+        "rect": {
+          "x": 37.283233642578125,
+          "y": 186.92385864257812,
+          "width": 21.02728271484375,
+          "height": 21.02728271484375
+        }
+      },
+      {
+        "class": "asset original-plant",
+        "src": "/assets/cozy_days/raster/original/plant.png",
+        "rect": {
+          "x": 0,
+          "y": 164,
+          "width": 36.0625,
+          "height": 63.9375
+        }
+      },
+      {
+        "class": "asset original-cheer",
+        "src": "/assets/cozy_days/raster/original/cheer.png",
+        "rect": {
+          "x": 301.203125,
+          "y": 14,
+          "width": 76.078125,
+          "height": 64.359375
+        }
+      },
+      {
+        "class": "asset ",
+        "src": "/assets/cozy_days/raster/decor/washi_pink.png",
+        "rect": {
+          "x": 12.445243835449219,
+          "y": 359.17822265625,
+          "width": 68.10951232910156,
+          "height": 44.0341796875
+        }
+      },
+      {
+        "class": "asset task-illustration",
+        "src": "/assets/cozy_days/raster/tasks/task_book.png",
+        "rect": {
+          "x": 276.1729736328125,
+          "y": 416.31378173828125,
+          "width": 33.638427734375,
+          "height": 20.7474365234375
+        }
+      },
+      {
+        "class": "asset task-sticker",
+        "src": "/assets/cozy_days/raster/decor/flower_pink.png",
+        "rect": {
+          "x": 268.9483642578125,
+          "y": 406.875244140625,
+          "width": 12.103271484375,
+          "height": 12.04638671875
+        }
+      },
+      {
+        "class": "asset task-illustration",
+        "src": "/assets/cozy_days/raster/tasks/task_stretch.png",
+        "rect": {
+          "x": 268.4200439453125,
+          "y": 479.3532409667969,
+          "width": 35.144287109375,
+          "height": 35.074737548828125
+        }
+      },
+      {
+        "class": "asset task-sticker",
+        "src": "/assets/cozy_days/raster/decor/flower_pink.png",
+        "rect": {
+          "x": 270.35821533203125,
+          "y": 513.3680419921875,
+          "width": 11.2835693359375,
+          "height": 11.217041015625
+        }
+      },
+      {
+        "class": "asset task-illustration",
+        "src": "/assets/cozy_days/raster/decor/sprout.png",
+        "rect": {
+          "x": 275,
+          "y": 552.9375,
+          "width": 31.96875,
+          "height": 20.078125
+        }
+      },
+      {
+        "class": "asset task-sticker",
+        "src": "/assets/cozy_days/raster/decor/flower_pink.png",
+        "rect": {
+          "x": 303.2145080566406,
+          "y": 585.2227783203125,
+          "width": 11.57098388671875,
+          "height": 11.507568359375
+        }
+      },
+      {
+        "class": "asset original-books",
+        "src": "/assets/cozy_days/raster/original/books-bubble.png",
+        "rect": {
+          "x": 0,
+          "y": 716.46875,
+          "width": 160.53125,
+          "height": 63.53125
+        }
+      },
+      {
+        "class": "asset original-peeking-cat",
+        "src": "/assets/cozy_days/raster/original/peeking-cat.png",
+        "rect": {
+          "x": 351.1875,
+          "y": 733.171875,
+          "width": 41.8125,
+          "height": 46.828125
+        }
+      }
+    ],
+    "assets": [
+      {
+        "src": "/assets/cozy_days/vectors/symbols/heart_pink_outline.svg",
+        "sha256": "d85097dde592cff0ea27227bbbf7ecd3dc2d3f4d6e47b572cb38257b3aae0c16"
+      },
+      {
+        "src": "/assets/cozy_days/raster/backgrounds/bedroom_header.png",
+        "sha256": "81a9a0f06760ac474e1865d8c88c52984eb547b298995c319bf23e1ab541cba6"
+      },
+      {
+        "src": "/assets/cozy_days/raster/characters/cats_header.png",
+        "sha256": "01c839801c4a78ce4c37433db0ee63e4a171fe3b19645c3b5756d37dde05e59a"
+      },
+      {
+        "src": "/assets/cozy_days/vectors/symbols/sparkle_gold.svg",
+        "sha256": "50e8ae3b016d0dbd60ae9b6b9c213310a33f338ffd39a700210436bd18bbb887"
+      },
+      {
+        "src": "/assets/cozy_days/vectors/symbols/star_cream.svg",
+        "sha256": "c725117c9e0860cd89d4c6c205003cc60f8dbdf7dc236b55d65bd6c280df0494"
+      },
+      {
+        "src": "/assets/cozy_days/raster/original/plant.png",
+        "sha256": "6e2e2cd3b1ed10f1e23d36026973f4d428218dd667b620cdda4d91e7d168b916"
+      },
+      {
+        "src": "/assets/cozy_days/raster/original/cheer.png",
+        "sha256": "a2c3119ddaf09f4936e79a4b5b5db55bf809f9a0d09e06fb8e9483e2e82ba2d0"
+      },
+      {
+        "src": "/assets/cozy_days/raster/decor/washi_pink.png",
+        "sha256": "67d472011ab6ed8e0df6876308fe9dbceb03e210246ecb7e5b03b01c12d7b3cb"
+      },
+      {
+        "src": "/assets/cozy_days/raster/tasks/task_book.png",
+        "sha256": "f6a9849fc81c08c6205dd5d61be74fbf3112eabf24a674ad6798e4995a043446"
+      },
+      {
+        "src": "/assets/cozy_days/raster/decor/flower_pink.png",
+        "sha256": "563d9fe84ad9482987dcad02852c3fa80326fb084f1a500cfb7a3c6231e6f5f5"
+      },
+      {
+        "src": "/assets/cozy_days/raster/tasks/task_stretch.png",
+        "sha256": "590862edc674dce928aaf28cf58510668868543de4fab44dcf30501af06c56ec"
+      },
+      {
+        "src": "/assets/cozy_days/raster/decor/sprout.png",
+        "sha256": "60ad0c46a2c5afa2c24994e18ee496f27c9c76c66b894916b88cef3174ebba77"
+      },
+      {
+        "src": "/assets/cozy_days/raster/original/books-bubble.png",
+        "sha256": "009726937676e55be84b722e089c5c5cb653aaa2f4f258cf65496553d0e14053"
+      },
+      {
+        "src": "/assets/cozy_days/raster/original/peeking-cat.png",
+        "sha256": "ca8dc6a3f80e92bd8727a10e00437d61083dee6bea49ed6263c5684110d7119c"
+      }
+    ]
+  }
+]

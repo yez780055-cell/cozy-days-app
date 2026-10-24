@@ -1,0 +1,227 @@
+{
+  "milestone": "M5 modal guard follow-up",
+  "baseSha": "1b5b9fa4e24adc509daa839111466e171d859179",
+  "productLogicSourceSha": "30bfaa033ad055cd15b3524bf2779e7617225507",
+  "actualScreenshotBuildSha": "b4fb7727a78586acbe4c9d0536fe6406c6da5f60",
+  "helperOnlySourceSha": "b4fb7727a78586acbe4c9d0536fe6406c6da5f60",
+  "serialTests": {
+    "sourceSha": "30bfaa033ad055cd15b3524bf2779e7617225507",
+    "commands": [
+      [
+        "npm run build",
+        0
+      ],
+      [
+        "npm run build:pages",
+        0
+      ],
+      [
+        "npx playwright test --config playwright.anniversary.config.ts",
+        0,
+        42
+      ],
+      [
+        "npx playwright test tests/swipe.spec.ts tests/audit-regressions.spec.ts tests/font-switcher.spec.ts",
+        0,
+        17
+      ]
+    ]
+  },
+  "helperFollowup": {
+    "commands": [
+      [
+        "npm run build",
+        0
+      ],
+      [
+        "npm run build:pages",
+        0
+      ]
+    ],
+    "sameProductBundleNames": [
+      "index-BC47A3xH.js",
+      "index-CM_8m_vZ.css"
+    ],
+    "noRepeat42or17": true
+  },
+  "visual": {
+    "strictZeroTolerance": true,
+    "latestResult": "NONZERO: 3/16/0 changed pixels; no zero-diff PASS claimed",
+    "latestComparisons": [
+      {
+        "width": 360,
+        "height": 740,
+        "changedPixels": 3,
+        "totalPixels": 266400,
+        "maxChannelDelta": 3
+      },
+      {
+        "width": 393,
+        "height": 852,
+        "changedPixels": 16,
+        "totalPixels": 334836,
+        "maxChannelDelta": 3
+      },
+      {
+        "width": 430,
+        "height": 932,
+        "changedPixels": 0,
+        "totalPixels": 400760,
+        "maxChannelDelta": 0
+      }
+    ],
+    "initialRun": {
+      "sourceSha": "30bfaa033ad055cd15b3524bf2779e7617225507",
+      "comparisons": [
+        {
+          "width": 360,
+          "height": 740,
+          "changedPixels": 62407,
+          "totalPixels": 266400,
+          "maxChannelDelta": 253
+        },
+        {
+          "width": 393,
+          "height": 852,
+          "changedPixels": 0,
+          "totalPixels": 334836,
+          "maxChannelDelta": 0
+        },
+        {
+          "width": 430,
+          "height": 932,
+          "changedPixels": 0,
+          "totalPixels": 400760,
+          "maxChannelDelta": 0
+        }
+      ],
+      "observation": "360 baseline lacked hero background/cats/book/stretch images; original decode errors were swallowed. Incomplete rendering inferred from actual screenshots; original network state was not captured."
+    },
+    "historical09": {
+      "sourceSha": "30bfaa033ad055cd15b3524bf2779e7617225507",
+      "comparisons": [
+        {
+          "width": 360,
+          "height": 740,
+          "changedPixels": 0,
+          "totalPixels": 266400,
+          "maxChannelDelta": 0
+        },
+        {
+          "width": 393,
+          "height": 852,
+          "changedPixels": 0,
+          "totalPixels": 334836,
+          "maxChannelDelta": 0
+        },
+        {
+          "width": 430,
+          "height": 932,
+          "changedPixels": 0,
+          "totalPixels": 400760,
+          "maxChannelDelta": 0
+        }
+      ],
+      "limitations": "earlier helper did not assert non-data URLs or wait initial goto before reload; historical result only"
+    },
+    "geometryAndAssetComparison": [
+      {
+        "width": 360,
+        "pointElementsAndGeometryEqual": true,
+        "allImageGeometryEqual": true,
+        "servedImageBytesEqual": true,
+        "imageCount": 16
+      },
+      {
+        "width": 393,
+        "pointElementsAndGeometryEqual": true,
+        "allImageGeometryEqual": true,
+        "servedImageBytesEqual": true,
+        "imageCount": 16
+      }
+    ],
+    "inference": "Latest sparse edge differences, max channel delta 3, appear consistent with rasterization/antialiasing. This is a judgment supported by equal observed geometry and asset bytes, not a relaxed pixel tolerance or proof of identical final pixels.",
+    "publicEvidence": "public/review/m5-modal-guard/source.json"
+  },
+  "failures": {
+    "realOldSourceFailures": "2 busy-close after write-failure tests; failing-traces/",
+    "testCoordinateError": "2 strengthened desktop backdrop-click failures; backdrop-test-coordinate-traces/"
+  },
+  "priorPublicM5Preserved": true,
+  "generatedMediaRestored": 5,
+  "logs": [
+    {
+      "file": "01-repro.log",
+      "sha256": "14ba656d0e5f3db33975356297dc22a2230d9bd2191a30ef39a00f10fa99d32f"
+    },
+    {
+      "file": "02-preflight.log",
+      "sha256": "d7456bb25d69dc91146916ab3b077e231b7b5cfa211082bea352ce7050fd6cff"
+    },
+    {
+      "file": "03-preflight-mobile.log",
+      "sha256": "a868cd279bb91f9cba661398c3ae8178c892bc1ecfaf948cb245ea6aee15efcb"
+    },
+    {
+      "file": "04-build.log",
+      "sha256": "adf4308c8285c8c945504d5ba7ab4523ab77774df737490b0401c5e0497a9eb6"
+    },
+    {
+      "file": "05-build-pages.log",
+      "sha256": "050078d265f23bce8f3c5cea4197f2535d5ae49da1cc9f0048afd8f2aa923133"
+    },
+    {
+      "file": "06-anniversary.log",
+      "sha256": "73f37da011c8550bff5f45df5f0ce56621e10f05e8d489bdfcc46fb0441fbd17"
+    },
+    {
+      "file": "07-frozen-regressions.log",
+      "sha256": "f2b656ebf2e579c4369929b4ac23fcabdebc88b9bb90922f5a6fb9025169f146"
+    },
+    {
+      "file": "08-visual.log",
+      "sha256": "ab575891c1147c35446186d8cabc2b9df3e9305fc414c8d0e8aa64d69cb6866f"
+    },
+    {
+      "file": "09-visual-complete.log",
+      "sha256": "5c1dfdf7a1d306267ce067cfebbfcff6b7bd74057ba8d34be10eb77dfd453600"
+    },
+    {
+      "file": "10-helper-build.log",
+      "sha256": "fa7524097ae5f619d8995ca8bf245305655f3fedccefb1295841f994cd0493ac"
+    },
+    {
+      "file": "11-helper-build-pages.log",
+      "sha256": "e7c6c6deeef17143b94beb1139b22c6e1bfb3a9865a91325d2706c38a6df6c56"
+    },
+    {
+      "file": "12-visual-final.log",
+      "sha256": "4012b4f93dfc9a534d6a1984d96719f8d947a8eb0ede4095f8a241c838b0e7ee"
+    }
+  ],
+  "diagnosticHashes": [
+    {
+      "file": "pixel-diagnostic.json",
+      "sha256": "3fb655f338ee85fabc31485928ac0d1ebf2cec9a20f4a9e3da9135d6d0ecf06e"
+    },
+    {
+      "file": "geometry-assets-diagnostic.json",
+      "sha256": "7025dfadc59603b74f41bbc413cab7987624a521ab56d187da25acc041a9f9a2"
+    },
+    {
+      "file": "prior-evidence-hashes.json",
+      "sha256": "a19deb4bb5139344144cfabf0e0501b21b024d9b42caca6e444488b4e5f1f517"
+    },
+    {
+      "file": "generated-media-archive.json",
+      "sha256": "df6044fc1d2a9cfabc8f96974c199ae5b984a2ad73281f05d572d9d33ce52d75"
+    }
+  ],
+  "remaining": {
+    "finalHeadCI": "coordinator",
+    "independentFollowupReview": "coordinator",
+    "latestVisualStrictPixelEquality": "not met at 360/393; requires explicit review of 3/16 max3 differences",
+    "androidRealDevice": "未验收"
+  },
+  "remoteActions": "none"
+}

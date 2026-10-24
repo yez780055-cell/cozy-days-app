@@ -1,0 +1,129 @@
+{
+  "sourceCommit": "30bfaa033ad055cd15b3524bf2779e7617225507",
+  "actualBuildCommit": "30bfaa033ad055cd15b3524bf2779e7617225507",
+  "appLogicSourceSha": "30bfaa033ad055cd15b3524bf2779e7617225507",
+  "builds": {
+    "baseline": {
+      "commit": "b059b6d9982062958f0a866e763f84383d69430d",
+      "branch": "local",
+      "mode": "local",
+      "builtAt": "2026-10-24T00:24:12.414Z",
+      "previewUrl": null
+    },
+    "candidate": {
+      "commit": "30bfaa033ad055cd15b3524bf2779e7617225507",
+      "branch": "local",
+      "mode": "local",
+      "builtAt": "2026-10-24T00:38:21.176Z",
+      "previewUrl": null
+    }
+  },
+  "baselineCommit": "b059b6d9982062958f0a866e763f84383d69430d",
+  "time": "2026-10-23T04:00:00Z",
+  "timezone": "Asia/Shanghai",
+  "font": "yozai",
+  "deviceScaleFactor": 1,
+  "seeds": [
+    100,
+    101,
+    102
+  ],
+  "synthetic": true,
+  "files": [
+    {
+      "path": "artifacts/integration/m5-modal-guard/visual-complete/todo-baseline-360x740.png",
+      "sha256": "dc028b00120df8576d480903b3c597b486f9bccbf3904dfb9dad931bcc67e333"
+    },
+    {
+      "path": "artifacts/integration/m5-modal-guard/visual-complete/todo-candidate-360x740.png",
+      "sha256": "dc028b00120df8576d480903b3c597b486f9bccbf3904dfb9dad931bcc67e333"
+    },
+    {
+      "path": "artifacts/integration/m5-modal-guard/visual-complete/anniversary-360x740.png",
+      "sha256": "a3bcc782503ae3e5fd38183e2b3638bc50809d3b35eb2884bbee7ccefd3ecaea"
+    },
+    {
+      "path": "artifacts/integration/m5-modal-guard/visual-complete/anniversary-card-360x740.png",
+      "sha256": "6d979599e176fe5153dcf023f09cc51ecd202672de5db608864a86fe6f4ae45b"
+    },
+    {
+      "path": "artifacts/integration/m5-modal-guard/visual-complete/period-header-360x740.png",
+      "sha256": "4674746e8caea722327a86c432d6f7e655e371012aba0cbbccba0508638b0278"
+    },
+    {
+      "path": "artifacts/integration/m5-modal-guard/visual-complete/period-diary-360x740.png",
+      "sha256": "be5d3af2e3dab04aa53638370e917225fdfebf619177cafe4f2e4e8a053aff1f"
+    },
+    {
+      "path": "artifacts/integration/m5-modal-guard/visual-complete/todo-baseline-393x852.png",
+      "sha256": "fa8930d8beff677bfbc1c04925e05de737c1c1f101ea43a3de033b04008cbdb2"
+    },
+    {
+      "path": "artifacts/integration/m5-modal-guard/visual-complete/todo-candidate-393x852.png",
+      "sha256": "fa8930d8beff677bfbc1c04925e05de737c1c1f101ea43a3de033b04008cbdb2"
+    },
+    {
+      "path": "artifacts/integration/m5-modal-guard/visual-complete/anniversary-393x852.png",
+      "sha256": "5ab176d163f45a594c541dcd88dbc1a1d7e82750ac905d7a57adbaf2a97e8227"
+    },
+    {
+      "path": "artifacts/integration/m5-modal-guard/visual-complete/anniversary-card-393x852.png",
+      "sha256": "5ab176d163f45a594c541dcd88dbc1a1d7e82750ac905d7a57adbaf2a97e8227"
+    },
+    {
+      "path": "artifacts/integration/m5-modal-guard/visual-complete/period-header-393x852.png",
+      "sha256": "8d6e24d5a96b2656e096becb779d61bf4bfd7059a96b87a5828bc4176a4b0937"
+    },
+    {
+      "path": "artifacts/integration/m5-modal-guard/visual-complete/period-diary-393x852.png",
+      "sha256": "7467107139ab280434f59fb05bc61817e99bb2c8e3e4c5e485aded7f9242d58c"
+    },
+    {
+      "path": "artifacts/integration/m5-modal-guard/visual-complete/todo-baseline-430x932.png",
+      "sha256": "ba9384d25dcd2ed4cde68d0c73fde79bd3aa2eafde3c08ae7933756638107219"
+    },
+    {
+      "path": "artifacts/integration/m5-modal-guard/visual-complete/todo-candidate-430x932.png",
+      "sha256": "ba9384d25dcd2ed4cde68d0c73fde79bd3aa2eafde3c08ae7933756638107219"
+    },
+    {
+      "path": "artifacts/integration/m5-modal-guard/visual-complete/anniversary-430x932.png",
+      "sha256": "c07c9ae53c7648159dac32979e37a9288da964e4ee04260b0842e12fd9079c43"
+    },
+    {
+      "path": "artifacts/integration/m5-modal-guard/visual-complete/anniversary-card-430x932.png",
+      "sha256": "c07c9ae53c7648159dac32979e37a9288da964e4ee04260b0842e12fd9079c43"
+    },
+    {
+      "path": "artifacts/integration/m5-modal-guard/visual-complete/period-header-430x932.png",
+      "sha256": "204ffb12882293681986157fcef21a11ecc620225ae43b5e22f7b811f3df48c7"
+    },
+    {
+      "path": "artifacts/integration/m5-modal-guard/visual-complete/period-diary-430x932.png",
+      "sha256": "2e8e91129a6448b1be269a63840b1e1fc59a34074a7f1116c533bb8845532cdc"
+    }
+  ],
+  "comparisons": [
+    {
+      "width": 360,
+      "height": 740,
+      "changedPixels": 0,
+      "totalPixels": 266400,
+      "maxChannelDelta": 0
+    },
+    {
+      "width": 393,
+      "height": 852,
+      "changedPixels": 0,
+      "totalPixels": 334836,
+      "maxChannelDelta": 0
+    },
+    {
+      "width": 430,
+      "height": 932,
+      "changedPixels": 0,
+      "totalPixels": 400760,
+      "maxChannelDelta": 0
+    }
+  ]
+}

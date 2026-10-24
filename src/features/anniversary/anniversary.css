@@ -55,3 +55,71 @@
 .ann-card-flower { position:absolute; left:-48px; right:auto; bottom:3px; width:18px; height:18px; opacity:.8; pointer-events:none; }
 .ann-card-tape { position:absolute; left:-50px; right:auto; width:38px; height:22px; top:-8px; transform:rotate(-6deg); opacity:.85; pointer-events:none; }
 @media(max-width:360px) { .ann-hero-flower { right:128px; } }
+
+/* Anniversary scrapbook composition, sized for a narrow phone first. */
+.ann-page { background-color:#fff8ed; background-image:radial-gradient(#d9b99422 .7px,transparent .7px),linear-gradient(145deg,#fff8ed,#fff0ec 48%,#fff9ed); background-size:7px 7px,auto; }
+.ann-hero { min-height:200px; padding:25px 24px 18px; background:linear-gradient(112deg,#ffe9e5 0%,#fff3e4 58%,#f8dfe4 100%); }
+.ann-hero:after { content:""; position:absolute; right:15px; top:30px; width:50px; height:57px; border:5px solid #fffaf0; outline:1px solid #d8bba7; transform:rotate(8deg); background:linear-gradient(145deg,#f3dfe4,#fff4d9); box-shadow:-58px 5px 0 -2px #fff7e6, -58px 5px 0 -1px #d8bba7; opacity:.9; }
+.ann-hero h1 { font-size:43px; font-weight:900; -webkit-text-stroke:.45px; letter-spacing:2px; color:#292624; margin-top:16px; }
+.ann-hero p { font-size:15px; letter-spacing:2px; line-height:1.9; color:#493d38; }
+.ann-hero .ann-cats { z-index:2; width:236px; height:153px; right:0; bottom:-2px; filter:drop-shadow(0 4px 2px #a8877555); }
+.ann-content { padding:0 16px; }
+.ann-date-panel { margin-top:-5px; padding:17px 13px 10px; border-radius:25px; background:#fffaf3ed; }
+.ann-date-title strong { font-size:24px; font-weight:750; }
+.ann-date-title span { font-size:14px; }
+.ann-week-layout { display:grid; grid-template-columns:minmax(0,1fr) 104px; gap:8px; align-items:stretch; }
+.ann-week-layout>div { min-width:0; }
+.ann-week-layout>div:first-child { display:grid; grid-template-rows:32px 1fr; min-height:0; }
+.ann-week-top { height:32px; }
+.ann-week-top span { font-size:11px; font-weight:600; }
+.ann-week { height:auto; min-height:88px; align-content:center; background:#fff7f3; }
+.ann-week button { min-height:65px; }
+.ann-month-note { position:relative; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; gap:5px; min-height:100px; padding:10px 3px; border:1px dashed #e5d3ba; border-radius:18px; background:#fff8e8; color:#5c4a3e; font-size:12px; line-height:1.6; }
+.ann-month-note .asset { position:absolute; top:-12px; right:5px; width:31px; height:31px; object-fit:contain; }
+.ann-month-note b { color:#da8a43; font-size:18px; }
+.ann-month-note i { font-style:normal; font-size:15px; }
+.ann-day-summary { display:flex; margin-top:2px; }
+.ann-filters { margin:12px 2px 14px; }
+.ann-filters button { min-height:42px; border:0; background:#f6eee2; font-size:14px; }
+.ann-filters button[aria-pressed=true] { background:#544a43; }
+.ann-card { min-height:116px; align-items:center; gap:10px; padding:11px 9px; border-radius:23px; }
+.ann-card { display:grid; grid-template-columns:72px minmax(0,1fr) 90px; gap:8px; }
+.ann-card-icon { grid-column:1; grid-row:1; }
+.ann-card-copy { grid-column:2; grid-row:1; padding:0; }
+.ann-card-side { grid-column:3; grid-row:1; display:grid; grid-template-columns:1fr 1fr; grid-template-rows:auto 44px; align-items:center; justify-items:center; align-self:stretch; min-width:0; }
+.ann-card-side .ann-count { grid-column:1 / -1; }
+.ann-card-side button { display:grid; place-items:center; width:44px; height:44px; border:0; border-radius:13px; background:transparent; color:#9b6e55; }
+.ann-card-side button:hover { background:#fff8; }
+.ann-card-side .ann-count { max-width:100%; padding:5px 6px; font-size:12px; }
+.ann-card-icon { width:76px; height:88px; }
+.ann-doodle { display:block; width:74px; height:70px; color:#42352e; filter:drop-shadow(0 1px #fff); }
+.ann-doodle-cats,.ann-doodle-love { position:relative; }
+.ann-doodle-cats .asset,.ann-doodle-love .asset { position:absolute; width:52px; height:48px; object-fit:contain; }
+.ann-doodle-cats .asset:first-child { left:5px; top:0; z-index:1; }
+.ann-doodle-cats .asset:nth-child(2) { left:15px; top:23px; }
+.ann-doodle-love .asset:first-child { left:3px; top:14px; width:57px; height:46px; }
+.ann-doodle-love .asset:nth-child(2) { right:1px; top:0; width:23px; height:23px; }
+.ann-card-copy { padding-bottom:0; }
+.ann-card-top { align-items:flex-start; }
+.ann-card h2 { font-size:19px; font-weight:750; line-height:1.35; }
+.ann-count { font-size:14px; font-weight:700; padding:6px 11px; }
+.ann-card time { font-size:14px; margin-top:3px; }
+.ann-meta { display:none; }
+.ann-card p { font-size:12px; line-height:1.55; margin:6px 0 0; }
+.ann-card-bottom { display:grid; grid-template-columns:1fr 1fr; grid-template-rows:auto 44px; margin:0; }
+.ann-card-bottom small { display:none; }
+.ann-card-bottom button { min-width:42px; min-height:42px; }
+.ann-card-copy { padding-right:0; }
+.ann-card-flower { left:-66px; right:auto; bottom:0; }
+.ann-card-tape { left:-69px; right:auto; width:30px; top:-13px; }
+.ann-footer { padding-bottom:14px; }
+@media(max-width:380px) {
+ .ann-content { padding:0 11px; }
+ .ann-week-layout { grid-template-columns:minmax(0,1fr) 91px; gap:5px; }
+ .ann-week button { min-height:60px; }
+ .ann-card-icon { width:61px; }
+ .ann-doodle { width:60px; }
+ .ann-card { grid-template-columns:60px minmax(0,1fr) 82px; gap:5px; }
+ .ann-count { font-size:12px; padding:5px 7px; }
+ .ann-hero .ann-cats { width:205px; right:-3px; }
+}

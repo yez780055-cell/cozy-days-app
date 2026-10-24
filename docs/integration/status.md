@@ -95,3 +95,8 @@ Remote checkpoint reconciliation (coordinator read-back, 2026-10-24): all seven 
 - Actual 360x740 screenshots in G2 artifacts show hero cats overlap subtitle, summary/daily labels wrap one character per line, summary height creates a large empty calendar tail, and flow/mood symbols do not match required waterdrop/cat treatment.
 - Coordinator requested one narrowed repair with actual screenshots before acceptance. No upgrade yet; if these coupled narrow-screen constraints persist after repair, Luna High is justified under existing routing (not a default escalation).
 - Independent G1 medium read-only compatibility review: PASS, no actionable findings; original record shape/conflict detection/recovery verified by code review; no new runtime tests claimed.
+
+### G2 escalation (evidence-based, one level)
+- Medium implementation 91accc9 reviewed; build and 7/7 period functional tests pass, but visual gate FAIL after a narrowed repair.
+- Second real captures artifacts/v021-g2/period-393x852-top.png show dashboard about 485px (calendar y205–623, summary y205–690); historical labels wrap excessively. 360 record capture still has vertical multi-select hint/tiny controls; hero collage/color hierarchy insufficient.
+- Sole writer gpt-6-luna/high now assigned period-only layout/fidelity calibration in independent worktree, reusing Medium implementation. No data/model/global/todo changes. Extra High is not authorized. Output requires actual three-size images, functional checks and no overflow; failure evidence retained in Medium worktree.

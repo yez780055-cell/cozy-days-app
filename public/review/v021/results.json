@@ -1,0 +1,112 @@
+{
+  "version": "0.2.1",
+  "status": "PASS_WITH_RETRY",
+  "actualSourceSHA": "ffbcae2b7ed688b3be21e6591d33083b3b475539",
+  "recordedAt": "2026-10-24T05:58:19.497Z",
+  "tests": {
+    "e2e": {
+      "passed": 131,
+      "failed": 1,
+      "command": "npm run test:e2e -- --output=artifacts/v021-final/e2e-output",
+      "log": "artifacts/v021-final/test-e2e-final.log",
+      "timeout": {
+        "test": "tests/swipe.spec.ts:98",
+        "step": "page.reload waiting for load",
+        "limitMs": 30000,
+        "originalUnchangedTestPassedInPriorFullRuns": true
+      }
+    },
+    "pages": {
+      "passed": 4,
+      "failed": 0,
+      "command": "npm run test:pages -- --output=artifacts/v021-final/pages-output",
+      "log": "artifacts/v021-final/test-pages-final.log"
+    },
+    "compatibility": "Existing migration, persistence, refresh, quota/write failure, conflict and recovery assertions retained",
+    "swipeRerun": {
+      "passed": 9,
+      "failed": 0,
+      "command": "npm run test:e2e -- tests/swipe.spec.ts --output=artifacts/v021-final/swipe-output",
+      "log": "artifacts/v021-final/test-swipe-final.log",
+      "snapshotCaseSeconds": 5.3,
+      "sourceTestsTimeoutsUnchanged": true
+    },
+    "uniqueE2ECasesWithPassEvidence": 132,
+    "adaptedTestsSHA256": {
+      "tests/period-recovery.spec.ts": "6d1eb743fe03f2bb0f1ffba640275ca4f346fde959041a41e1e93253b450c6e9",
+      "tests/period-assets.spec.ts": "8a7e0ea913ef9889a0eff0e1369e083e76e5f93a8766569cb1eeb236754963c1"
+    }
+  },
+  "npmCi": {
+    "passed": true,
+    "packagesAdded": 168,
+    "vulnerabilities": 0,
+    "log": "artifacts/v021-final/npm-ci.log"
+  },
+  "builds": [
+    "npm run build",
+    "npm run build:pages"
+  ],
+  "todo": {
+    "sourceBaseline": "6a36762dcaf6f46b70a309d281e29dc8c145d721",
+    "changedSourceFiles": 0,
+    "pixelComparison": [
+      {
+        "width": 360,
+        "height": 740,
+        "changedPixels": 0,
+        "baselineSHA256": "ac495cfd3ad0e65eed9d5ab16b78a4c80ba5abf7842d78d764b004a4a8f481bc",
+        "candidateSHA256": "ac495cfd3ad0e65eed9d5ab16b78a4c80ba5abf7842d78d764b004a4a8f481bc"
+      },
+      {
+        "width": 393,
+        "height": 852,
+        "changedPixels": 0,
+        "baselineSHA256": "d7b920bff7981f5ed6b118a2bf35ffcf3a6ec3e9e7a2f2f35f28de11220553d1",
+        "candidateSHA256": "d7b920bff7981f5ed6b118a2bf35ffcf3a6ec3e9e7a2f2f35f28de11220553d1"
+      },
+      {
+        "width": 430,
+        "height": 932,
+        "changedPixels": 0,
+        "baselineSHA256": "8e6e24ad529cf2be6bd58b75156244ecc43ce40ff0f7b1e3bc742dbc18eb0c30",
+        "candidateSHA256": "8e6e24ad529cf2be6bd58b75156244ecc43ce40ff0f7b1e3bc742dbc18eb0c30"
+      }
+    ]
+  },
+  "evidence": {
+    "route": "/review/v021/",
+    "images": 29,
+    "provenance": "source.json",
+    "synthetic": true,
+    "automaticDemoData": false
+  },
+  "firstRuns": {
+    "e2e": {
+      "passed": 127,
+      "failed": 5,
+      "reasons": [
+        "2 context.close ENOENT trace output directory collisions with concurrent Pages run",
+        "3 legacy dash-separated history summary assertions adapted to exact two-line date container text"
+      ]
+    },
+    "pages": {
+      "passed": 3,
+      "failed": 1,
+      "reason": "Same trace output directory collision"
+    },
+    "resolution": "Final complete suites run serially with distinct output directories; no application source changes"
+  },
+  "limitations": [
+    "Browser viewports and CSS safe-area simulation only; no Android hardware verification",
+    "No remote push, PR, deploy or main operation in this phase"
+  ],
+  "secondRun": {
+    "e2e": {
+      "passed": 131,
+      "failed": 1,
+      "reason": "period-assets 360px checked complete before image decode; original assertions retained after await decode"
+    },
+    "log": "artifacts/v021-final/test-e2e-second.log"
+  }
+}

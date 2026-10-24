@@ -29,6 +29,8 @@ for (const viewport of viewports) {
     await expect(period.locator('.period-calendar-flower')).toBeVisible();
     await expect(period.locator('.period-diary-tape')).toBeVisible();
     await expect(period.locator('.period-art--note .period-art-main')).toBeVisible();
+    // Visibility alone does not wait for image bytes to finish loading.
+    await period.locator('img').evaluateAll(nodes => Promise.all(nodes.map(node => (node as HTMLImageElement).decode())));
     const images = await period.locator('img').evaluateAll(nodes => nodes.map(node => {
       const image = node as HTMLImageElement;
       const style = getComputedStyle(image);

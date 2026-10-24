@@ -1,0 +1,22 @@
+
+> little-days-app@0.2.1 test:e2e
+> playwright test tests/swipe.spec.ts --output=artifacts/v021-final/swipe-output
+
+[WebServer] (node:13192) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 9 tests using 1 worker
+
+(node:24292) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ok 1 [chromium] › tests\swipe.spec.ts:30:3 › 滑动阈值、跟手与删除/完成/恢复撤销 360x740 (10.2s)
+  ok 2 [chromium] › tests\swipe.spec.ts:30:3 › 滑动阈值、跟手与删除/完成/恢复撤销 393x852 (10.1s)
+  ok 3 [chromium] › tests\swipe.spec.ts:30:3 › 滑动阈值、跟手与删除/完成/恢复撤销 430x932 (9.9s)
+  ok 4 [chromium] › tests\swipe.spec.ts:84:1 › 退场时数据仍在，300ms 收缩与下方补位完成后才移除 (2.1s)
+  ok 5 [chromium] › tests\swipe.spec.ts:98:1 › 完整快照撤销保留 ID/分类/日期/时间/收藏/贴纸与原始排序 (5.3s)
+  ok 6 [chromium] › tests\swipe.spec.ts:128:1 › 快速连续操作支持独立撤销，同一任务删除后撤销不重复创建 (7.3s)
+  ok 7 [chromium] › tests\swipe.spec.ts:145:1 › 5秒读条、超时消失及导航卸载清理 (4.8s)
+  ok 8 [chromium] › tests\swipe.spec.ts:158:1 › 真实浏览器触控：纵向滚动不操作，横向拖动不误开编辑 (6.3s)
+  ok 9 [chromium] › tests\swipe.spec.ts:177:1 › 减少动态效果仍可删除/完成/撤销且没有常驻任务复选框 (1.5s)
+
+  9 passed (1.0m)

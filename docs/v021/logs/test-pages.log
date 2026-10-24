@@ -1,0 +1,30 @@
+
+> little-days-app@0.2.1 test:pages
+> playwright test --config playwright.pages.config.ts
+
+[WebServer] (node:12544) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 4 tests using 1 worker
+
+(node:17704) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  x  1 [pages-chromium] › tests\pages.spec.ts:7:3 › Pages production: assets and interactions 360x740 (4.3s)
+(node:16352) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ok 2 [pages-chromium] › tests\pages.spec.ts:7:3 › Pages production: assets and interactions 393x852 (4.3s)
+  ok 3 [pages-chromium] › tests\pages.spec.ts:7:3 › Pages production: assets and interactions 430x932 (4.2s)
+  ok 4 [pages-chromium] › tests\pages.spec.ts:56:1 › Pages static review route serves evidence, video controls, and build metadata (958ms)
+
+
+  1) [pages-chromium] › tests\pages.spec.ts:7:3 › Pages production: assets and interactions 360x740 
+
+    Error: browserContext.close: ENOENT: no such file or directory, open 'D:\cozy-days-v021-g5\test-results\.playwright-artifacts-0\traces\9bb6bb2ed574bebb3c58-77c5ad5dd89694e2c09a.trace'
+
+    Error: ENOENT: no such file or directory, open 'D:\cozy-days-v021-g5\test-results\.playwright-artifacts-0\cf03cbc3f1d6f17969b66fcf3cbfc26a.zip'
+
+    Error Context: test-results\pages-Pages-production-assets-and-interactions-360x740-pages-chromium\error-context.md
+
+  1 failed
+    [pages-chromium] › tests\pages.spec.ts:7:3 › Pages production: assets and interactions 360x740 ─
+  3 passed (20.3s)

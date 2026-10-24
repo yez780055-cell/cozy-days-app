@@ -1,0 +1,185 @@
+
+> little-days-app@0.2.1 test:e2e
+> playwright test --output=artifacts/v021-final/e2e-output
+
+[WebServer] (node:11556) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 132 tests using 1 worker
+
+(node:15368) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+M3 asset audit 360: [{"name":"cats_header.png","hash":"01c839801c4a78ce4c37433db0ee63e4a171fe3b19645c3b5756d37dde05e59a","width":1602,"height":884,"clearFraction":0.4186014653628666,"solidFraction":0},{"name":"bedroom_header.png","hash":"81a9a0f06760ac474e1865d8c88c52984eb547b298995c319bf23e1ab541cba6","width":1672,"height":941,"clearFraction":0,"solidFraction":1},{"name":"flower_pink.png","hash":"563d9fe84ad9482987dcad02852c3fa80326fb084f1a500cfb7a3c6231e6f5f5","width":139,"height":138,"clearFraction":0.4442185382129079,"solidFraction":0.528047127515379},{"name":"heart_pink_outline.svg","hash":"d85097dde592cff0ea27227bbbf7ecd3dc2d3f4d6e47b572cb38257b3aae0c16","width":128,"height":128,"clearFraction":0.7938232421875,"solidFraction":0.1390380859375},{"name":"star_cream.svg","hash":"c725117c9e0860cd89d4c6c205003cc60f8dbdf7dc236b55d65bd6c280df0494","width":128,"height":128,"clearFraction":0.5589599609375,"solidFraction":0.41839599609375},{"name":"sparkle_gold.svg","hash":"50e8ae3b016d0dbd60ae9b6b9c213310a33f338ffd39a700210436bd18bbb887","width":128,"height":128,"clearFraction":0.72198486328125,"solidFraction":0.2554931640625},{"name":"washi_pink.png","hash":"67d472011ab6ed8e0df6876308fe9dbceb03e210246ecb7e5b03b01c12d7b3cb","width":302,"height":179,"clearFraction":0.4642421103259462,"solidFraction":0.5185171482481779}]
+  ok   1 [chromium] › tests\anniversary-assets.spec.ts:10:3 › anniversary assets and full card framing at 360px (2.4s)
+M3 asset audit 393: [{"name":"cats_header.png","hash":"01c839801c4a78ce4c37433db0ee63e4a171fe3b19645c3b5756d37dde05e59a","width":1602,"height":884,"clearFraction":0.4186014653628666,"solidFraction":0},{"name":"bedroom_header.png","hash":"81a9a0f06760ac474e1865d8c88c52984eb547b298995c319bf23e1ab541cba6","width":1672,"height":941,"clearFraction":0,"solidFraction":1},{"name":"flower_pink.png","hash":"563d9fe84ad9482987dcad02852c3fa80326fb084f1a500cfb7a3c6231e6f5f5","width":139,"height":138,"clearFraction":0.4442185382129079,"solidFraction":0.528047127515379},{"name":"heart_pink_outline.svg","hash":"d85097dde592cff0ea27227bbbf7ecd3dc2d3f4d6e47b572cb38257b3aae0c16","width":128,"height":128,"clearFraction":0.7938232421875,"solidFraction":0.1390380859375},{"name":"star_cream.svg","hash":"c725117c9e0860cd89d4c6c205003cc60f8dbdf7dc236b55d65bd6c280df0494","width":128,"height":128,"clearFraction":0.5589599609375,"solidFraction":0.41839599609375},{"name":"sparkle_gold.svg","hash":"50e8ae3b016d0dbd60ae9b6b9c213310a33f338ffd39a700210436bd18bbb887","width":128,"height":128,"clearFraction":0.72198486328125,"solidFraction":0.2554931640625},{"name":"washi_pink.png","hash":"67d472011ab6ed8e0df6876308fe9dbceb03e210246ecb7e5b03b01c12d7b3cb","width":302,"height":179,"clearFraction":0.4642421103259462,"solidFraction":0.5185171482481779}]
+  ok   2 [chromium] › tests\anniversary-assets.spec.ts:10:3 › anniversary assets and full card framing at 393px (2.5s)
+M3 asset audit 430: [{"name":"cats_header.png","hash":"01c839801c4a78ce4c37433db0ee63e4a171fe3b19645c3b5756d37dde05e59a","width":1602,"height":884,"clearFraction":0.4186014653628666,"solidFraction":0},{"name":"bedroom_header.png","hash":"81a9a0f06760ac474e1865d8c88c52984eb547b298995c319bf23e1ab541cba6","width":1672,"height":941,"clearFraction":0,"solidFraction":1},{"name":"flower_pink.png","hash":"563d9fe84ad9482987dcad02852c3fa80326fb084f1a500cfb7a3c6231e6f5f5","width":139,"height":138,"clearFraction":0.4442185382129079,"solidFraction":0.528047127515379},{"name":"heart_pink_outline.svg","hash":"d85097dde592cff0ea27227bbbf7ecd3dc2d3f4d6e47b572cb38257b3aae0c16","width":128,"height":128,"clearFraction":0.7938232421875,"solidFraction":0.1390380859375},{"name":"star_cream.svg","hash":"c725117c9e0860cd89d4c6c205003cc60f8dbdf7dc236b55d65bd6c280df0494","width":128,"height":128,"clearFraction":0.5589599609375,"solidFraction":0.41839599609375},{"name":"sparkle_gold.svg","hash":"50e8ae3b016d0dbd60ae9b6b9c213310a33f338ffd39a700210436bd18bbb887","width":128,"height":128,"clearFraction":0.72198486328125,"solidFraction":0.2554931640625},{"name":"washi_pink.png","hash":"67d472011ab6ed8e0df6876308fe9dbceb03e210246ecb7e5b03b01c12d7b3cb","width":302,"height":179,"clearFraction":0.4642421103259462,"solidFraction":0.5185171482481779}]
+  ok   3 [chromium] › tests\anniversary-assets.spec.ts:10:3 › anniversary assets and full card framing at 430px (2.4s)
+  ok   4 [chromium] › tests\anniversary-assets.spec.ts:96:1 › anniversary asset gallery checks reference fit and transparent edges on light and dark backgrounds (655ms)
+  ok   5 [chromium] › tests\anniversary-dates.spec.ts:5:1 › 单次事件、今天、过去、跨年与真实天数 (2ms)
+  ok   6 [chromium] › tests\anniversary-dates.spec.ts:12:1 › 年度事件下一次、今天、未来起始年和累计周年 (1ms)
+  ok   7 [chromium] › tests\anniversary-dates.spec.ts:19:1 › 2月29日平年回落2月28日，闰年恢复，世纪闰年规则 (1ms)
+  ok   8 [chromium] › tests\anniversary-dates.spec.ts:26:1 › 有效日期拒绝自动溢出的日期与非法格式 (3ms)
+  ok   9 [chromium] › tests\anniversary-dates.spec.ts:32:3 › 本地日期、UTC跨日与夏令时：America/Los_Angeles (745ms)
+  ok  10 [chromium] › tests\anniversary-dates.spec.ts:32:3 › 本地日期、UTC跨日与夏令时：Pacific/Kiritimati (643ms)
+
+  ok  11 [chromium] › tests\anniversary-m5-metadata.spec.ts:6:1 › anniversary manifest SHA matches canonical git bytes and served resource bytes (540ms)
+  ok  12 [chromium] › tests\anniversary-migration.spec.ts:20:1 › v3→v4完整保留既有表字段、主键、自定义分类和所有索引 (226ms)
+  ok  13 [chromium] › tests\anniversary-modal-guard.spec.ts:3:52 › anniversary save: busy close attempt cannot lock dialog after a failed write (3.4s)
+  ok  14 [chromium] › tests\anniversary-modal-guard.spec.ts:3:52 › anniversary remove: busy close attempt cannot lock dialog after a failed write (3.3s)
+  ok  15 [chromium] › tests\anniversary-storage.spec.ts:30:1 › 新增提交成功后刷新失败：明确已保存，刷新重试不会重复新增 (1.3s)
+Delete result with persisted count 0 已删除，但暂时无法刷新收藏。请重新读取，无需重复删除。
+  ok  16 [chromium] › tests\anniversary-storage.spec.ts:53:1 › 删除提交成功后刷新失败：明确已删除并提供只读重试 (1.6s)
+  ok  17 [chromium] › tests\anniversary-storage.spec.ts:71:1 › 写入真正失败保留草稿，重试保存仅产生一条记录 (1.0s)
+  ok  18 [chromium] › tests\anniversary-storage.spec.ts:89:1 › 同一事件循环连续提交时仅提交一次 (965ms)
+  ok  19 [chromium] › tests\anniversary-storage.spec.ts:106:1 › 首次读取失败禁新增，切换模块后恢复并保留旧记录 (1.2s)
+  ok  20 [chromium] › tests\anniversary-visual.spec.ts:3:1 › four scrapbook categories fit at phone widths and remain scrollable (12.0s)
+  ok  21 [chromium] › tests\anniversary.spec.ts:24:1 › 空状态、新增、全部字段编辑、刷新/模块切换保留、删除确认与数量 (3.9s)
+  ok  22 [chromium] › tests\anniversary.spec.ts:65:1 › 动态筛选、周标记、月视图与跨月选择 (2.8s)
+  ok  23 [chromium] › tests\anniversary.spec.ts:91:3 › 移动布局、缩短视口与真实截图 360 (3.7s)
+  ok  24 [chromium] › tests\anniversary.spec.ts:91:3 › 移动布局、缩短视口与真实截图 393 (3.7s)
+  ok  25 [chromium] › tests\anniversary.spec.ts:91:3 › 移动布局、缩短视口与真实截图 430 (3.8s)
+  ok  26 [chromium] › tests\anniversary.spec.ts:126:1 › 从v3升级保留待办与分类数据 (1.3s)
+  ok  27 [chromium] › tests\anniversary.spec.ts:151:1 › 插画缺失仍可显示，离线新增后重新进入仍保留 (2.0s)
+  ok  28 [chromium] › tests\anniversary.spec.ts:166:1 › 360×480编辑完整字段与六行月历操作可滚动使用 (2.9s)
+  ok  29 [chromium] › tests\audit-regressions.spec.ts:3:1 › valid local dates save in UTC+14 while impossible dates are rejected (1.2s)
+  ok  30 [chromium] › tests\audit-regressions.spec.ts:20:1 › the saved current font can be retried after startup loading fails (860ms)
+  ok  31 [chromium] › tests\categories-time.spec.ts:27:1 › 默认分类与自定义分类新增/改名/筛选持久化，拒绝重名 (3.8s)
+  ok  32 [chromium] › tests\categories-time.spec.ts:41:1 › 删除自定义分类只移入生活，保留已完成任务和时间；旧撤销不复活已删分类 (4.8s)
+  ok  33 [chromium] › tests\categories-time.spec.ts:58:1 › 可选时间、跨日期编辑和分类筛选组合即时更新，未设时间不造默认值 (4.3s)
+  ok  34 [chromium] › tests\categories-time.spec.ts:78:1 › v2 旧任务迁移保留命名分类/完成/收藏，缺少时间不补值 (1.8s)
+  ok  35 [chromium] › tests\categories-time.spec.ts:97:61 › 奶油卡片、独立滚动及渐变触控 360x740 (6.9s)
+  ok  36 [chromium] › tests\categories-time.spec.ts:97:61 › 奶油卡片、独立滚动及渐变触控 393x852 (6.9s)
+  ok  37 [chromium] › tests\categories-time.spec.ts:97:61 › 奶油卡片、独立滚动及渐变触控 430x932 (7.2s)
+  ok  38 [chromium] › tests\cozy-assets.spec.ts:4:1 › 正式素材、三种安卓视口、长文本与安全区 (37.1s)
+  ok  39 [chromium] › tests\decorations.spec.ts:7:1 › 关键词识别覆盖五类、英文边界与多关键词优先级 (2ms)
+  ok  40 [chromium] › tests\decorations.spec.ts:14:1 › 未知标题稳定兜底，部分/非法字段修复，配色与布局存在变化 (2ms)
+  ok  41 [chromium] › tests\decorations.spec.ts:33:1 › 素材注册表只包含 ready，文件真实存在且哈希一致 (20ms)
+  ok  42 [chromium] › tests\decorations.spec.ts:45:1 › 插画请求失败时使用包内 ready 星星兜底 (1.4s)
+  ok  43 [chromium] › tests\decorations.spec.ts:68:1 › 新任务保存装饰，编辑重匹配，自动贴纸/配色持久化且不影响勾选删除 (8.0s)
+  ok  44 [chromium] › tests\decorations.spec.ts:103:1 › v1 旧数据升级及当前版本部分/缺失装饰修复均写回，编辑后稳定 (3.8s)
+  ok  45 [chromium] › tests\decorations.spec.ts:146:1 › 三视口装饰不覆盖文字/按钮/复选框，所有任务有可解码插画 (11.6s)
+  ok  46 [chromium] › tests\font-switcher.spec.ts:3:1 › only the current font loads on startup and entering Settings does not preload other fonts (1.2s)
+  ok  47 [chromium] › tests\font-switcher.spec.ts:15:1 › the three navigation buttons switch pages on short press (1.3s)
+  ok  48 [chromium] › tests\font-switcher.spec.ts:27:1 › long-pressing each navigation button opens Settings menu without switching page (4.0s)
+  ok  49 [chromium] › tests\font-switcher.spec.ts:46:1 › Settings opens from quick menu and returns to the previous module (2.3s)
+  ok  50 [chromium] › tests\font-switcher.spec.ts:63:1 › font switching loads before applying and persists through reload (4.3s)
+  ok  51 [chromium] › tests\font-switcher.spec.ts:81:1 › font load failure preserves the previous selection and allows retry (3.3s)
+  ok  52 [chromium] › tests\mobile-round2.spec.ts:9:1 › 随机装饰排除星星，旧字段稳定修复且保留种子与配色 (157ms)
+  ok  53 [chromium] › tests\mobile-round2.spec.ts:17:1 › 连续混合操作逆序撤销恢复完整 ID、数据与排列位置 (5.4s)
+  ok  54 [chromium] › tests\mobile-round2.spec.ts:25:38 › 同一任务完成、恢复、删除按 2-1-0 撤销 (5.2s)
+  ok  55 [chromium] › tests\mobile-round2.spec.ts:25:38 › 同一任务完成、恢复、删除按 0-2-1 撤销 (5.1s)
+  ok  56 [chromium] › tests\mobile-round2.spec.ts:39:1 › 每条记录独立五秒到期，撤销中间记录不重置其他倒计时 (7.5s)
+  ok  57 [chromium] › tests\mobile-round2.spec.ts:48:1 › 预设分类可改名删除，删除生活及最后分类均无悬空引用 (4.9s)
+  ok  58 [chromium] › tests\mobile-round2.spec.ts:60:61 › 自定义面板、标题收藏、双端渐隐与键盘 360x740 (2.6s)
+  ok  59 [chromium] › tests\mobile-round2.spec.ts:60:61 › 自定义面板、标题收藏、双端渐隐与键盘 393x852 (2.6s)
+  ok  60 [chromium] › tests\mobile-round2.spec.ts:60:61 › 自定义面板、标题收藏、双端渐隐与键盘 430x932 (2.7s)
+  ok  61 [chromium] › tests\mobile-round2.spec.ts:73:1 › 已保存的分类列表不会被新预设覆盖或补回 (3.5s)
+  ok  62 [chromium] › tests\mobile-round2.spec.ts:86:61 › 空状态、完成文字及多条撤销不遮挡 360x740 (4.7s)
+  ok  63 [chromium] › tests\mobile-round2.spec.ts:86:61 › 空状态、完成文字及多条撤销不遮挡 393x852 (4.9s)
+  ok  64 [chromium] › tests\mobile-round2.spec.ts:86:61 › 空状态、完成文字及多条撤销不遮挡 430x932 (5.0s)
+  ok  65 [chromium] › tests\original-illustrations.spec.ts:41:3 › original illustrations: real layout, scrolling, swipes and safe area 360x740 (18.6s)
+  ok  66 [chromium] › tests\original-illustrations.spec.ts:41:3 › original illustrations: real layout, scrolling, swipes and safe area 393x852 (23.2s)
+  ok  67 [chromium] › tests\original-illustrations.spec.ts:41:3 › original illustrations: real layout, scrolling, swipes and safe area 430x932 (27.5s)
+  ok  68 [chromium] › tests\period-assets.spec.ts:21:3 › period artwork is legible and contained at 360x740 (13.7s)
+  ok  69 [chromium] › tests\period-assets.spec.ts:21:3 › period artwork is legible and contained at 393x852 (12.9s)
+  ok  70 [chromium] › tests\period-assets.spec.ts:21:3 › period artwork is legible and contained at 430x932 (16.4s)
+M4 source audit: [{"name":"cats_header.png","width":1602,"height":884,"hash":"01c839801c4a78ce4c37433db0ee63e4a171fe3b19645c3b5756d37dde05e59a","clearFraction":0.4186014653628666,"opaqueFraction":0,"partialFraction":0.5813985346371334,"expectedWidth":1602,"expectedHeight":884,"expectedClear":0.4186,"expectedHash":"01c839801c4a78ce4c37433db0ee63e4a171fe3b19645c3b5756d37dde05e59a"},{"name":"cats_empty_state.png","width":1875,"height":811,"hash":"96e7ea984b170bbdb78af03b74e3b3bb7360569cc706f0fd1d139c38f3bff829","clearFraction":0.4454740649404028,"opaqueFraction":0.00006642005754212905,"partialFraction":0.554459515002055,"expectedWidth":1875,"expectedHeight":811,"expectedClear":0.44547,"expectedHash":"96e7ea984b170bbdb78af03b74e3b3bb7360569cc706f0fd1d139c38f3bff829"},{"name":"book_open_decor.png","width":394,"height":258,"hash":"22a71d58b0992a999c4ffa2808e80ee928fec6839cc4fff4139cee19420840b2","clearFraction":0.4676641876205092,"opaqueFraction":0,"partialFraction":0.5323358123794908,"expectedWidth":394,"expectedHeight":258,"expectedClear":0.46766,"expectedHash":"22a71d58b0992a999c4ffa2808e80ee928fec6839cc4fff4139cee19420840b2"},{"name":"washi_pink.png","width":302,"height":179,"hash":"67d472011ab6ed8e0df6876308fe9dbceb03e210246ecb7e5b03b01c12d7b3cb","clearFraction":0.4642421103259462,"opaqueFraction":0.5185171482481779,"partialFraction":0.01724074142587591,"expectedWidth":302,"expectedHeight":179,"expectedClear":0.46424,"expectedHash":"67d472011ab6ed8e0df6876308fe9dbceb03e210246ecb7e5b03b01c12d7b3cb"},{"name":"flower_pink.png","width":139,"height":138,"hash":"563d9fe84ad9482987dcad02852c3fa80326fb084f1a500cfb7a3c6231e6f5f5","clearFraction":0.4442185382129079,"opaqueFraction":0.528047127515379,"partialFraction":0.027734334271713065,"expectedWidth":139,"expectedHeight":138,"expectedClear":0.44422,"expectedHash":"563d9fe84ad9482987dcad02852c3fa80326fb084f1a500cfb7a3c6231e6f5f5"},{"name":"star_cream.svg","width":128,"height":128,"hash":"5d84edd7fbd1406e5cdc658c607c8a5c24607ef2aee4c52c8bfc31b79a84bd84","clearFraction":0.5589599609375,"opaqueFraction":0.41839599609375,"partialFraction":0.02264404296875,"expectedWidth":128,"expectedHeight":128,"expectedClear":0.55896,"expectedHash":"5d84edd7fbd1406e5cdc658c607c8a5c24607ef2aee4c52c8bfc31b79a84bd84"},{"name":"sparkle_gold.svg","width":128,"height":128,"hash":"3119e0e755612e7125ad32de61168ef55b5e6e2035c5f6129931749b044fec57","clearFraction":0.72198486328125,"opaqueFraction":0.2554931640625,"partialFraction":0.02252197265625,"expectedWidth":128,"expectedHeight":128,"expectedClear":0.721984,"expectedHash":"3119e0e755612e7125ad32de61168ef55b5e6e2035c5f6129931749b044fec57"},{"name":"heart_pink_outline.svg","width":128,"height":128,"hash":"6137cc47a35ee8c05200ec41efb747efb6edb173dcedee5fa734655fb2c64927","clearFraction":0.7938232421875,"opaqueFraction":0.1390380859375,"partialFraction":0.067138671875,"expectedWidth":128,"expectedHeight":128,"expectedClear":0.793823,"expectedHash":"6137cc47a35ee8c05200ec41efb747efb6edb173dcedee5fa734655fb2c64927"}]
+  ok  71 [chromium] › tests\period-assets.spec.ts:77:1 › period asset source files match their declared dimensions, pixel alpha and canonical hashes (17.1s)
+  ok  72 [chromium] › tests\period-assets.spec.ts:125:1 › a failed illustration request falls back and the period view stays usable offline (2.6s)
+  ok  73 [chromium] › tests\period-m5-audit.spec.ts:3:1 › history deletion failure is visible inside the modal and can be retried (7.0s)
+  ok  74 [chromium] › tests\period-model.spec.ts:4:1 › date-only arithmetic handles leap years, month boundaries and DST days (4ms)
+  ok  75 [chromium] › tests\period-model.spec.ts:19:1 › statistics use complete history, distinguish settings, and do not invent missed cycles (11ms)
+  ok  76 [chromium] › tests\period-model.spec.ts:33:1 › validation rejects overlap, invalid and future records; allows adjacent and self edits (1ms)
+  ok  77 [chromium] › tests\period-model.spec.ts:42:1 › statistics limit observations to latest six intervals and completed durations (1ms)
+  ok  78 [chromium] › tests\period-recovery.spec.ts:5:1 › failed diary survives leaving and refreshing without claiming a database save (5.2s)
+  ok  79 [chromium] › tests\period-recovery.spec.ts:12:1 › raw editor and settings drafts survive navigation and refresh; failed save keeps editor open (5.8s)
+  ok  80 [chromium] › tests\period-recovery.spec.ts:19:1 › settings raw empty input survives refresh and failed settings save stays open (6.5s)
+  ok  81 [chromium] › tests\period-recovery.spec.ts:25:1 › newer session fallback beats stale local backup; retry identity remains stable (5.6s)
+  ok  82 [chromium] › tests\period-recovery.spec.ts:33:1 › stale recovery cannot overwrite a newer database after backup cleanup fails (11.1s)
+  ok  83 [chromium] › tests\period-recovery.spec.ts:43:1 › all recovery storage unavailable is explicit; memory survives navigation (2.7s)
+  ok  84 [chromium] › tests\period-recovery.spec.ts:49:1 › malformed period database is preserved and todo remains usable (5.8s)
+  ok  85 [chromium] › tests\period-recovery.spec.ts:56:1 › slow old writes cannot replace rapid newer edits across unmount (6.0s)
+  ok  86 [chromium] › tests\period-recovery.spec.ts:62:1 › 360x480 settings and editor actions remain reachable (3.6s)
+  ok  87 [chromium] › tests\period-recovery.spec.ts:66:64 › local midnight focus preserves draft in Pacific/Kiritimati (9.7s)
+  ok  88 [chromium] › tests\period-recovery.spec.ts:66:64 › local midnight focus preserves draft in America/Los_Angeles (10.8s)
+  ok  89 [chromium] › tests\period-recovery.spec.ts:71:1 › failed untouched new form retries with the same identity after refresh (7.4s)
+  ok  90 [chromium] › tests\period-recovery.spec.ts:78:1 › malformed draft shapes do not crash or corrupt a valid database (6.7s)
+  ok  91 [chromium] › tests\period-recovery.spec.ts:83:1 › external newer database is not silently overwritten by the mounted session (3.5s)
+  ok  92 [chromium] › tests\period-recovery.spec.ts:89:1 › sparse period array is rejected without crashing or clearing the original (5.8s)
+  ok  93 [chromium] › tests\period-recovery.spec.ts:94:1 › replacement requires confirmation and refuses unreliable backup storage (3.1s)
+  ok  94 [chromium] › tests\period-recovery.spec.ts:101:1 › archived versions can be explicitly restored after confirmation (10.0s)
+  ok  95 [chromium] › tests\period-recovery.spec.ts:108:1 › repository rejects malformed writes before changing the database (2.6s)
+  ok  96 [chromium] › tests\period-recovery.spec.ts:112:1 › retired fields remain opaque through diary autosave, failure recovery and reload (13.1s)
+  ok  97 [chromium] › tests\period-recovery.spec.ts:154:1 › new records omit retired fields and optimistic comparison retains legacy changes (3.1s)
+  ok  98 [chromium] › tests\period-recovery.spec.ts:175:1 › one slow load survives page unmount without a competing old load (6.4s)
+  ok  99 [chromium] › tests\period-recovery.spec.ts:180:94 › DST clock change preserves date draft 2026-03-08T09:59:50Z (11.0s)
+  ok 100 [chromium] › tests\period-recovery.spec.ts:180:94 › DST clock change preserves date draft 2026-11-01T08:59:50Z (11.6s)
+  ok 101 [chromium] › tests\period-recovery.spec.ts:188:1 › historical recovery locks immediately during slow read and remount does not start another load (4.0s)
+  ok 102 [chromium] › tests\period-recovery.spec.ts:195:1 › historical recovery archives the latest failed pending diary before switching sources (4.5s)
+  ok 103 [chromium] › tests\period-recovery.spec.ts:200:1 › historical recovery cannot discard pending changes when local backup fails (4.3s)
+  ok 104 [chromium] › tests\period-recovery.spec.ts:206:1 › another tab cannot erase a failed diary backup when its original tab closes (27.2s)
+  ok 105 [chromium] › tests\period-recovery.spec.ts:214:1 › newer device draft survives reload when session writes fail (8.1s)
+  ok 106 [chromium] › tests\period.spec.ts:21:1 › empty state, historical cycles, calendar, diary persistence, settings and evidence (12.3s)
+  ok 107 [chromium] › tests\period.spec.ts:56:1 › history edit, overlap rejection, deletion and setting fallback (11.2s)
+  ok 108 [chromium] › tests\period.spec.ts:69:1 › month navigation, adjacent date, future diary lock and todo isolation (4.3s)
+  ok 109 [chromium] › tests\period.spec.ts:79:95 › mobile fit 360x740 (5.2s)
+  ok 110 [chromium] › tests\period.spec.ts:79:95 › mobile fit 393x852 (4.8s)
+  ok 111 [chromium] › tests\period.spec.ts:79:95 › mobile fit 430x932 (5.3s)
+  ok 112 [chromium] › tests\period.spec.ts:96:1 › failed save stays visible and retry persists the latest diary; offline writing works (8.0s)
+  ok 113 [chromium] › tests\review-evidence.spec.ts:18:3 › review evidence: real todo interaction 360x740 (15.9s)
+  ok 114 [chromium] › tests\review-evidence.spec.ts:18:3 › review evidence: real todo interaction 393x852 (15.2s)
+  ok 115 [chromium] › tests\review-evidence.spec.ts:18:3 › review evidence: real todo interaction 430x932 (16.8s)
+  ok 116 [chromium] › tests\swipe.spec.ts:30:3 › 滑动阈值、跟手与删除/完成/恢复撤销 360x740 (25.0s)
+  ok 117 [chromium] › tests\swipe.spec.ts:30:3 › 滑动阈值、跟手与删除/完成/恢复撤销 393x852 (26.5s)
+  ok 118 [chromium] › tests\swipe.spec.ts:30:3 › 滑动阈值、跟手与删除/完成/恢复撤销 430x932 (28.3s)
+  ok 119 [chromium] › tests\swipe.spec.ts:84:1 › 退场时数据仍在，300ms 收缩与下方补位完成后才移除 (6.9s)
+  x  120 [chromium] › tests\swipe.spec.ts:98:1 › 完整快照撤销保留 ID/分类/日期/时间/收藏/贴纸与原始排序 (33.3s)
+(node:20528) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ok 121 [chromium] › tests\swipe.spec.ts:128:1 › 快速连续操作支持独立撤销，同一任务删除后撤销不重复创建 (6.8s)
+  ok 122 [chromium] › tests\swipe.spec.ts:145:1 › 5秒读条、超时消失及导航卸载清理 (4.1s)
+  ok 123 [chromium] › tests\swipe.spec.ts:158:1 › 真实浏览器触控：纵向滚动不操作，横向拖动不误开编辑 (6.0s)
+  ok 124 [chromium] › tests\swipe.spec.ts:177:1 › 减少动态效果仍可删除/完成/撤销且没有常驻任务复选框 (1.5s)
+  ok 125 [chromium] › tests\todo.spec.ts:14:1 › 新增、刷新保留、完成与准确撤销 (3.9s)
+  ok 126 [chromium] › tests\todo.spec.ts:32:1 › 编辑多行内容、修改日期、删除取消和确认 (3.2s)
+  ok 127 [chromium] › tests\todo.spec.ts:50:1 › 全部未完成包含过去与未来，日期日历与今天入口可操作 (2.8s)
+  ok 128 [chromium] › tests\todo.spec.ts:75:1 › 空内容不能保存，弹窗焦点与模块入口 (1.2s)
+  ok 129 [chromium] › tests\todo.spec.ts:91:1 › 页面加载后断网仍可新增，恢复网络刷新后保留 (1.2s)
+  ok 130 [chromium] › tests\todo.spec.ts:102:1 › 两种手机尺寸：长列表滚动、导航与截图 (4.1s)
+  ok 131 [chromium] › tests\todo.spec.ts:125:1 › 状态预览、模态框与键盘可视高度模拟 (2.0s)
+  ok 132 [chromium] › tests\todo.spec.ts:155:1 › 减少动态效果偏好与桌面设备切换 (966ms)
+
+
+  1) [chromium] › tests\swipe.spec.ts:98:1 › 完整快照撤销保留 ID/分类/日期/时间/收藏/贴纸与原始排序 ───────────────────────
+
+    Test timeout of 30000ms exceeded.
+
+    Error: page.reload: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for navigation until "load"
+        - navigated to "http://127.0.0.1:5173/"
+
+
+      117 |   await taskAction(page,'中间要保留所有字段','complete');
+      118 |   await expect(page.getByRole('button',{name:'已完成 1',exact:true})).toBeVisible();
+    > 119 |   await page.reload();await page.getByRole('button',{name:'已完成 1',exact:true}).click();
+          |              ^
+      120 |   await expect(card(page,'中间要保留所有字段').locator('.task-favorite')).toHaveCount(1);
+      121 |   expect((await rows(page))[0]).toMatchObject({...original[0],completed:true});
+      122 |   await page.getByRole('button',{name:'编辑：中间要保留所有字段',exact:true}).click();
+        at D:\cozy-days-v021-g5\tests\swipe.spec.ts:119:14
+
+    Error Context: artifacts\v021-final\e2e-output\swipe-完整快照撤销保留-ID-分类-日期-时间-收藏-贴纸与原始排序-chromium\error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    artifacts\v021-final\e2e-output\swipe-完整快照撤销保留-ID-分类-日期-时间-收藏-贴纸与原始排序-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace artifacts\v021-final\e2e-output\swipe-完整快照撤销保留-ID-分类-日期-时间-收藏-贴纸与原始排序-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [chromium] › tests\swipe.spec.ts:98:1 › 完整快照撤销保留 ID/分类/日期/时间/收藏/贴纸与原始排序 ────────────────────────
+  131 passed (14.1m)

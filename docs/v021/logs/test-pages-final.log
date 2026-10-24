@@ -1,0 +1,17 @@
+
+> little-days-app@0.2.1 test:pages
+> playwright test --config playwright.pages.config.ts --output=artifacts/v021-final/pages-output
+
+[WebServer] (node:5464) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 4 tests using 1 worker
+
+(node:10980) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ok 1 [pages-chromium] › tests\pages.spec.ts:7:3 › Pages production: assets and interactions 360x740 (4.2s)
+  ok 2 [pages-chromium] › tests\pages.spec.ts:7:3 › Pages production: assets and interactions 393x852 (4.1s)
+  ok 3 [pages-chromium] › tests\pages.spec.ts:7:3 › Pages production: assets and interactions 430x932 (3.9s)
+  ok 4 [pages-chromium] › tests\pages.spec.ts:56:1 › Pages static review route serves evidence, video controls, and build metadata (585ms)
+
+  4 passed (14.9s)

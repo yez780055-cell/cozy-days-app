@@ -1,14 +1,22 @@
 apply plugin: 'com.android.application'
 
+def releaseCodeText = System.getenv('ANDROID_VERSION_CODE') ?: '1'
+if (!(releaseCodeText ==~ /[1-9][0-9]*/) || new BigInteger(releaseCodeText) > 2100000000) {
+    throw new GradleException('ANDROID_VERSION_CODE must be a positive integer no greater than 2100000000')
+}
+def signingEnvironment = ['ANDROID_KEYSTORE_PATH', 'ANDROID_KEYSTORE_PASSWORD', 'ANDROID_KEY_ALIAS', 'ANDROID_KEY_PASSWORD']
+def hasReleaseSigning = signingEnvironment.every { System.getenv(it)?.trim() }
+
 android {
     namespace "com.littledays.app"
     compileSdk rootProject.ext.compileSdkVersion
+    testBuildType "release"
     defaultConfig {
         applicationId "com.littledays.app"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
+        versionCode Integer.parseInt(releaseCodeText)
+        versionName "0.2.1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
@@ -16,10 +24,38 @@ android {
             ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    signingConfigs {
+        release {
+            if (hasReleaseSigning) {
+                storeFile file(System.getenv('ANDROID_KEYSTORE_PATH'))
+                storePassword System.getenv('ANDROID_KEYSTORE_PASSWORD')
+                keyAlias System.getenv('ANDROID_KEY_ALIAS')
+                keyPassword System.getenv('ANDROID_KEY_PASSWORD')
+            }
+        }
+    }
+    splits {
+        abi { enable false }
+        density { enable false }
+    }
     buildTypes {
         release {
+            signingConfig signingConfigs.release
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+// Validate the resolved graph, including indirect callers such as `build`.
+// Debug builds remain usable without production credentials.
+gradle.taskGraph.whenReady { graph ->
+    if (graph.allTasks.any { it.project == project && it.name.toLowerCase().contains('release') }) {
+        if (!hasReleaseSigning) {
+            throw new GradleException('Release signing requires ANDROID_KEYSTORE_PATH, ANDROID_KEYSTORE_PASSWORD, ANDROID_KEY_ALIAS and ANDROID_KEY_PASSWORD; refusing an unsigned/debug-signed release')
+        }
+        if (!android.signingConfigs.release.storeFile.isFile()) {
+            throw new GradleException('ANDROID_KEYSTORE_PATH must point to an existing keystore file')
         }
     }
 }

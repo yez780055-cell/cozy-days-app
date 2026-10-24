@@ -3,7 +3,6 @@ import { Asset } from '../../components/Asset';
 const art = {
   header: 'cat',
   note: 'empty',
-  tips: 'book',
 } as const;
 
 export function PeriodArt({ slot }: { slot: keyof typeof art }) {
@@ -14,6 +13,5 @@ export function PeriodArt({ slot }: { slot: keyof typeof art }) {
       <Asset name="sparkle" className="period-art-sparkle"/>
       <Asset name="heart" className="period-art-heart"/>
     </>}
-    {slot === 'tips' && <Asset name="heart" className="period-art-heart"/>}
   </div>;
 }

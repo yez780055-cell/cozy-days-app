@@ -27,17 +27,16 @@ for (const viewport of viewports) {
     await expect(period.locator('.period-art--header .period-art-main')).toBeVisible();
     await expect(period.locator('.period-calendar-flower')).toBeVisible();
     await expect(period.locator('.period-diary-tape')).toBeVisible();
-    await expect(period.locator('.period-art--tips .period-art-main')).toBeVisible();
     await expect(period.locator('.period-art--note .period-art-main')).toBeVisible();
     const images = await period.locator('img').evaluateAll(nodes => nodes.map(node => {
       const image = node as HTMLImageElement;
       const style = getComputedStyle(image);
       return { name: image.src.split('/').at(-1), loaded: image.complete && image.naturalWidth > 0, pointerEvents: style.pointerEvents };
     }));
-    expect(images.length).toBe(9);
+    expect(images.length).toBe(7);
     expect(images.every(image => image.loaded && image.pointerEvents === 'none')).toBe(true);
     expect(new Set(images.map(image => image.name))).toEqual(new Set([
-      'cats_header.png', 'cats_empty_state.png', 'book_open_decor.png', 'washi_pink.png', 'flower_pink.png',
+      'cats_header.png', 'cats_empty_state.png', 'washi_pink.png', 'flower_pink.png',
       'star_cream.svg', 'sparkle_gold.svg', 'heart_pink_outline.svg',
     ]));
     expect(await period.evaluate(element => element.scrollWidth <= element.clientWidth)).toBe(true);
@@ -60,13 +59,7 @@ for (const viewport of viewports) {
     expect(overlaps(tape!, diaryHeading!)).toBe(false);
     expect(overlaps(tape!, diaryDate!)).toBe(false);
     await page.screenshot({ path: `artifacts/integration/m4/diary-${viewport.width}x${viewport.height}.png`, animations: 'disabled' });
-    const tips = period.locator('.period-tips');
-    await tips.scrollIntoViewIfNeeded();
-    await expect(tips).toBeInViewport();
-    const book = await tips.locator('.period-art-main').boundingBox();
-    const tipContent = await tips.locator('button[aria-label="查看小贴士详情"]').boundingBox();
-    expect(overlaps(book!, tipContent!)).toBe(false);
-    await page.screenshot({ path: `artifacts/integration/m4/tips-${viewport.width}x${viewport.height}.png`, animations: 'disabled' });
+
   });
 }
 
@@ -128,8 +121,7 @@ test('a failed illustration request falls back and the period view stays usable 
   await expect(header).toHaveJSProperty('naturalWidth', 128);
   await context.setOffline(true);
   await expect(page.locator('.period-calendar')).toBeVisible();
-  await expect(page.getByRole('button', { name: '查看小贴士详情' })).toBeVisible();
-  await page.getByRole('button', { name: '查看小贴士详情' }).click();
-  await expect(page.getByRole('dialog', { name: '给自己的温柔小贴士' })).toBeVisible();
+  await page.getByRole('button', { name: '周期设置', exact: true }).click();
+  await expect(page.getByRole('dialog', { name: '周期设置' })).toBeVisible();
   await expect(page.locator('.period-art--header .period-art-main')).toHaveJSProperty('naturalWidth', 128);
 });

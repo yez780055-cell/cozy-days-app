@@ -94,25 +94,6 @@
 .period-note>span{font-size:11px;line-height:1.7;color:#796582}
 .period-art--note{width:96px;height:52px;flex:none}
 
-.period-reminders ul{list-style:none;margin:0;padding:0}
-.period-reminders li{display:flex;align-items:center;gap:8px;border-top:1px solid #f2e6dd;padding:7px 0;font-size:13px}
-.period-reminders .checkbox{width:44px;height:44px;min-width:44px;transform:scale(.75);margin:-2px}
-.period-reminders li>span{flex:1;min-width:0;overflow-wrap:anywhere;line-height:1.6}
-.period-reminders li .done{text-decoration:line-through;color:#9e8980}
-.period-reminders li>button:last-child{border:0;background:transparent;color:#a18a80;width:44px;min-width:44px;min-height:44px}
-.period-reminders form{margin:8px 0 14px}
-.period-reminders form label{font-size:11px}
-.period-reminders form>div{display:flex;gap:7px;margin-top:7px}
-.period-reminders input{min-width:0;width:100%;border:1px solid #e5cfc5;background:#fffaf5;border-radius:10px;padding:9px;font:inherit;font-size:16px}
-.period-reminders form button{white-space:nowrap}
-
-.period-tips{overflow:hidden;min-height:184px;padding-bottom:18px}
-.period-tips>button{position:relative;z-index:1;border:0;background:transparent;padding:0;width:74%;text-align:left;font:inherit;color:inherit}
-.period-tips b{font-size:13px;font-weight:500;line-height:1.7}
-.period-tips p{font-size:12px;line-height:1.8;margin:6px 0;color:#7d6a60}
-.period-tips button>span{display:flex;align-items:center;font-size:11px;color:#a45e78;min-height:32px}
-.period-art--tips{position:absolute;right:8px;bottom:8px;width:54px;height:38px;opacity:.88}
-.period-art--tips .period-art-heart{width:16px;height:16px;right:1px;top:0}
 .period-storage{font-size:10px;text-align:center;color:#87746b;line-height:1.7;margin:4px 0}
 .period-error{margin:10px;padding:12px;border-radius:12px;background:#f8dce3;color:#894159;font-size:12px;line-height:1.7}
 .period-error button{margin-left:8px;border:0;background:#fff7ef;color:inherit;min-height:44px;padding:4px 12px;border-radius:8px}
@@ -120,7 +101,6 @@
 .period-dialog label{display:flex;flex-direction:column;gap:8px;font-size:13px;margin:16px 0}
 .period-dialog input{width:100%;min-width:0;min-height:44px;padding:10px;border:1px solid #e1cec2;border-radius:10px;background:#fffaf5;font:inherit;font-size:16px;color:inherit}
 .period-dialog p{font-size:12px;line-height:1.9;color:#806d64}
-.period-dialog a{font-size:12px;color:#99526d;line-height:2}
 .period-dialog form>.period-primary{width:100%;margin-top:12px}
 .period-history-list{list-style:none;margin:16px 0 0;padding:0}
 .period-history-list li{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:3px;border-top:1px solid #ecdcd1;padding:7px 0;font-size:12px}

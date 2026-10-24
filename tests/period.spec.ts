@@ -17,7 +17,7 @@ async function add(page:Page,start:string,end?:string) {
 async function shot(page:Page,name:string) {mkdirSync(evidence,{recursive:true});await page.screenshot({path:`${evidence}/${name}.png`,animations:'disabled'});}
 async function saved(page:Page) { await expect(page.locator('.period-storage')).toContainText('记录仅保存在'); }
 
-test('empty state, historical cycles, calendar, diary persistence, settings, reminders and evidence',async({page})=>{
+test('empty state, historical cycles, calendar, diary persistence, settings and evidence',async({page})=>{
   await open(page); await expect(page.locator('.period-empty')).toContainText('还没有经期记录');
   await page.locator('.period-empty').scrollIntoViewIfNeeded();
   await shot(page,'04-empty');
@@ -40,23 +40,16 @@ test('empty state, historical cycles, calendar, diary persistence, settings, rem
   // Historical 28 days takes priority over fallback 30.
   await expect(page.locator('.period-averages')).toContainText('28');
   await page.locator('.period-summary').scrollIntoViewIfNeeded(); await shot(page,'05-cycle-updated');
-  await page.getByRole('button',{name:'新建提醒'}).click();
-  await page.getByLabel('给自己的小提醒').fill('早点休息'); await page.getByRole('button',{name:'添加',exact:true}).click();
-  await page.getByRole('checkbox',{name:'完成提醒：早点休息'}).click(); await saved(page);
   await page.reload(); await open(page);
   await expect(page.locator('.period-averages')).toContainText('28');
   await expect(page.getByRole('button',{name:'较多',exact:true})).toHaveAttribute('aria-pressed','true');
   await expect(page.getByRole('button',{name:'腹痛',exact:true})).toHaveAttribute('aria-pressed','true');
   await expect(page.getByRole('button',{name:'疲惫',exact:true})).toHaveAttribute('aria-pressed','true');
-  await expect(page.getByRole('checkbox',{name:'完成提醒：早点休息'})).toHaveAttribute('aria-checked','true');
   await page.getByRole('button',{name:/^2026-10-22/}).click();
   await expect(page.getByRole('button',{name:'较多',exact:true})).toHaveAttribute('aria-pressed','false');
   await page.getByRole('button',{name:'平静',exact:true}).click();
   await page.getByRole('button',{name:'今天',exact:true}).click();
   await expect(page.getByRole('button',{name:'开心',exact:true})).toHaveAttribute('aria-pressed','true');
-  await page.getByRole('button',{name:'查看小贴士详情'}).click(); await expect(page.getByRole('dialog')).toContainText('不是医疗诊断'); await page.keyboard.press('Escape');
-  await page.getByRole('button',{name:'删除提醒：早点休息'}).click(); await saved(page);
-  await page.reload(); await open(page); await expect(page.getByRole('checkbox',{name:'完成提醒：早点休息'})).toHaveCount(0);
 });
 
 test('history edit, overlap rejection, deletion and setting fallback',async({page})=>{
@@ -86,7 +79,6 @@ for(const viewport of [{width:360,height:740},{width:393,height:852},{width:430,
   await page.setViewportSize(viewport);await open(page);
   expect(await page.locator('.period-page').evaluate(el=>el.scrollWidth<=el.clientWidth)).toBeTruthy();
   await expect(page.getByRole('navigation')).toBeInViewport();
-  await page.getByRole('button',{name:'查看小贴士详情'}).click(); await expect(page.getByRole('dialog')).toBeInViewport();await page.keyboard.press('Escape');
   await page.getByRole('button',{name:'周期设置',exact:true}).click();await expect(page.getByRole('dialog')).toBeInViewport();
 });
 

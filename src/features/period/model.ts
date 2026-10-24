@@ -1,9 +1,8 @@
 export interface PeriodEntry { id: string; start: string; end?: string }
 export interface DailyEntry { date: string; flow?: string; symptoms: string[]; mood?: string }
-export interface PeriodReminder { id: string; text: string; completed: boolean }
 export interface CycleSettings { cycleLength: number; periodLength: number }
-export interface PeriodData { periods: PeriodEntry[]; days: Record<string, DailyEntry>; reminders: PeriodReminder[]; settings: CycleSettings }
-export const emptyData = (): PeriodData => ({ periods: [], days: {}, reminders: [], settings: { cycleLength: 28, periodLength: 5 } });
+export interface PeriodData { periods: PeriodEntry[]; days: Record<string, DailyEntry>; settings: CycleSettings }
+export const emptyData = (): PeriodData => ({ periods: [], days: {}, settings: { cycleLength: 28, periodLength: 5 } });
 const DAY = 86400000;
 // Date-only values are integer UTC days. Only today's key uses the device's local calendar.
 export function dayNumber(key: string): number {

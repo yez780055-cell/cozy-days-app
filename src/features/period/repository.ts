@@ -8,7 +8,6 @@ export function validPeriodData(value: unknown): value is PeriodData {
   return Array.isArray(d.periods) && Array.from(d.periods).every(p => p && typeof p.id === 'string' && !!p.id && date(p.start) && (p.end === undefined || (date(p.end) && p.end >= p.start)))
     && new Set(d.periods.map(p => p.id)).size === d.periods.length
     && !!d.days && typeof d.days === 'object' && !Array.isArray(d.days) && Object.entries(d.days).every(([key, e]) => date(key) && e && e.date === key && Array.isArray(e.symptoms) && Array.from(e.symptoms).every(s => typeof s === 'string') && (e.flow === undefined || typeof e.flow === 'string') && (e.mood === undefined || typeof e.mood === 'string'))
-    && Array.isArray(d.reminders) && Array.from(d.reminders).every(r => r && typeof r.id === 'string' && !!r.id && typeof r.text === 'string' && typeof r.completed === 'boolean') && new Set(d.reminders.map(r=>r.id)).size===d.reminders.length
     && !!d.settings && Number.isInteger(d.settings.cycleLength) && d.settings.cycleLength >= 15 && d.settings.cycleLength <= 90 && Number.isInteger(d.settings.periodLength) && d.settings.periodLength >= 1 && d.settings.periodLength <= Math.min(15, d.settings.cycleLength);
 }
 
@@ -26,6 +25,8 @@ export const periodRepository = {
     const record = await db.state.get('local');
     if (!record) return emptyData();
     if (!validPeriodData(record.value)) throw new Error('Invalid period data; original record retained');
+    // Retired/unknown fields stay opaque and round-trip unchanged through edits
+    // and recovery. Keep the original shape/order for optimistic save comparison.
     return record.value;
   },
   async save(value: PeriodData, expected: string) {

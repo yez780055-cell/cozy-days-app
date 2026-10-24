@@ -3,8 +3,6 @@ import { PeriodArt } from './PeriodArt';
 import { PeriodCalendar } from './PeriodCalendar';
 import { CycleSummary } from './CycleSummary';
 import { DailyPeriodRecord } from './DailyPeriodRecord';
-import { PeriodReminders } from './PeriodReminders';
-import { PeriodTips } from './PeriodTips';
 import { PeriodEditor, PeriodHistory, PeriodSettings } from './PeriodForms';
 import { localToday, type PeriodEntry } from './model';
 import { usePeriod } from './usePeriod';
@@ -38,8 +36,6 @@ export default function PeriodPage() {
         const days={...d.days}; if(!value.flow&&!value.mood&&!value.symptoms.length) delete days[selected]; else days[selected]=value;
         return {...d,days};
       })}/>
-      <PeriodReminders values={data.reminders} onChange={reminders=>update(d=>({...d,reminders}))}/>
-      <PeriodTips data={data} today={today}/>
       <p className="period-storage" role="status">{saving?'正在保存…':error?(durable?'尚未保存到记录库 · '+notice:'尚未保存 · 仅内存保留，刷新或关闭页面会丢失，请重试'):'♡ 记录仅保存在这台设备 · 清除站点数据会丢失记录'}</p>
     </div>}
     {ready&&dialog==='editor'&&<PeriodEditor entry={editing} selected={selected} data={data} today={today} onClose={close} onSave={async entry=>{const ok=await update(d=>({...d,periods:[...d.periods.filter(p=>p.id!==entry.id),entry]}));if(ok&&viewRef.current===view) close();return ok;}}/>}

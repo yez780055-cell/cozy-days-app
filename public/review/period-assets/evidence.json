@@ -1,0 +1,67 @@
+{
+  "milestone": "M4 period asset visual review",
+  "sourceCommit": "05ad5ae79f315eda81d38194ecccffcbd29282c6",
+  "generator": "Playwright Chromium; playwright.period.config.ts; synthetic date 2026-10-23; 360x740, 393x852, 430x932",
+  "screenshots": [
+    {
+      "file": "evidence/header-360x740.png",
+      "capture": "initial period view",
+      "sha256": "0d7f82e96d1e121a7d0e91017b0b8b14a047f4c65737b14b74e369670fd59334"
+    },
+    {
+      "file": "evidence/header-393x852.png",
+      "capture": "initial period view",
+      "sha256": "d49663e793f0b65ec514935fadf170d12dccf2b923dfc5e0ac1595af4753a224"
+    },
+    {
+      "file": "evidence/header-430x932.png",
+      "capture": "initial period view",
+      "sha256": "18b32ca339c4bb21df9942ef0e9beba8bf0b0ce53baa12d81b5fbab6d54af861"
+    },
+    {
+      "file": "evidence/diary-360x740.png",
+      "capture": "period page scrolled to daily diary",
+      "sha256": "ac5c1b5aad4477fe9c181fba2471c049387bef54ad2f2de8af93585673b5029c"
+    },
+    {
+      "file": "evidence/diary-393x852.png",
+      "capture": "period page scrolled to daily diary",
+      "sha256": "6a50e18230623c9755d088c6da9bd5880260f70b2cc7404dbea7bcc2e0b90d44"
+    },
+    {
+      "file": "evidence/diary-430x932.png",
+      "capture": "period page scrolled to daily diary",
+      "sha256": "c149972668d02904d8c2029e02dd296104293fc1d886888271deb918e0e7daaa"
+    },
+    {
+      "file": "evidence/tips-360x740.png",
+      "capture": "period page scrolled to tips card",
+      "sha256": "123533f49cbf88ad3d4abab1c6fb232e8b1f059d04e49fc3e89f09a68d9ba0e0"
+    },
+    {
+      "file": "evidence/tips-393x852.png",
+      "capture": "period page scrolled to tips card",
+      "sha256": "f120b55e75b6fc2d63d911c00996619bf7f5ecf363af244bfd39705a2e73c84f"
+    },
+    {
+      "file": "evidence/tips-430x932.png",
+      "capture": "period page scrolled to tips card",
+      "sha256": "03927e551a8bbfd62c3841327203b4a62fb17c25e65f7d97017c9ccf666ad58c"
+    },
+    {
+      "file": "evidence/assets-light.png",
+      "capture": "transparent assets on checkerboard light background",
+      "sha256": "9ccdd1c2bb744081ea4a0e0f4e47b476fe885cbb01fc8d93c462ac59847a1c4f"
+    },
+    {
+      "file": "evidence/assets-dark.png",
+      "capture": "transparent assets on dark background",
+      "sha256": "936e6f687ad39a3695514e636e3208ed1140592aab89280b803fc173acc0bc5f"
+    }
+  ],
+  "reference": {
+    "type": "user-provided local Codex attachment",
+    "sha256": "9d19d52870789f086461e245cf8ad383ecd61ec0ebd965ef61dbf63870576a38",
+    "embeddedInRepository": false
+  }
+}

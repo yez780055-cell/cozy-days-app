@@ -40,7 +40,7 @@ Python 3 用于 ZIP、签名和资源检查。签名变量仅用于 release；�
 
 GitHub Environment `android-release` 的 Secrets 由发布负责人设置：`ANDROID_KEYSTORE_BASE64`（上述长期密钥的 Base64）、`ANDROID_KEYSTORE_PASSWORD`、`ANDROID_KEY_ALIAS`、`ANDROID_KEY_PASSWORD`。该 Environment 仅允许 `release/android-*` 和 `main` 分支部署；其他分支的手动运行会被 Environment 策略阻止签名。绝不上传到代码、Issue、日志或 artifact。CI 将密钥解码到 runner 临时目录，设置私有权限，构建后通过 trap 和 always 步骤清理。
 
-推送 `release/android-*` 分支会以 code 1 构建；也可在 **Signed Android APK** 的 `workflow_dispatch` 输入更高 version_code。仅对可信任、已审查源码触发正式签名。此工作流没有 PR/pull_request_target 触发，fork 仓库不运行签名 job，只申请 `contents: read`，第三方 actions 固定 commit SHA。完整 Web E2E、普通构建、Pages 构建及 Pages 测试通过后才运行签名 job。
+推送 `release/android-*` 分支会以 code 1 构建；也可在 **Signed Android APK** 的 `workflow_dispatch` 输入更高 version_code。仅对可信任、已审查源码触发正式签名。此工作流没有 PR/pull_request_target 触发，fork 仓库不运行签名 job，只申请 `contents: read`，第三方 actions 固定 commit SHA。完整 Web E2E、普通构建、Pages 构建及 Pages 测试与 APK 签名和模拟器验收并行运行。上传的 artifact 仅为候选制品，只有完整工作流全部通过后才能验收交付或合并。
 
 下载 `little-days-0.2.1-code-…` artifact，包含 APK、SHA256SUMS、证书指纹、aapt 信息、工具版本与源 SHA。artifact 保留 **90 天**，过期后不能再从 Actions 下载；发布负责人应将已验证版本另存安全的长期发行归档。工作流可按同一源码和锁文件重复执行；不承诺 APK 字节级一致，JDK/Node 小版本、runner 镜像及依赖工具仍可能更新。
 

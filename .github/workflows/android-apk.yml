@@ -48,7 +48,6 @@ jobs:
           retention-days: 90
 
   signed-apk:
-    needs: web-regression
     environment: android-release
     # No PR trigger, pull_request_target, or execution in a fork repository.
     if: github.event.repository.fork == false

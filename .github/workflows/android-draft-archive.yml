@@ -99,12 +99,20 @@ jobs:
               run('git', 'fetch', '--no-tags', 'origin', f'refs/tags/{tag}')
               require(run('git', 'rev-parse', 'FETCH_HEAD^{commit}').strip() == sha, 'Tag does not point to accepted source')
               # Use runner-provided Android tools only; never execute artifact contents.
-              tools = sorted((Path(os.environ['ANDROID_HOME']) / 'build-tools').glob('*/apksigner'))
-              require(bool(tools), 'Runner Android signing tools unavailable')
-              signature = run(str(tools[-1]), 'verify', '--print-certs', str(apks[0]))
+              build_tools = Path(os.environ['ANDROID_HOME']) / 'build-tools' / '35.0.0'
+              signer = build_tools / 'apksigner'
+              aapt = build_tools / 'aapt'
+              if not signer.is_file() or not aapt.is_file():
+                  subprocess.run(['sdkmanager', 'build-tools;35.0.0'], check=True)
+              require(signer.is_file() and aapt.is_file(), 'Android build-tools 35.0.0 unavailable')
+              print(f'APK verification tool: {signer}', flush=True)
+              verification = subprocess.run([str(signer), 'verify', '--print-certs', str(apks[0])], text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+              signature = verification.stdout
+              print(signature, flush=True)
+              verification.check_returncode()
               fingerprints = re.findall(r'Signer #\d+ certificate SHA-256 digest: ([0-9a-fA-F]+)', signature)
               require(bool(fingerprints) and all(value.lower() == cert for value in fingerprints), 'APK certificate mismatch')
-              badging = run(str(tools[-1].with_name('aapt')), 'dump', 'badging', str(apks[0]))
+              badging = run(str(aapt), 'dump', 'badging', str(apks[0]))
               require(re.search(r"^package: name='com\.littledays\.app' ", badging, re.MULTILINE), 'APK package mismatch')
               name = f'cozy-days-{tag}.apk'
 

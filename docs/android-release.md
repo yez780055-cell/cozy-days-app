@@ -44,4 +44,4 @@ GitHub Environment `android-release` 的 Secrets 由发布负责人设置：`AND
 
 当前图标和启动图沿用现有有效的 Capacitor 模板资源，本轮没有替换。code 1 是仓库中首次已知正式签名包的起点，不代表已核实所有未连接设备上的安装历史。
 
-此流程的静态 APK 校验和 Web E2E 不等于设备测试。当前工作流不执行模拟器安装、启动或覆盖升级，也没有 Android 真机数据保留证据。正式发布前应使用合成数据执行同签名 code 1 → code 2 覆盖安装，验证启动和 IndexedDB 数据保留，记录设备/API、源 SHA、证书和测试结果，切勿以真实个人数据库做发布测试。
+code 1 发布工作流还配置真实 API35 x86_64 模拟器验收：构建同证书的 release 测试 APK 和临时 code 2 包，删除临时密钥后安装 code 1、启动内置 WebView，通过只指定的新 instrumentation 类在应用已创建的 IndexedDB 中写入合成待办、纪念日和生理期 state；随后 `adb install -r` 覆盖安装 code 2，重新启动并验证三类数据及 `https://localhost` 源站。既不卸载也不清空数据，不启用 release 调试，不修改业务 schema。正式下载 artifact 始终只含原始 code 1，临时测试 APK 不上传，另行上传真实测试输出、设备属性、证书与日志 90 天；更高 version_code 跳过这个固定 1→2 场景。配置提交不等于测试已通过，只有对应 CI 的 instrumentation 输出和 result.txt 同时成功才是模拟器证据；当前没有 Android 真机测试结论。仅限新建的 CI 模拟器，禁止在个人设备或真实数据库运行。

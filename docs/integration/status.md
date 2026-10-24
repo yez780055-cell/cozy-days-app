@@ -90,3 +90,8 @@ Remote checkpoint reconciliation (coordinator read-back, 2026-10-24): all seven 
 - Reviewed cleanup 0a37c0a: retired components, model API, operations, styles removed. Legacy extra fields remain opaque and round-trip in original shape for conflict comparison; no DB version or todo changes.
 - G1 npm build passed; 40/40 period/recovery/assets + 8/8 focused recovery/model/deletion checks. Historical test-generated screenshots excluded from commit.
 - G2 sole writer gpt-6-luna/medium: period visual components/CSS only, minimum sufficient for scoped responsive UI and approved artwork. Real three-size visual checks required. No data logic changes. Escalation only after reproduced narrowed complex-layout failure.
+
+### G2 visual review of first Medium render
+- Actual 360x740 screenshots in G2 artifacts show hero cats overlap subtitle, summary/daily labels wrap one character per line, summary height creates a large empty calendar tail, and flow/mood symbols do not match required waterdrop/cat treatment.
+- Coordinator requested one narrowed repair with actual screenshots before acceptance. No upgrade yet; if these coupled narrow-screen constraints persist after repair, Luna High is justified under existing routing (not a default escalation).
+- Independent G1 medium read-only compatibility review: PASS, no actionable findings; original record shape/conflict detection/recovery verified by code review; no new runtime tests claimed.

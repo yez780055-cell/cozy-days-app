@@ -108,12 +108,107 @@
 .period-delete-confirm button{font-size:13px;margin-right:10px}
 .period-delete-confirm p{margin:0 0 5px}
 
-@media(max-width:370px){.period-content{padding-left:9px;padding-right:9px}
-.period-card{padding-left:12px;padding-right:12px}
-.period-header-copy{padding-left:19px}
-.period-header h1{font-size:35px}
-.period-art--header{right:0;width:126px;height:92px}
-.period-header-sticker{right:8px;font-size:9px}
-.period-calendar header h2{font-size:18px}
-.period-legend{gap:8px;font-size:9px}
+/* Illustrated journal layout: a broad calendar beside a compact cycle rail. */
+.period-page{background-color:#fff8ee;background-image:var(--period-paper-url);background-size:420px auto;background-blend-mode:soft-light}
+.period-header{min-height:190px;background-image:linear-gradient(90deg,#fff5e9db 0%,#fff5e9a6 43%,transparent 76%),var(--period-paper-url),radial-gradient(ellipse at 78% 40%,#dfd0f2,transparent 50%),radial-gradient(ellipse at 12% 18%,#f4becd,transparent 58%),linear-gradient(0deg,#f8e6d4,#fff9ef)}
+.period-header-copy{width:55%;padding:26px 0 18px 24px}
+.period-header-copy>span{font-size:11px;letter-spacing:2px}
+.period-header h1{font-size:36px;letter-spacing:2px;margin:13px 0 8px}
+.period-header p{font-size:14px;line-height:1.9}
+.period-header-sticker{right:20px;top:20px;font-size:12px;line-height:1.9;padding:11px 15px;background:#fff8e8e8}
+.period-art--header{right:0;bottom:4px;width:min(65vw,330px);height:205px;clip-path:inset(0 0 0 12%)}
+.period-art--header .period-art-star{width:28px;height:28px;right:10%;top:4%}
+.period-art--header .period-art-sparkle{width:24px;height:24px;left:8%;top:27%}
+.period-art--header .period-art-heart{width:28px;height:28px;left:40%;bottom:0}
+.period-content{padding:14px 18px 24px;gap:14px}
+.period-dashboard{display:grid;grid-template-columns:minmax(0,1.95fr) minmax(0,1fr);gap:10px;align-items:start}
+.period-dashboard>.period-card{height:auto;padding:16px 14px}
+.period-calendar header{align-items:flex-start;flex-wrap:wrap;row-gap:4px}
+.period-calendar header>div{margin-left:auto}
+.period-calendar header h2{font-size:16px}
+.period-calendar header button{min-width:36px;min-height:36px}
+.period-calendar .period-today{display:inline-flex;font-size:10px;min-width:36px;min-height:36px;padding:3px 5px}
+.period-weekdays{padding-top:10px;padding-bottom:7px}
+.period-date{height:38px;font-size:clamp(13px,4vw,17px);border-radius:14px}
+.period-legend{gap:8px 10px;font-size:clamp(9px,2.6vw,11px);margin-top:12px}
+.period-selected{font-size:10px}
+.period-summary{padding-top:13px!important}
+.period-summary header{align-items:center}
+.period-summary h2{font-size:12px;letter-spacing:0;gap:3px;white-space:nowrap}
+.period-summary h2>span{font-size:16px}
+.period-summary header>button{min-width:30px;min-height:36px;padding:2px}
+.period-cycle-line{display:block}
+.period-cycle-line>p{display:flex;align-items:baseline;gap:3px;font-size:11px;white-space:nowrap;margin:8px 0 4px}
+.period-cycle-line strong{font-size:clamp(27px,8vw,38px)}
+.period-countdown{text-align:left;font-size:10px;line-height:1.5}
+.period-countdown strong{font-size:16px;display:inline;margin-left:4px}
+.period-progress{height:8px;margin:8px 0 10px}
+.period-history-link{min-height:58px;gap:5px;margin:6px 0;padding:5px 0;font-size:10px;line-height:1.5}
+.period-history-link svg{width:16px;height:16px}
+.period-history-link b{font-size:10px;overflow-wrap:anywhere}
+.period-history-link>span:last-child{font-size:9px}
+.period-averages{display:flex;flex-direction:column;align-items:stretch;gap:0}
+.period-averages button{min-height:54px;align-items:flex-start;gap:1px;border-right:0;border-bottom:1px solid #f0e5df;padding:6px 2px;font-size:10px}
+.period-averages b{font-size:19px}
+.period-averages button:last-child{align-items:center;flex-direction:row;justify-content:flex-start;min-height:44px}
+.period-summary .period-fine{font-size:9px;line-height:1.5}
+.period-empty h3{font-size:13px;line-height:1.5}
+.period-empty p{font-size:11px}
+.period-daily{padding:18px 18px 20px}
+.period-daily>header{margin-bottom:4px}
+.period-daily h2{font-size:21px}
+.period-daily .period-fine{margin-top:4px}
+.period-record-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(94px,.36fr);gap:12px;align-items:stretch}
+.period-record-options{min-width:0}
+.period-daily fieldset{margin-top:8px}
+.period-daily legend{font-size:13px;gap:5px}
+.period-choices{gap:2px}
+.period-daily .period-record-options fieldset{display:grid;grid-template-columns:68px minmax(0,1fr);align-items:center;column-gap:5px}
+.period-daily .period-record-options legend{grid-column:1;grid-row:1;margin:0;line-height:1.35;max-width:68px;overflow-wrap:anywhere}
+.period-record-options .period-choices{grid-column:2;grid-row:1;margin-top:0}
+.period-choices button{min-height:57px;font-size:clamp(9px,2.8vw,12px);white-space:normal;line-height:1.2;text-align:center}
+.period-daily legend span{white-space:nowrap}
+.period-daily legend small{flex-basis:100%;margin-left:21px;line-height:1.1}
+.period-choice-icon{width:clamp(27px,8vw,38px);height:clamp(27px,8vw,38px)}
+.period-note{height:100%;min-height:250px;box-sizing:border-box;margin:13px 0 0;padding:13px 9px;flex-direction:column;justify-content:space-between;text-align:center;background:linear-gradient(150deg,#f5edffed,#e9def7ed);border:1px solid #e1d4ed;box-shadow:0 5px 12px #7b648011;transform:rotate(1.5deg)}
+.period-note>span{font-size:12px;line-height:2.15;color:#69577a}
+.period-art--note{width:100%;height:110px;max-width:142px}
+.period-cat-face{width:100%;height:100%;display:block}
+.period-choice-icon:has(.period-cat-face){padding:2px;box-sizing:border-box;background:#fff6e9}
+.period-choices [aria-pressed=true] .period-choice-icon:has(.period-cat-face){background:#fde4ea}
+.period-choices .period-choice-icon.row-0 svg{color:#cb6382}
+.period-choices .period-choice-icon.row-1 svg{color:#77617a}
+.period-choices .period-choice-icon.row-2 svg{color:#897346}
+.period-header::after{content:"";position:absolute;z-index:0;right:32%;top:20px;width:54px;height:54px;border-radius:50%;background:radial-gradient(circle at 36% 38%,#fff5cb 0 44%,#f4d58b 68%,#efd08d 100%);box-shadow:0 0 22px #ffedba;opacity:.92}
+
+@media(max-width:390px){
+ .period-content{padding-left:10px;padding-right:10px}
+ .period-dashboard{grid-template-columns:minmax(0,1.95fr) minmax(0,1fr);gap:7px}
+ .period-dashboard>.period-card{padding:13px 9px}
+ .period-calendar header h2{font-size:14px}
+ .period-calendar header>div button{min-width:30px;min-height:36px;padding:2px}
+ .period-legend{gap:7px;font-size:9px}
+ .period-selected{font-size:9px}
+ .period-summary h2{font-size:12px}
+ .period-cycle-line>p{font-size:13px}
+ .period-cycle-line strong{font-size:28px}
+ .period-countdown strong{font-size:14px}
+ .period-history-link{gap:3px;font-size:9px}
+ .period-averages button{font-size:9px}
+ .period-record-layout{grid-template-columns:minmax(0,1fr) 82px;gap:6px}
+ .period-daily{padding-left:12px;padding-right:12px}
+ .period-daily legend{font-size:11px}
+ .period-daily .period-record-options fieldset{grid-template-columns:58px minmax(0,1fr);column-gap:3px}
+ .period-daily .period-record-options legend{font-size:10px;max-width:58px}
+ .period-choices button{min-height:64px;font-size:9px}
+ .period-note{min-height:230px;padding:10px 5px}
+ .period-note>span{font-size:10px}
+ .period-art--note{height:90px}
+ .period-header{min-height:190px}
+ .period-header-copy{width:45%;padding:24px 0 14px 19px}
+ .period-header-copy>span{font-size:9px;letter-spacing:1px;white-space:nowrap}
+ .period-header h1{font-size:31px;letter-spacing:1px}
+ .period-header p{font-size:11px}
+ .period-art--header{right:0;width:65vw;height:160px}
+ .period-header-sticker{right:8px;top:12px;font-size:9px;padding:7px 9px}
 }

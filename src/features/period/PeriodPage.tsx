@@ -23,15 +23,15 @@ export default function PeriodPage() {
   useEffect(()=>{ const refresh=()=>setToday(localToday()); const timer=setInterval(refresh,30_000); window.addEventListener('focus',refresh); return ()=>{clearInterval(timer);window.removeEventListener('focus',refresh);}; },[]);
   function select(date:string) {setSelected(date);setMonth(date.slice(0,7));}
   function add() {setView({dialog:'editor'});}
-  return <section className="period-page" aria-label="生理期页面">
+  return <section className="period-page" aria-label="生理期页面" style={{'--period-paper-url':`url("${import.meta.env.BASE_URL}assets/cozy_days/raster/backgrounds/paper_texture.png")`} as React.CSSProperties}>
     <header className="period-header"><div className="period-header-copy"><span>COZY DAYS · 小饱日常</span><h1 aria-label="生理期日历">生理期 <em>♡</em></h1><p>好好照顾自己，<br/>每个阶段的你都很可爱。</p></div><PeriodArt slot="header"/><span className="period-header-sticker" aria-hidden="true">也要温柔地<br/>对待自己呀 ♡</span></header>
     {error&&<div className="period-error" role="alert">{error}<button onClick={retry}>重试</button></div>}
     {(conflict||archives.length>0)&&<button disabled={saving||restoring} className="period-primary" onClick={()=>setBackups(true)}>查看恢复备份</button>}
     {conflict&&<div className="period-error"><button onClick={()=>{setConfirmRestore(false);resolveConflict('database');}}>使用记录库版本</button><button onClick={()=>setConfirmRestore(true)}>恢复草稿版本</button><p>选择前双方均不覆盖；冲突副本暂留在恢复区。{notice}</p>{confirmRestore&&<div><p>草稿将替换当前记录库的全部生理期记录。双方副本必须先保存到设备本地恢复区；你也可以查看、导出备份后再决定。确认后还需点击重试保存。</p><button onClick={()=>setConfirmRestore(false)}>取消替换</button><button onClick={()=>{resolveConflict('draft');setConfirmRestore(false);}}>确认替换记录库</button></div>}</div>}
     {backups&&<PeriodRecovery entries={[...archives,...(conflictData?[conflictData]:[])]} notice={notice} onClose={()=>setBackups(false)} onRestore={value=>{setBackups(false);setConfirmRestore(false);void restoreArchive(value);}}/>}
     {!ready?<p className="loading-message">正在打开你的手账…</p>:<div className="period-content">
-      <PeriodCalendar month={month} selected={selected} today={today} data={data} onMonth={setMonth} onSelect={select}/>
-      <CycleSummary data={data} today={today} onHistory={()=>setDialog('history')} onSettings={()=>setDialog('settings')} onAdd={add}/>
+      <div className="period-dashboard"><PeriodCalendar month={month} selected={selected} today={today} data={data} onMonth={setMonth} onSelect={select}/>
+      <CycleSummary data={data} today={today} onHistory={()=>setDialog('history')} onSettings={()=>setDialog('settings')} onAdd={add}/></div>
       <DailyPeriodRecord date={selected} today={today} value={data.days[selected]} onChange={value=>update(d=>{
         const days={...d.days}; if(!value.flow&&!value.mood&&!value.symptoms.length) delete days[selected]; else days[selected]=value;
         return {...d,days};

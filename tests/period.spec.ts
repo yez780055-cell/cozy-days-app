@@ -77,7 +77,17 @@ test('month navigation, adjacent date, future diary lock and todo isolation',asy
 
 for(const viewport of [{width:360,height:740},{width:393,height:852},{width:430,height:932}]) test(`mobile fit ${viewport.width}x${viewport.height}`,async({page})=>{
   await page.setViewportSize(viewport);await open(page);
+  await add(page,'2026-09-25','2026-09-29');await add(page,'2026-10-23');
   expect(await page.locator('.period-page').evaluate(el=>el.scrollWidth<=el.clientWidth)).toBeTruthy();
+  await expect(page.getByRole('button',{name:'今天',exact:true})).toBeVisible();
+  const art=await page.locator('.period-art--header').boundingBox();expect(art?.width).toBeGreaterThan(viewport.width*.6);
+  const dash=await page.locator('.period-dashboard').boundingBox();const cal=await page.locator('.period-calendar').boundingBox();const summary=await page.locator('.period-summary').boundingBox();
+  expect(cal!.width/(cal!.width+summary!.width)).toBeGreaterThan(.62);expect(cal!.width/(cal!.width+summary!.width)).toBeLessThan(.71);
+  mkdirSync('artifacts/v021-g2',{recursive:true});
+  await page.screenshot({path:`artifacts/v021-g2/period-${viewport.width}x${viewport.height}-full.png`,fullPage:true,animations:'disabled'});
+  await page.screenshot({path:`artifacts/v021-g2/period-${viewport.width}x${viewport.height}-top.png`,animations:'disabled'});
+  await page.locator('.period-daily').scrollIntoViewIfNeeded();
+  await page.screenshot({path:`artifacts/v021-g2/period-${viewport.width}x${viewport.height}-record.png`,animations:'disabled'});
   await expect(page.getByRole('navigation')).toBeInViewport();
   await page.getByRole('button',{name:'周期设置',exact:true}).click();await expect(page.getByRole('dialog')).toBeInViewport();
 });

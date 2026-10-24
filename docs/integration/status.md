@@ -85,3 +85,8 @@ Remote checkpoint reconciliation (coordinator read-back, 2026-10-24): all seven 
 - Baseline v0.2.0 peeled commit = origin/main = 6a36762dcaf6f46b70a309d281e29dc8c145d721. Existing checkouts preserved.
 - Feature worktree D:/cozy-days-v021-design; feature/v0.2.1-design-fidelity. Stable anchor checkpoint/v0.2.1-g0-stable-20261024T0820Z (nested annotated tag resolves to stable commit, never overwrite).
 - G1 dispatch: period-only input, output obsolete reminders/tips removal + compatibility tests; persistence risk medium, initial model gpt-6.1-sol/medium. Sole writer uses independent G1 worktree. Escalate only with narrowed reproduced failure evidence.
+
+## v0.2.1 G1 complete / G2 dispatch
+- Reviewed cleanup 0a37c0a: retired components, model API, operations, styles removed. Legacy extra fields remain opaque and round-trip in original shape for conflict comparison; no DB version or todo changes.
+- G1 npm build passed; 40/40 period/recovery/assets + 8/8 focused recovery/model/deletion checks. Historical test-generated screenshots excluded from commit.
+- G2 sole writer gpt-6-luna/medium: period visual components/CSS only, minimum sufficient for scoped responsive UI and approved artwork. Real three-size visual checks required. No data logic changes. Escalation only after reproduced narrowed complex-layout failure.

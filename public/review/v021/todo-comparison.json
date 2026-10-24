@@ -1,0 +1,27 @@
+{
+  "baselineSource": "6a36762dcaf6f46b70a309d281e29dc8c145d721",
+  "comparison": "Exact RGBA pixel equality; no threshold",
+  "rows": [
+    {
+      "width": 360,
+      "height": 740,
+      "changedPixels": 0,
+      "baselineSHA256": "ac495cfd3ad0e65eed9d5ab16b78a4c80ba5abf7842d78d764b004a4a8f481bc",
+      "candidateSHA256": "ac495cfd3ad0e65eed9d5ab16b78a4c80ba5abf7842d78d764b004a4a8f481bc"
+    },
+    {
+      "width": 393,
+      "height": 852,
+      "changedPixels": 0,
+      "baselineSHA256": "d7b920bff7981f5ed6b118a2bf35ffcf3a6ec3e9e7a2f2f35f28de11220553d1",
+      "candidateSHA256": "d7b920bff7981f5ed6b118a2bf35ffcf3a6ec3e9e7a2f2f35f28de11220553d1"
+    },
+    {
+      "width": 430,
+      "height": 932,
+      "changedPixels": 0,
+      "baselineSHA256": "8e6e24ad529cf2be6bd58b75156244ecc43ce40ff0f7b1e3bc742dbc18eb0c30",
+      "candidateSHA256": "8e6e24ad529cf2be6bd58b75156244ecc43ce40ff0f7b1e3bc742dbc18eb0c30"
+    }
+  ]
+}

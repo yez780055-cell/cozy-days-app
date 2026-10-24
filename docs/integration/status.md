@@ -79,3 +79,52 @@ An independent Sol Medium review of `6c477f1a4d7b952bc81920026f3fe18f01c9edcb` p
 
 Historical checkpoint `pre-modal-guard-20261024T003504Z` points to `1b5b9fa4e24adc509daa839111466e171d859179`; retain earlier checkpoint/source SHA entries as historical records. Android real-device behavior remains **未验收**.
 Remote checkpoint reconciliation (coordinator read-back, 2026-10-24): all seven checkpoint tags are present remotely. Annotated tags were resolved to their peeled commits: `pre-integration` → `b059b6d9982062958f0a866e763f84383d69430d`, `m0-baseline` → `22b4235e65345b86e1722258d0e0eb1e88b86364`, and `anniversary-functional` → `75e7de3a7a2811c3d0ccd5c766f2e8979012e387`. Other lightweight checkpoint references match the commit SHAs already recorded above. PRs #7–#10 remain open; their current heads match the previously recorded SHAs and each is an ancestor of `6c477f1a4d7b952bc81920026f3fe18f01c9edcb`. No integration PR has been created.
+
+## v0.2.1 G0 (2026-10-24)
+- Existing AGENTS.md, AGENT_ROUTING.md and saved docs/integration/routing.md read successfully. Local config selects gpt-6.1-sol/high. Prior merge authorization does not apply.
+- Baseline v0.2.0 peeled commit = origin/main = 6a36762dcaf6f46b70a309d281e29dc8c145d721. Existing checkouts preserved.
+- Feature worktree D:/cozy-days-v021-design; feature/v0.2.1-design-fidelity. Stable anchor checkpoint/v0.2.1-g0-stable-20261024T0820Z (nested annotated tag resolves to stable commit, never overwrite).
+- G1 dispatch: period-only input, output obsolete reminders/tips removal + compatibility tests; persistence risk medium, initial model gpt-6.1-sol/medium. Sole writer uses independent G1 worktree. Escalate only with narrowed reproduced failure evidence.
+
+## v0.2.1 G1 complete / G2 dispatch
+- Reviewed cleanup 0a37c0a: retired components, model API, operations, styles removed. Legacy extra fields remain opaque and round-trip in original shape for conflict comparison; no DB version or todo changes.
+- G1 npm build passed; 40/40 period/recovery/assets + 8/8 focused recovery/model/deletion checks. Historical test-generated screenshots excluded from commit.
+- G2 sole writer gpt-6-luna/medium: period visual components/CSS only, minimum sufficient for scoped responsive UI and approved artwork. Real three-size visual checks required. No data logic changes. Escalation only after reproduced narrowed complex-layout failure.
+
+### G2 visual review of first Medium render
+- Actual 360x740 screenshots in G2 artifacts show hero cats overlap subtitle, summary/daily labels wrap one character per line, summary height creates a large empty calendar tail, and flow/mood symbols do not match required waterdrop/cat treatment.
+- Coordinator requested one narrowed repair with actual screenshots before acceptance. No upgrade yet; if these coupled narrow-screen constraints persist after repair, Luna High is justified under existing routing (not a default escalation).
+- Independent G1 medium read-only compatibility review: PASS, no actionable findings; original record shape/conflict detection/recovery verified by code review; no new runtime tests claimed.
+
+### G2 escalation (evidence-based, one level)
+- Medium implementation 91accc9 reviewed; build and 7/7 period functional tests pass, but visual gate FAIL after a narrowed repair.
+- Second real captures artifacts/v021-g2/period-393x852-top.png show dashboard about 485px (calendar y205–623, summary y205–690); historical labels wrap excessively. 360 record capture still has vertical multi-select hint/tiny controls; hero collage/color hierarchy insufficient.
+- Sole writer gpt-6-luna/high now assigned period-only layout/fidelity calibration in independent worktree, reusing Medium implementation. No data/model/global/todo changes. Extra High is not authorized. Output requires actual three-size images, functional checks and no overflow; failure evidence retained in Medium worktree.
+
+## v0.2.1 G2 complete / G3 dispatch
+- Reviewed Luna High calibration eb7c314; labels/header/countdown overflow resolved, daily fieldset hint readable, viewport double column retained. Build and 12/12 period/assets tests passed. Real three-size captures in D:/cozy-days-v021-g2-high/artifacts/v021-g2; transient settings hint suppressed only in isolated evidence context.
+- Immutable period anchor checkpoint/v0.2.1-g2-period. No business/date/persistence or todo changes in visual phase.
+- G3 sole writer gpt-6-luna/medium for anniversary-only React/CSS and local SVG category art. Initial minimum sufficient model; no inherited High escalation. Independent worktree, original recurrence/CRUD/recovery preserved. Actual 3-size empty and four synthetic card captures required. Upgrade only if narrowed reproduced problems remain after Medium repair.
+
+### G3 Medium gate and one-level escalation
+- Medium f72b0de: build + 13 targeted tests pass. Initial actual 360 render had week overflow/deletion clipping; repaired render shows controls and notes but still has flower over note text, tape close to titles, date panel roughly 260px and flat hero/empty photo frames rather than the requested collage hierarchy.
+- Evidence D:/cozy-days-v021-g3/artifacts/v021-g3/anniversary-360-{top,scroll}.png reviewed. Functional PASS does not imply final visual PASS.
+- Sole writer Luna High assigned anniversary visual calibration after this narrowed Medium repair; no persistence/model/global/todo edits, no Extra High.
+
+## v0.2.1 G3 complete / G4 integrated visual review
+- Reviewed 5bdabeff: real 360/393/430 captures show full hero background/cats, real counters, notes, icon/theme/recurrence and both operations; terminal-card scroll avoids FAB. Build and 13/13 targeted tests pass. Date panel 207–214px retained to preserve 44px navigation/today controls.
+- Immutable anniversary anchor checkpoint/v0.2.1-g3-anniversary. No data/date/CRUD/recovery logic changes.
+- G4 sole Luna Medium writer: bounded final visual refinements (minor period CatFace variation, anniversary photos/bow decoration and empty scroll tail), isolate existing test-port change; final combined Playwright evidence and original-reference review page. No model/repository/global/todo changes. Source logic SHA recorded separately from later evidence-only commits. Use synthetic fixtures in new contexts only.
+
+## v0.2.1 G4 accepted / G5 full regression
+- Reviewed e09cbf1 real 3-size screenshots and 360 month modal: mood faces differentiated, photos/bow visible, notes/control boundaries clear, long title/note wrap; source changes limited to scoped visual files. 12 period + 13 anniversary targeted tests and build passed; one stabilized modal evidence rerun passed.
+- G5 sole gpt-6.1-sol/medium writer for full E2E, old IndexedDB/failure recovery, Pages builds and frozen-todo verification, 0.2.1 package metadata and final static evidence record. Medium required for data/failure regression judgment; no default High escalation.
+- Baseline todo capture input D:/cozy-days-v021-design/artifacts/v021-todo-baseline.mjs with baseline screenshots/source.json; isolated stable build at http://127.0.0.1:5182. Source implementation pinned after G4; record actual code SHA + capture state, not an invented future evidence commit SHA.
+
+## v0.2.1 G5 final gate / G6 handoff
+- G5 subagent stopped on usage limit after final evidence/results were saved; coordinator inspected raw logs, completed evidence packaging/commit, and did not substitute another model for source work.
+- Final full E2E run: 131/132; one untouched swipe snapshot case exhausted 30s during reload. Original complete swipe group rerun: 9/9, including that case at 5.3s. All 132 unique cases have pass evidence; status remains PASS_WITH_RETRY, not a fictitious single-run green. Pages 4/4 passed.
+- G5 only changed version metadata to 0.2.1 and precise display/image-settle tests. App source remains identical to ffbcae2. Coordinator rebuilt Web and Pages successfully after integration and validated static review HTTP route, all 29 images and provenance/results.
+- Source, image and capture-script hashes verified; stable todo exact pixel comparisons are 0/0/0 and all todo/shared/Android source diffs against v0.2.0 are zero. Raw test logs preserved under docs/v021/logs, including failed attempts; trailing log whitespace retained intentionally.
+- Final evidence /review/v021/ contains original references, actual three-size captures, operation states and real results. Only isolated synthetic browser records were used; no production DB or demo auto-seed.
+- G6: push feature/v0.2.1-design-fidelity plus four new immutable checkpoint tags, create PR to main, verify exact-head GitHub CI/Cloudflare Preview, then stop for human acceptance. No merge authorized. Actual PR/deployment result is recorded externally in the PR and final response, avoiding evidence-only update loops.

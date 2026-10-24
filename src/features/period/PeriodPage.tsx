@@ -43,8 +43,7 @@ export default function PeriodPage() {
       <p className="period-storage" role="status">{saving?'正在保存…':error?(durable?'尚未保存到记录库 · '+notice:'尚未保存 · 仅内存保留，刷新或关闭页面会丢失，请重试'):'♡ 记录仅保存在这台设备 · 清除站点数据会丢失记录'}</p>
     </div>}
     {ready&&dialog==='editor'&&<PeriodEditor entry={editing} selected={selected} data={data} today={today} onClose={close} onSave={async entry=>{const ok=await update(d=>({...d,periods:[...d.periods.filter(p=>p.id!==entry.id),entry]}));if(ok&&viewRef.current===view) close();return ok;}}/>}
-    {ready&&dialog==='history'&&<PeriodHistory data={data} onClose={close} onAdd={add} onEdit={entry=>setView({editing:entry,dialog:'editor'})} onRemove={id=>update(d=>({...d,periods:d.periods.filter(p=>p.id!==id)}))}/>}
+    {ready&&dialog==='history'&&<PeriodHistory data={data} error={error} saving={saving} onRetry={()=>void retry()} onClose={close} onAdd={add} onEdit={entry=>setView({editing:entry,dialog:'editor'})} onRemove={id=>update(d=>({...d,periods:d.periods.filter(p=>p.id!==id)}))}/>}
     {ready&&dialog==='settings'&&<PeriodSettings data={data} today={today} onClose={close} onSave={async settings=>{const ok=await update(d=>({...d,settings}));if(ok&&viewRef.current===view) close();return ok;}}/>}
   </section>;
 }
-

@@ -79,3 +79,9 @@ An independent Sol Medium review of `6c477f1a4d7b952bc81920026f3fe18f01c9edcb` p
 
 Historical checkpoint `pre-modal-guard-20261024T003504Z` points to `1b5b9fa4e24adc509daa839111466e171d859179`; retain earlier checkpoint/source SHA entries as historical records. Android real-device behavior remains **未验收**.
 Remote checkpoint reconciliation (coordinator read-back, 2026-10-24): all seven checkpoint tags are present remotely. Annotated tags were resolved to their peeled commits: `pre-integration` → `b059b6d9982062958f0a866e763f84383d69430d`, `m0-baseline` → `22b4235e65345b86e1722258d0e0eb1e88b86364`, and `anniversary-functional` → `75e7de3a7a2811c3d0ccd5c766f2e8979012e387`. Other lightweight checkpoint references match the commit SHAs already recorded above. PRs #7–#10 remain open; their current heads match the previously recorded SHAs and each is an ancestor of `6c477f1a4d7b952bc81920026f3fe18f01c9edcb`. No integration PR has been created.
+
+## v0.2.1 G0 (2026-10-24)
+- Existing AGENTS.md, AGENT_ROUTING.md and saved docs/integration/routing.md read successfully. Local config selects gpt-6.1-sol/high. Prior merge authorization does not apply.
+- Baseline v0.2.0 peeled commit = origin/main = 6a36762dcaf6f46b70a309d281e29dc8c145d721. Existing checkouts preserved.
+- Feature worktree D:/cozy-days-v021-design; feature/v0.2.1-design-fidelity. Stable anchor checkpoint/v0.2.1-g0-stable-20261024T0820Z (nested annotated tag resolves to stable commit, never overwrite).
+- G1 dispatch: period-only input, output obsolete reminders/tips removal + compatibility tests; persistence risk medium, initial model gpt-6.1-sol/medium. Sole writer uses independent G1 worktree. Escalate only with narrowed reproduced failure evidence.

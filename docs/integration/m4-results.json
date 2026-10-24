@@ -1,0 +1,70 @@
+{
+  "milestone": "M4-period-assets",
+  "status": "local-complete",
+  "baseCommit": "f6c1140630c3f85dffbe949ae74a706c61e378e9",
+  "sourceCommits": [
+    "280b4fecbf2314abd473e1a5bf660c2678c1984f",
+    "05ad5ae79f315eda81d38194ecccffcbd29282c6"
+  ],
+  "testedSourceCommit": "05ad5ae79f315eda81d38194ecccffcbd29282c6",
+  "assetSummary": {
+    "reusedAvailableAssets": 8,
+    "retainedNeedsRedrawItems": 11,
+    "reusedFunctionalIcons": ["calendar", "mood", "bell"],
+    "fallback": "existing shared Asset data URI fallback; tested after failed image request and while context offline",
+    "rights": "user authorized reuse of reviewed project assets in this task; no third-party license claim"
+  },
+  "referenceSearch": {
+    "boundedRoot": "C:\\Users\\32582\\.codex\\attachments",
+    "extensions": ["png", "jpg", "jpeg", "webp", "heic"],
+    "rasterFilesEnumerated": 6,
+    "uniqueImagesBySha256": 3,
+    "periodReferenceFound": true,
+    "dimensions": "941x1672",
+    "sha256": "9d19d52870789f086461e245cf8ad383ecd61ec0ebd965ef61dbf63870576a38",
+    "copiedIntoRepository": false,
+    "croppedIntoAppArt": false,
+    "comparisonGaps": ["moon", "tulip bouquet", "white cat with hot-water bottle", "black cat with cup", "note and paperclip scene"]
+  },
+  "screenshots": {
+    "sourceCommit": "05ad5ae79f315eda81d38194ecccffcbd29282c6",
+    "generator": "Playwright Chromium / playwright.period.config.ts / synthetic date 2026-10-23",
+    "viewports": ["360x740", "393x852", "430x932"],
+    "directory": "public/review/period-assets/evidence/",
+    "topCapture": "header-* (initial viewport; ordinary screenshot)",
+    "scrolledCaptures": ["diary-* (inner .period-page scrolled into diary section)", "tips-* (inner .period-page scrolled into tips section)"],
+    "notEvidence": "failed-attempt-01/document-fullPage-no-inner-scroll-* are document fullPage captures without scrolling the inner period page",
+    "checksums": "public/review/period-assets/evidence.json"
+  },
+  "initialFailure": {
+    "result": "49 passed, 1 failed",
+    "cause": "new alpha assertion expected alpha 255; cats_header source has alpha_max 254 and partial-alpha pixels, opaqueFraction 0",
+    "originalArtworkChanged": false,
+    "preexistingTestsChanged": false,
+    "trace": {"path": "artifacts/integration/m4/failed-attempt-01/trace.zip", "sha256": "bdd6de909134f42a823818c833eb95074aef7db5c581f12d1495a0c650024e0c"},
+    "context": {"path": "artifacts/integration/m4/failed-attempt-01/error-context.md", "sha256": "de6310836ec8b0957e475e704dc46d6ccf9cafc9cb7758739a14ed55d058ae51"},
+    "log": {"path": "artifacts/integration/m4/failed-attempt-01/period-tests.log", "sha256": "f34226e3e9006727e4538f0e5e28cc7bf0640d741600d88e29796caede9b7a03"}
+  },
+  "verification": [
+    {"command": "npm ci", "exitCode": 0, "outcome": "completed; 2 dependency advisories (moderate/high)", "log": "artifacts/integration/m4/final-npm-ci.log", "sha256": "5b616d2913a5e5ac76de42221101b1229e3f231555d9f5ed35eb885a0ca75c02"},
+    {"command": "npm run build", "exitCode": 0, "outcome": "passed", "log": "artifacts/integration/m4/final-build.log", "sha256": "868353bef9096ea9ae4a1c727a47d7216b0b0faa481d51e51b56498526aa9b47"},
+    {"command": "npm run build:pages", "exitCode": 0, "outcome": "passed", "log": "artifacts/integration/m4/final-build-pages.log", "sha256": "7077d02ec0cd9aef5aeeee14987ea963378c6e8f8dd7204b98cf5ec983cf6b23"},
+    {"command": "npx playwright test --config playwright.period.config.ts", "exitCode": 0, "outcome": "50 passed", "log": "artifacts/integration/m4/final-period-tests.log", "sha256": "b93ef85c876fe175681560b200a0598826e6e84156635373a2258dcfad072504"},
+    {"command": "npx playwright test tests/swipe.spec.ts tests/audit-regressions.spec.ts tests/font-switcher.spec.ts", "exitCode": 0, "outcome": "17 passed", "log": "artifacts/integration/m4/final-legacy-regressions.log", "sha256": "0e41692821faf356385ba360a6d946f39fd262aca3f1af71060d6a43a76dbe2e"},
+    {"command": "npm run test:pages", "exitCode": 0, "outcome": "4 passed", "log": "artifacts/integration/m4/final-pages-tests.log", "sha256": "7d3e03ab085ad381bd00432f83ca78628e4b84ee66dd4dc22e786e27da14c3ec"},
+    {"command": "npm run build", "exitCode": 0, "outcome": "passed after adding local review page/evidence", "log": "artifacts/integration/m4/final-review-build.log", "sha256": "81958ab1ebbc09c11488388b9e673923cb5f002b82903d78dd635caaecc5b21f"},
+    {"command": "npm run build:pages", "exitCode": 0, "outcome": "passed; 11 period evidence images in dist-pages/review/period-assets/evidence", "log": "artifacts/integration/m4/final-review-build-pages.log", "sha256": "32d6ed3c835cd713857dcba4b7a85bc3fe2ddba8ee507cb17111e8b512805605"},
+    {"command": "npm run test:pages", "exitCode": 0, "outcome": "4 passed including static review route", "log": "artifacts/integration/m4/final-review-pages-tests.log", "sha256": "c384c45eb2f405ab27906ddba536af6baba990da569404e50bcc9163cf11353a"}
+  ],
+  "externalReview": {
+    "m4CloudflarePreview": "not performed",
+    "androidDevice": "not performed",
+    "pushPrTagRelease": "none",
+    "m3OnlineEvidenceOnly": {
+      "url": "https://7cf7307c.cozy-days-app.pages.dev/review/anniversary/",
+      "buildInfoCommit": "7128500cb8e0d6d0d02927c2ea35bdb83020734e",
+      "sourceCommit": "48d1bf81e9b61757323f10de22a21245417184c4",
+      "notM4Acceptance": true
+    }
+  }
+}

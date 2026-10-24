@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>生理期视觉素材预览 · 小饱日常</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <main>
+    <header>
+      <p class="eyebrow">COZY DAYS · PERIOD ASSETS</p>
+      <h1>生理期视觉素材库</h1>
+      <p class="intro">可直接复用的共享素材与待重绘项目。棋盘格表示透明画布；切换白、粉、深色背景可检查边缘。</p>
+      <p><a href="./evidence.html">查看 M4 三尺寸真实应用截图与核验记录 ↗</a></p>
+      <p class="source-note" id="source-note"></p>
+      <div class="controls" aria-label="预览背景">
+        <button type="button" data-bg="white" aria-pressed="true">白色背景</button>
+        <button type="button" data-bg="pink" aria-pressed="false">粉色背景</button>
+        <button type="button" data-bg="dark" aria-pressed="false">深色背景</button>
+      </div>
+      <div class="summary" id="summary"></div>
+    </header>
+    <section><h2>可直接使用</h2><div class="grid" id="ready"></div></section>
+    <section><h2>需要重绘或使用组件</h2><div class="grid pending" id="pending"></div></section>
+    <footer>资源索引：<code>/assets/cozy_days/period/manifest.json</code></footer>
+  </main>
+  <script src="./preview.js"></script>
+</body>
+</html>

@@ -1,0 +1,96 @@
+{
+  "sourceSha": "88fa1b7f313410cb16fcf124015452314889ea44",
+  "baseSha": "74bf1c62fc885d7ec8c8155773420128e06a8329",
+  "artifactManifest": "D:\\cozy-days-m2-period-20261023T150338Z\\artifacts\\integration\\m2\\88fa1b7f313410cb16fcf124015452314889ea44\\manifest.json",
+  "generatedUtc": "2026-10-23T23:33:09.5732238Z",
+  "timezone": "UTC",
+  "browser": "Playwright Chromium, synthetic data",
+  "testResults": {
+    "period": 45,
+    "anniversary": 35,
+    "legacyRegression": 17,
+    "pages": 4,
+    "recoveryEvidence": 1,
+    "build": "exit 0",
+    "buildPages": "exit 0",
+    "npmCi": "exit 0"
+  },
+  "screenshots": [
+    {
+      "file": "01-home.png",
+      "sha256": "0353A5DE0F3E63AD3B92C2AC3F19DB6F20EA59967ADF2A0750FBD1457CF5A98C",
+      "source": "D:\\cozy-days-m2-period-20261023T150338Z\\artifacts\\integration\\m2\\88fa1b7f313410cb16fcf124015452314889ea44\\screenshots\\01-home.png",
+      "copiedHashVerified": true
+    },
+    {
+      "file": "02-calendar-selected.png",
+      "sha256": "C6BBF20F7C881668868D0C1E6C5B715C7F9C520CAF6C89024458EB99E457086E",
+      "source": "D:\\cozy-days-m2-period-20261023T150338Z\\artifacts\\integration\\m2\\88fa1b7f313410cb16fcf124015452314889ea44\\screenshots\\02-calendar-selected.png",
+      "copiedHashVerified": true
+    },
+    {
+      "file": "03-daily-selected.png",
+      "sha256": "0893D60CE305F76474C9BC38ECB178158670E0A9EFD942410F5B4F879E102267",
+      "source": "D:\\cozy-days-m2-period-20261023T150338Z\\artifacts\\integration\\m2\\88fa1b7f313410cb16fcf124015452314889ea44\\screenshots\\03-daily-selected.png",
+      "copiedHashVerified": true
+    },
+    {
+      "file": "04-empty.png",
+      "sha256": "D305939D5CA485B5C554FE2F60233E49561B601796E4AA9B5F44D79BEC417408",
+      "source": "D:\\cozy-days-m2-period-20261023T150338Z\\artifacts\\integration\\m2\\88fa1b7f313410cb16fcf124015452314889ea44\\screenshots\\04-empty.png",
+      "copiedHashVerified": true
+    },
+    {
+      "file": "05-cycle-updated.png",
+      "sha256": "9BF947FDAE1C57A24705EBBAA011D2C02589809DB0C87702A8653668DD414447",
+      "source": "D:\\cozy-days-m2-period-20261023T150338Z\\artifacts\\integration\\m2\\88fa1b7f313410cb16fcf124015452314889ea44\\screenshots\\05-cycle-updated.png",
+      "copiedHashVerified": true
+    },
+    {
+      "file": "period-360x480-editor.png",
+      "sha256": "4A18F76713C6BF651853107414EDBC47E85CFBA9CE1E59A54B78A48DC2301D12",
+      "source": "D:\\cozy-days-m2-period-20261023T150338Z\\artifacts\\integration\\m2\\88fa1b7f313410cb16fcf124015452314889ea44\\screenshots\\period-360x480-editor.png",
+      "copiedHashVerified": true
+    },
+    {
+      "file": "period-360x480-settings.png",
+      "sha256": "3D010D94A792C8126F6F872AA539FB5149F9C0C20CAA37A06535A1744811F77C",
+      "source": "D:\\cozy-days-m2-period-20261023T150338Z\\artifacts\\integration\\m2\\88fa1b7f313410cb16fcf124015452314889ea44\\screenshots\\period-360x480-settings.png",
+      "copiedHashVerified": true
+    },
+    {
+      "file": "recovery-save-failure.png",
+      "sha256": "438D722F1D24A0D50736778BF33AC8026777E8841BDAB7D51EAE0B9EF8214477",
+      "source": "D:\\cozy-days-m2-period-20261023T150338Z\\artifacts\\integration\\m2\\88fa1b7f313410cb16fcf124015452314889ea44\\screenshots\\recovery-save-failure.png",
+      "copiedHashVerified": true
+    },
+    {
+      "file": "recovery-closed-tab-backup.png",
+      "sha256": "8063ABEAC1AB58C6BB1A6251DC85CEC68BE4881D3C3A51C97D4D81F6E8132117",
+      "source": "D:\\cozy-days-m2-period-20261023T150338Z\\artifacts\\integration\\m2\\88fa1b7f313410cb16fcf124015452314889ea44\\screenshots\\recovery-closed-tab-backup.png",
+      "copiedHashVerified": true
+    },
+    {
+      "file": "recovery-explicit-confirmation.png",
+      "sha256": "57CD235F261BB1C8CDC7FD4FB3735AE9E3962B421157BFCECB77EA346233EE66",
+      "source": "D:\\cozy-days-m2-period-20261023T150338Z\\artifacts\\integration\\m2\\88fa1b7f313410cb16fcf124015452314889ea44\\screenshots\\recovery-explicit-confirmation.png",
+      "copiedHashVerified": true
+    },
+    {
+      "file": "recovery-restored-persisted.png",
+      "sha256": "CF998436664C559E21E98A9270917C329604E404F8B19B4554CB32C912905173",
+      "source": "D:\\cozy-days-m2-period-20261023T150338Z\\artifacts\\integration\\m2\\88fa1b7f313410cb16fcf124015452314889ea44\\screenshots\\recovery-restored-persisted.png",
+      "copiedHashVerified": true
+    }
+  ],
+  "excludedScreenshots": [
+    "editor-393.png",
+    "month-393.png"
+  ],
+  "limitations": [
+    "No Android real-device verification",
+    "No design reference visual comparison or M3/M4 asset acceptance",
+    "Test screenshots show feature behavior and are not visual approval",
+    "Predictions are estimates, not contraception or diagnosis"
+  ]
+}

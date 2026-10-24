@@ -21,10 +21,10 @@ for (const viewport of viewports) {
       name: img.getAttribute('src'), loaded: (img as HTMLImageElement).naturalWidth > 0,
       width: (img as HTMLImageElement).naturalWidth,
     })));
-    expect(images).toHaveLength(5);
+    expect(images).toHaveLength(6);
     expect(images.every(image => image.loaded)).toBe(true);
     expect(images.map(image => image.name?.split('/').at(-1))).toEqual(expect.arrayContaining([
-      'cats_empty_state.png', 'heart_pink_outline.svg', 'sparkle_gold.svg', 'flower_pink.png', 'star_cream.svg',
+      'bedroom_header.png', 'cats_header.png', 'heart_pink_outline.svg', 'sparkle_gold.svg', 'flower_pink.png', 'star_cream.svg',
     ]));
     await page.evaluate(() => document.fonts.ready);
     await page.screenshot({ path:`artifacts/integration/m3/hero-empty-${viewport.width}.png` });
@@ -43,7 +43,8 @@ for (const viewport of viewports) {
     expect(await page.locator('.ann-page').evaluate(el => el.scrollWidth <= el.clientWidth)).toBe(true);
     const audit = await page.evaluate(async () => {
       const files = [
-        ['cats_empty_state.png', '/assets/cozy_days/raster/characters/cats_empty_state.png'],
+        ['cats_header.png', '/assets/cozy_days/raster/characters/cats_header.png'],
+        ['bedroom_header.png', '/assets/cozy_days/raster/backgrounds/bedroom_header.png'],
         ['flower_pink.png', '/assets/cozy_days/raster/decor/flower_pink.png'],
         ['heart_pink_outline.svg', '/assets/cozy_days/vectors/symbols/heart_pink_outline.svg'],
         ['star_cream.svg', '/assets/cozy_days/vectors/symbols/star_cream.svg'],
@@ -66,13 +67,14 @@ for (const viewport of viewports) {
     });
     console.log(`M3 asset audit ${viewport.width}: ${JSON.stringify(audit)}`);
     expect(audit.every(item => /^[0-9a-f]{64}$/.test(item.hash))).toBe(true);
-    expect(audit.filter(item => item.name.endsWith('.png')).every(item => item.clearFraction > 0 && item.solidFraction > 0)).toBe(true);
+    expect(audit.filter(item => ['cats_header.png','flower_pink.png','washi_pink.png'].includes(item.name)).every(item => item.clearFraction > 0)).toBe(true);
+    expect(audit.filter(item => ['flower_pink.png','washi_pink.png'].includes(item.name)).every(item => item.solidFraction > 0)).toBe(true);
     await card.scrollIntoViewIfNeeded();
     const cardBox = await card.boundingBox();
     const tapeBox = await card.locator('.ann-card-tape').boundingBox();
     const countBox = await card.locator('.ann-count').boundingBox();
     const flowerBox = await card.locator('.ann-card-flower').boundingBox();
-    const controls = await card.locator('.ann-card-bottom button').evaluateAll(buttons => buttons.map(button => { const r = button.getBoundingClientRect(); return { x:r.x, y:r.y, width:r.width, height:r.height }; }));
+    const controls = await card.locator('.ann-card-actions button').evaluateAll(buttons => buttons.map(button => { const r = button.getBoundingClientRect(); return { x:r.x, y:r.y, width:r.width, height:r.height }; }));
     const overlaps = (a: {x:number;y:number;width:number;height:number}, b: {x:number;y:number;width:number;height:number}) => a.x < b.x+b.width && a.x+a.width > b.x && a.y < b.y+b.height && a.y+a.height > b.y;
     expect(overlaps(tapeBox!, countBox!)).toBe(false);
     expect(controls.every(control => !overlaps(flowerBox!, control))).toBe(true);

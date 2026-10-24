@@ -8,7 +8,9 @@
 
 签名凭据已存入受分支策略限制的 `android-release` Environment Secrets；本机仓库外有仅当前 Windows 用户可访问的加密 JKS 和 DPAPI 密码存档，并另存第二磁盘备份。DPAPI 备份依赖原 Windows 用户配置，不能当作跨机器密码恢复方案；更换系统前必须将密钥及密码转存个人安全密码库/离线介质，切勿把密码贴入聊天或公开文件。GitHub Secrets 可供后续 CI 签名，但不能从 GitHub 界面取回明文。
 
-请长期离线保管同一签名密钥并安全备份密码。后续版本必须沿用同一包名、同一签名和更大的 versionCode，才能覆盖安装并保留应用数据。建议下一版 `0.2.2` 使用 code `2`（届时同步修改 Gradle versionName 和校验脚本预期值）。不要卸载后重装来升级；卸载会移除应用私有数据。正式版也无法覆盖不同证书的 debug 包。发布流程不接触用户真实 IndexedDB。
+请长期离线保管同一签名密钥并安全备份密码。后续版本必须沿用同一包名、同一签名和更大的 versionCode，才能覆盖安装并保留应用数据。建议下一版 `0.2.2` 使用 code `2`；届时须同步修改 Gradle versionName、默认 versionCode、workflow_dispatch 的 version_code 默认值、验证器预期版本和 artifact 名称。不要卸载后重装来升级；卸载会移除应用私有数据。正式版也无法覆盖不同证书的 debug 包。发布流程不接触用户真实 IndexedDB。
+
+回退也不能降低 versionCode：从已确认的 checkpoint 取回旧业务源码，沿用同一包名和签名，以高于已安装版本的 versionCode 重新打包并覆盖安装。回退过程不卸载应用、不清空数据库。
 
 ## 本地正式打包
 

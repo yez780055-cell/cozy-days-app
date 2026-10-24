@@ -19,6 +19,9 @@ run_phase() {
   grep -q 'OK (1 test)' "artifacts/android-device/$phase.txt"
   ! grep -Eq 'FAILURES|INSTRUMENTATION_FAILED|Process crashed' "artifacts/android-device/$phase.txt"
 }
+# Verify the bundled app starts without network access.
+adb shell svc wifi disable
+adb shell svc data disable
 run_phase create
 adb shell am force-stop com.littledays.app
 # Upgrade in place: never uninstall or clear data between phases.

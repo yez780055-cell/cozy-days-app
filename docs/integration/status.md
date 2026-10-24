@@ -1,31 +1,24 @@
-# Integration status — M0 baseline
+# Integration status — release record (2026-10-24)
 
-- Goal/version: Cozy Days integration, package version `0.1.0`.
-- Integration branch: `integration/cozy-next-20261023T141904Z`.
-- Baseline HEAD: `b059b6d9982062958f0a866e763f84383d69430d`.
-- Remote checkpoint: `checkpoint/pre-integration-20261023T141904Z` was independently read back at the baseline SHA.
-- Worktree: `D:\cozy-days-integration-20261023T141904Z`; clean at start.
-- Main protection: ruleset `25687265` requires PR and latest `verify`; no bypass. Do not force-push or delete refs. PRs #7/#8/#9/#10 are open; each has `verify` and Cloudflare success (as prevalidated for M0; refresh before any later merge).
-- M0 state: inventory and baseline checks complete. The primary-session model was subsequently verified from its current local `turn_context`: `gpt-6.1-sol`, effort `high`, timestamp `2026-10-23T14:31:54.207Z`. M1 functionality is accepted. M2 code and scoped checks passed on source `88fa1b7f313410cb16fcf124015452314889ea44`; its checkpoint is awaiting coordinator push/read-back. Asset quality and visual comparison remain for M3/M4.
-- M0 checkpoint reference: `checkpoint/m0-baseline-20261023T143021Z`; the coordinator must push and read it back before reporting the checkpoint as available remotely.
-- Asset inventory: anniversary 6 assets available / 9 missing; period 8 assets available / 11 missing, including 3 icons. Refer to `asset-map.md`; paths exist. Copyright/permission status remains under review.
-- Protected original-workspace files were not edited. SHA-256: `D:\daylight-app\README.md` = `6546A211B931E151FC5D1472589B0D4C1B401C6A5EA435D73B0A960C6AAC296D`; `D:\daylight-app\tests\swipe.spec.ts` = `E93D93F71332DD12F00C381B2926F7E3AD50DA563CE5D7F1A50894AD3E9E4145`.
-- Checks ran serially in the requested order. Each full console transcript and exit code is recorded under `artifacts/integration/m0/`. The 40 generated evidence files were copied to `artifacts/integration/m0/generated/`, each copy was SHA-256 verified, and only those generated tracked paths were restored. `generated-index.json` binds their hashes to tested source `b059b6d9982062958f0a866e763f84383d69430d`. Logs and generated media remain local ignored artifacts; they were not included in the documentation commit.
-- Rollback: see `rollback.md`. Git rollback cannot restore browser/device data or reverse a Dexie migration.
+- Goal/version: Cozy Days integration, package candidate version `0.2.0` (not yet tagged or released).
+- Integration branch: `integration/release-record-20261024T0245Z`; this documentation-record worktree starts at `6c477f1a4d7b952bc81920026f3fe18f01c9edcb`.
+- M0–M4 acceptance is complete. M5's local full matrix and independent follow-up review are complete with P0/P1 = 0. M5 is locally accepted; final-HEAD GitHub CI and Preview remain coordinator gates.
+- M6 and M7 are not complete. No release-candidate tag, integration PR, merge SHA, or delivery completion is claimed.
+- Pixel evidence: latest strict comparison is 3/16/0 changed pixels at 360/393/430, maximum channel delta 3/3/0. It is not an all-zero result. All 16 image geometries and served asset bytes match at the compared sizes; antialiasing is an inference, not proof of pixel identity.
+- Assets: anniversary has 6 usable / 9 redraw gaps; period has 8 usable / 11 redraw gaps and 3 functional component icons. Android physical-device behavior remains **未验收**.
 
 ## Milestones
 
 | Milestone | Scope | State / entry gate |
 |---|---|---|
-| M0 | Inventory, protection, baseline, task/asset map | Complete; both builds, 59 E2E and 4 Pages tests passed |
-| M1 | Anniversary functionality | Complete; source `d4adc9d1e7f3bd85f402159b857455b7e82f02b3`; 35 specialist + 17 existing regressions + 4 Pages tests and both builds passed; checkpoint `checkpoint/anniversary-functional-20261023T144942Z` |
-| M2 | Period functionality and failed-save behavior | Functionality passed on `88fa1b7f313410cb16fcf124015452314889ea44`; 45 period, 35 anniversary, 17 legacy regression, 4 Pages, both builds and 1 recovery-evidence test all exited 0. Coordinator checkpoint push/read-back pending. No Android device or reference-image visual acceptance. |
-| M3 | Anniversary assets and visual comparison | Complete locally on `58447f89bf759eee668cbee34849bf2b1873d12e`; coordinator checkpoint/tag and overall acceptance pending |
-| M4 | Period assets and responsive review | Complete locally on `05ad5ae79f315eda81d38194ecccffcbd29282c6`; final review evidence is recorded in `m4-period-assets.md` and `m4-results.json` |
-| M5 | Cross-feature audit and regression | Not started; only after M1–M4 |
-| M6 | Release candidate and protected PR merge | Not started; all goal gates and current checks required |
-| M7 | Delivery and stop for user feedback | Not started |
-
+| M0 | Inventory, protection, baseline, task/asset map | Complete |
+| M1 | Anniversary functionality | Complete |
+| M2 | Period functionality and failed-save behavior | Complete |
+| M3 | Anniversary assets and visual comparison | Complete |
+| M4 | Period assets and responsive review | Complete |
+| M5 | Cross-feature audit and regression | Local full matrix and independent review complete; P0/P1=0. Final-HEAD CI and Preview pending coordinator. |
+| M6 | Release candidate and protected PR merge | Not complete; see `release-candidate.md` |
+| M7 | Delivery and stop for user feedback | Not complete |
 ## Baseline command record
 
 | Order | Command | Exit code | Outcome |
@@ -66,3 +59,13 @@ M4 coordinator acceptance: remote `checkpoint/period-assets-20261024T000753Z` an
 M5 local completion: functional source `ab0b533d380dbcd543f3eb9b95aaf1205ae542cd` fixes the reproduced history-deletion failure notice inside its modal, updates Vite/plugin-react to audited compatible 6.4.5/4.7.0, and sets candidate version 0.2.0. The strictly serial matrix passed npm ci, both builds, full E2E 126, Pages 4, anniversary specialist 39, period specialist 51, and cap copy android. Metadata source `4e4561f629902c4f210256edd5bb3fc48b7ecc82` corrects six empty-content anniversary hashes and adds direct git/browser byte checks; both builds and five scoped asset/metadata tests passed on this SHA. No source artwork or Android configuration changed. Audit before: two vulnerable tooling packages; after: zero. All prior tests remain intact.
 
 M5 actual built screenshots use metadata source 4e4561f, with logic source ab0b533 recorded separately. A clean b059b6d baseline was installed/built without tracked changes, then three fixed-time/font/seed synthetic todo screenshot pairs were compared with zero-tolerance decoded RGBA: 0/266400 pixels at 360x740, 0/334836 at 393x852, 0/400760 at 430x932; maximum channel delta 0 in all cases. New anniversary and period header/card/diary evidence, source/build IDs, hashes and limitations are in `public/review/m5/`, `m5.md` and `m5-results.json`. Forty-nine generated old review files were hash-archived before restoring only their paths. Four initial/reproduction failures have retained traces and distinct reasons; no failed run was relabeled green. Independent review, final-HEAD full CI and M5 final Preview remain coordinator gates. Android real-device behavior is **未验收**; no APK or remote action was performed by the M5 writer.
+
+## Current M5 final record (2026-10-24)
+
+The earlier M5 matrix remains bound to functional source `ab0b533d380dbcd543f3eb9b95aaf1205ae542cd` and metadata source `4e4561f629902c4f210256edd5bb3fc48b7ecc82`. It passed 126 full E2E, 4 Pages, 39 anniversary, 51 period, both builds, and Android cap copy on the stated source(s); do not treat these as final-HEAD CI.
+
+The follow-up product source `30bfaa033ad055cd15b3524bf2779e7617225507` passed both builds, 42 anniversary tests and 17 frozen regressions. Screenshot/helper build `b4fb7727a78586acbe4c9d0536fe6406c6da5f60` also passed both builds; it is evidence-helper-only after product source, and did not rerun the 42/17 tests. Its latest strict pixel result is 3/16/0 changed pixels (max channel delta 3/3/0), not zero. The 360/393 comparisons report identical geometry for all 16 images and identical served bytes; antialiasing is an interpretation only. Details and limitations are in `m5-modal-guard.md` and its result JSON.
+
+An independent Sol Medium review of `6c477f1a4d7b952bc81920026f3fe18f01c9edcb` passed. It covered a sync-ref guard race around modal close and left `defaultTodo` unchanged. No new tests were run for this documentation record. The prior GitHub CI run `40045183751` succeeded historically with 127 E2E, 4 Pages, and two builds; it is not evidence for current final HEAD. Local review found the two 30bf product builds, anniversary 42 tests, historical 17 regressions, and b4fb helper's two builds as recorded above. Current final-HEAD CI and Preview are still pending.
+
+Historical checkpoint `pre-modal-guard-20261024T003504Z` points to `1b5b9fa4e24adc509daa839111466e171d859179`; retain earlier checkpoint/source SHA entries as historical records. Android real-device behavior remains **未验收**.

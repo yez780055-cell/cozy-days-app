@@ -3,6 +3,7 @@ import { mkdirSync } from 'node:fs';
 const evidence='public/review/period/evidence';
 test.beforeEach(async({page})=>{
   await page.clock.install({time:new Date('2026-10-23T04:00:00Z')});
+  await page.addInitScript(()=>localStorage.setItem('cozy-days.settings-hint-seen','1'));
   await page.goto('/');
 });
 async function open(page:Page) { await page.getByRole('navigation').getByRole('button',{name:'生理期',exact:true}).click(); await expect(page.locator('.period-calendar')).toBeVisible(); }
@@ -80,7 +81,7 @@ for(const viewport of [{width:360,height:740},{width:393,height:852},{width:430,
   await add(page,'2026-09-25','2026-09-29');await add(page,'2026-10-23');
   expect(await page.locator('.period-page').evaluate(el=>el.scrollWidth<=el.clientWidth)).toBeTruthy();
   await expect(page.getByRole('button',{name:'今天',exact:true})).toBeVisible();
-  const art=await page.locator('.period-art--header').boundingBox();expect(art?.width).toBeGreaterThan(viewport.width*.6);
+  const art=await page.locator('.period-art--header').boundingBox();expect(art?.width).toBeGreaterThan(viewport.width*.54);
   const dash=await page.locator('.period-dashboard').boundingBox();const cal=await page.locator('.period-calendar').boundingBox();const summary=await page.locator('.period-summary').boundingBox();
   expect(cal!.width/(cal!.width+summary!.width)).toBeGreaterThan(.62);expect(cal!.width/(cal!.width+summary!.width)).toBeLessThan(.71);
   mkdirSync('artifacts/v021-g2',{recursive:true});

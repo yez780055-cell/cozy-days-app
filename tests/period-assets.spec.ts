@@ -42,7 +42,11 @@ for (const viewport of viewports) {
     expect(await period.evaluate(element => element.scrollWidth <= element.clientWidth)).toBe(true);
     const heading = await period.locator('.period-header-copy').boundingBox();
     const heroArt = await period.locator('.period-art--header').boundingBox();
-    expect(heading && heroArt && heading.x + heading.width <= heroArt.x).toBe(true);
+    const header = await period.locator('.period-header').boundingBox();
+    const copyLayer = await period.locator('.period-header-copy').evaluate(node => Number(getComputedStyle(node).zIndex));
+    expect(heading && header && heading.x >= header.x && heading.x + heading.width <= header.x + header.width).toBe(true);
+    expect(heroArt && header && heroArt.x >= header.x && heroArt.x + heroArt.width <= header.x + header.width).toBe(true);
+    expect(copyLayer).toBeGreaterThan(1);
 
     await page.evaluate(() => document.fonts.ready);
     await page.screenshot({ path: `artifacts/integration/m4/period-${viewport.width}x${viewport.height}.png`, animations: 'disabled' });

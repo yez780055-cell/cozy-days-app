@@ -100,3 +100,8 @@ Remote checkpoint reconciliation (coordinator read-back, 2026-10-24): all seven 
 - Medium implementation 91accc9 reviewed; build and 7/7 period functional tests pass, but visual gate FAIL after a narrowed repair.
 - Second real captures artifacts/v021-g2/period-393x852-top.png show dashboard about 485px (calendar y205–623, summary y205–690); historical labels wrap excessively. 360 record capture still has vertical multi-select hint/tiny controls; hero collage/color hierarchy insufficient.
 - Sole writer gpt-6-luna/high now assigned period-only layout/fidelity calibration in independent worktree, reusing Medium implementation. No data/model/global/todo changes. Extra High is not authorized. Output requires actual three-size images, functional checks and no overflow; failure evidence retained in Medium worktree.
+
+## v0.2.1 G2 complete / G3 dispatch
+- Reviewed Luna High calibration eb7c314; labels/header/countdown overflow resolved, daily fieldset hint readable, viewport double column retained. Build and 12/12 period/assets tests passed. Real three-size captures in D:/cozy-days-v021-g2-high/artifacts/v021-g2; transient settings hint suppressed only in isolated evidence context.
+- Immutable period anchor checkpoint/v0.2.1-g2-period. No business/date/persistence or todo changes in visual phase.
+- G3 sole writer gpt-6-luna/medium for anniversary-only React/CSS and local SVG category art. Initial minimum sufficient model; no inherited High escalation. Independent worktree, original recurrence/CRUD/recovery preserved. Actual 3-size empty and four synthetic card captures required. Upgrade only if narrowed reproduced problems remain after Medium repair.

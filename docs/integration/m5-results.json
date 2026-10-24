@@ -1,0 +1,490 @@
+{
+  "milestone": "M5",
+  "status": "local verified; coordinator independent review/final Preview/final HEAD CI pending",
+  "appLogicSourceSha": "ab0b533d380dbcd543f3eb9b95aaf1205ae542cd",
+  "metadataSourceSha": "4e4561f629902c4f210256edd5bb3fc48b7ecc82",
+  "evidenceOnlyCommit": "see git commit containing this file",
+  "baseSha": "bb0650036a0bd4ecb9d0a1e73b42d81f8c93e2db",
+  "integrationBaseline": "b059b6d9982062958f0a866e763f84383d69430d",
+  "version": "0.2.0",
+  "serialFunctionalGate": {
+    "sourceSha": "ab0b533d380dbcd543f3eb9b95aaf1205ae542cd",
+    "commands": [
+      [
+        "npm ci",
+        0
+      ],
+      [
+        "npm run build",
+        0
+      ],
+      [
+        "npm run build:pages",
+        0
+      ],
+      [
+        "npm run test:e2e",
+        0,
+        126
+      ],
+      [
+        "npm run test:pages",
+        0,
+        4
+      ],
+      [
+        "npx playwright test --config playwright.anniversary.config.ts",
+        0,
+        39
+      ],
+      [
+        "npx playwright test --config playwright.period.config.ts",
+        0,
+        51
+      ],
+      [
+        "npx cap copy android",
+        0
+      ]
+    ]
+  },
+  "metadataFollowup": {
+    "sourceSha": "4e4561f629902c4f210256edd5bb3fc48b7ecc82",
+    "commands": [
+      [
+        "npm run build",
+        0
+      ],
+      [
+        "npm run build:pages",
+        0
+      ],
+      [
+        "npx playwright test tests/anniversary-assets.spec.ts tests/anniversary-m5-metadata.spec.ts --reporter=line",
+        0,
+        5
+      ]
+    ],
+    "noFullSuiteRerun": "metadata/test only; coordinator requires final HEAD full CI"
+  },
+  "dependencyAudit": {
+    "before": {
+      "packages": 2,
+      "moderate": 1,
+      "high": 1,
+      "source": "baseline package-lock identical to pre-M5 package-lock",
+      "json": "artifacts/integration/m5/audit-before.json"
+    },
+    "after": {
+      "packages": 0,
+      "json": "artifacts/integration/m5/audit-after.json"
+    },
+    "selected": {
+      "vite": "6.4.5",
+      "pluginReact": "4.7.0"
+    },
+    "forceFix": false
+  },
+  "screenshots": {
+    "sourceCommit": "4e4561f629902c4f210256edd5bb3fc48b7ecc82",
+    "actualBuildCommit": "4e4561f629902c4f210256edd5bb3fc48b7ecc82",
+    "appLogicSourceSha": "ab0b533d380dbcd543f3eb9b95aaf1205ae542cd",
+    "builds": {
+      "baseline": {
+        "commit": "b059b6d9982062958f0a866e763f84383d69430d",
+        "branch": "local",
+        "mode": "local",
+        "builtAt": "2026-10-24T00:24:12.414Z",
+        "previewUrl": null
+      },
+      "candidate": {
+        "commit": "4e4561f629902c4f210256edd5bb3fc48b7ecc82",
+        "branch": "local",
+        "mode": "local",
+        "builtAt": "2026-10-24T00:23:11.554Z",
+        "previewUrl": null
+      }
+    },
+    "baselineCommit": "b059b6d9982062958f0a866e763f84383d69430d",
+    "time": "2026-10-23T04:00:00Z",
+    "timezone": "Asia/Shanghai",
+    "font": "yozai",
+    "deviceScaleFactor": 1,
+    "seeds": [
+      100,
+      101,
+      102
+    ],
+    "synthetic": true,
+    "files": [
+      {
+        "file": "todo-baseline-360x740.png",
+        "sha256": "dc028b00120df8576d480903b3c597b486f9bccbf3904dfb9dad931bcc67e333"
+      },
+      {
+        "file": "todo-candidate-360x740.png",
+        "sha256": "dc028b00120df8576d480903b3c597b486f9bccbf3904dfb9dad931bcc67e333"
+      },
+      {
+        "file": "anniversary-360x740.png",
+        "sha256": "a3bcc782503ae3e5fd38183e2b3638bc50809d3b35eb2884bbee7ccefd3ecaea"
+      },
+      {
+        "file": "anniversary-card-360x740.png",
+        "sha256": "6d979599e176fe5153dcf023f09cc51ecd202672de5db608864a86fe6f4ae45b"
+      },
+      {
+        "file": "period-header-360x740.png",
+        "sha256": "4674746e8caea722327a86c432d6f7e655e371012aba0cbbccba0508638b0278"
+      },
+      {
+        "file": "period-diary-360x740.png",
+        "sha256": "be5d3af2e3dab04aa53638370e917225fdfebf619177cafe4f2e4e8a053aff1f"
+      },
+      {
+        "file": "todo-baseline-393x852.png",
+        "sha256": "fa8930d8beff677bfbc1c04925e05de737c1c1f101ea43a3de033b04008cbdb2"
+      },
+      {
+        "file": "todo-candidate-393x852.png",
+        "sha256": "fa8930d8beff677bfbc1c04925e05de737c1c1f101ea43a3de033b04008cbdb2"
+      },
+      {
+        "file": "anniversary-393x852.png",
+        "sha256": "5ab176d163f45a594c541dcd88dbc1a1d7e82750ac905d7a57adbaf2a97e8227"
+      },
+      {
+        "file": "anniversary-card-393x852.png",
+        "sha256": "5ab176d163f45a594c541dcd88dbc1a1d7e82750ac905d7a57adbaf2a97e8227"
+      },
+      {
+        "file": "period-header-393x852.png",
+        "sha256": "8d6e24d5a96b2656e096becb779d61bf4bfd7059a96b87a5828bc4176a4b0937"
+      },
+      {
+        "file": "period-diary-393x852.png",
+        "sha256": "7467107139ab280434f59fb05bc61817e99bb2c8e3e4c5e485aded7f9242d58c"
+      },
+      {
+        "file": "todo-baseline-430x932.png",
+        "sha256": "ba9384d25dcd2ed4cde68d0c73fde79bd3aa2eafde3c08ae7933756638107219"
+      },
+      {
+        "file": "todo-candidate-430x932.png",
+        "sha256": "ba9384d25dcd2ed4cde68d0c73fde79bd3aa2eafde3c08ae7933756638107219"
+      },
+      {
+        "file": "anniversary-430x932.png",
+        "sha256": "c07c9ae53c7648159dac32979e37a9288da964e4ee04260b0842e12fd9079c43"
+      },
+      {
+        "file": "anniversary-card-430x932.png",
+        "sha256": "c07c9ae53c7648159dac32979e37a9288da964e4ee04260b0842e12fd9079c43"
+      },
+      {
+        "file": "period-header-430x932.png",
+        "sha256": "204ffb12882293681986157fcef21a11ecc620225ae43b5e22f7b811f3df48c7"
+      },
+      {
+        "file": "period-diary-430x932.png",
+        "sha256": "2e8e91129a6448b1be269a63840b1e1fc59a34074a7f1116c533bb8845532cdc"
+      },
+      {
+        "file": "todo-diff-360x740.png",
+        "sha256": "07df52b638f19b4192a1064c0ab3b3799166d11d0ccdb02bce5d2c6df62146fc"
+      },
+      {
+        "file": "todo-diff-393x852.png",
+        "sha256": "7efb86fc12fa38e270d912ce8310e26c12c118ac3ba1ee930e17e56f5ff1de2b"
+      },
+      {
+        "file": "todo-diff-430x932.png",
+        "sha256": "61b093d35fd7d8e828003427d67dae4e93d4347ca0b7439917c07bdb772b2445"
+      }
+    ],
+    "comparisons": [
+      {
+        "width": 360,
+        "height": 740,
+        "changedPixels": 0,
+        "totalPixels": 266400,
+        "maxChannelDelta": 0
+      },
+      {
+        "width": 393,
+        "height": 852,
+        "changedPixels": 0,
+        "totalPixels": 334836,
+        "maxChannelDelta": 0
+      },
+      {
+        "width": 430,
+        "height": 932,
+        "changedPixels": 0,
+        "totalPixels": 400760,
+        "maxChannelDelta": 0
+      }
+    ],
+    "failureState": {
+      "file": "history-delete-failure.png",
+      "sourceCommit": "ab0b533d380dbcd543f3eb9b95aaf1205ae542cd",
+      "test": "tests/period-m5-audit.spec.ts",
+      "sha256": "0b56633a0bbdc52d941e8686fe4085a93e50568af12bcfd55e0e88ac2da0b717"
+    }
+  },
+  "todoPixelComparisons": [
+    {
+      "width": 360,
+      "height": 740,
+      "changedPixels": 0,
+      "totalPixels": 266400,
+      "maxChannelDelta": 0
+    },
+    {
+      "width": 393,
+      "height": 852,
+      "changedPixels": 0,
+      "totalPixels": 334836,
+      "maxChannelDelta": 0
+    },
+    {
+      "width": 430,
+      "height": 932,
+      "changedPixels": 0,
+      "totalPixels": 400760,
+      "maxChannelDelta": 0
+    }
+  ],
+  "archivedGeneratedMedia": {
+    "count": 49,
+    "manifest": "artifacts/integration/m5/generated-media-archive.json",
+    "restored": true
+  },
+  "failures": [
+    {
+      "dir": "artifacts/integration/m5/failures/repro-selector",
+      "kind": "test implementation mistake: wrong history button selector"
+    },
+    {
+      "dir": "artifacts/integration/m5/failures/repro-hidden-error",
+      "kind": "confirmed P1: history modal had no save-failure alert"
+    },
+    {
+      "dir": "artifacts/integration/m5/failures/metadata-test-path",
+      "kind": "test tooling: git binary exceeded default execFileSync buffer"
+    },
+    {
+      "dir": "artifacts/integration/m5/failures/metadata-empty-hashes",
+      "kind": "confirmed P2: all six manifest hashes mismatch actual bytes"
+    }
+  ],
+  "logs": [
+    {
+      "file": "01-npm-ci.log",
+      "sha256": "f5dfe510660b35bbcad118c52190616be7bfc85c0c67748fb167eb093aa1ab7e"
+    },
+    {
+      "file": "02-build.log",
+      "sha256": "cec3eff26e31467fa63c879f33adb850be36bc76faa8758d2993ea162bdb110a"
+    },
+    {
+      "file": "03-build-pages.log",
+      "sha256": "899d4e7d25a8b7de0d184cd62e448ca5c33413396332910af4de1299e51f37a5"
+    },
+    {
+      "file": "04-test-e2e.log",
+      "sha256": "89181ee4bce5afcc344b2afc85709121eebc1d8eca7fd9d20731cc4f1af9839c"
+    },
+    {
+      "file": "05-test-pages.log",
+      "sha256": "6576c3d231222c5aef6f3cc2f5bcef0e2e3da422574e11864598089e31acf2e8"
+    },
+    {
+      "file": "06-anniversary.log",
+      "sha256": "2541bb09131cea8033043fb382e16be2a9158d79ef42823252331b6194dd5389"
+    },
+    {
+      "file": "07-period.log",
+      "sha256": "537ea092e7b0c20dc5b8fc3229912df43abe5411a9e9565fa5429e228a03c0b1"
+    },
+    {
+      "file": "08-cap-copy.log",
+      "sha256": "4adab2186cbb03a95a889642f34c198f26eb2ae57e37a1a087d3f0654fe485d4"
+    },
+    {
+      "file": "09-metadata-repro.log",
+      "sha256": "b09806d97b78b64791250bb779f7755bfb96f5bf497f5f8c9e04feb067df6882"
+    },
+    {
+      "file": "10-metadata-repro-hash.log",
+      "sha256": "377e02a1de96842a9287fdf7f603aebf137da2c01f55376446204b8a76421612"
+    },
+    {
+      "file": "11-metadata-build.log",
+      "sha256": "a7d46f68d11eda88f6f2d04204247b506be97bfcf6a4c81d0ca1591b0bcdeee3"
+    },
+    {
+      "file": "12-metadata-build-pages.log",
+      "sha256": "af3e185231275409ff58b267f6b8359382ca4cfd12058081c912819458205744"
+    },
+    {
+      "file": "13-metadata-assets.log",
+      "sha256": "7196902b1ffb069b38481f605acbfe4d3f8e0f52349a9aa928291784c4cae3f1"
+    },
+    {
+      "file": "14-baseline-ci.log",
+      "sha256": "a50e0a29b58741255a8152eb94898f8e93e87b3bffe7d9ef285261cc72da53f7"
+    },
+    {
+      "file": "15-baseline-build.log",
+      "sha256": "ef920d18d0686db6f384d489064c8ca0e0777384aa3590cb717aaff649cf017d"
+    },
+    {
+      "file": "16-visual.log",
+      "sha256": "5c1dfdf7a1d306267ce067cfebbfcff6b7bd74057ba8d34be10eb77dfd453600"
+    },
+    {
+      "file": "17-visual-scrolled.log",
+      "sha256": "5c1dfdf7a1d306267ce067cfebbfcff6b7bd74057ba8d34be10eb77dfd453600"
+    },
+    {
+      "file": "audit-after.json",
+      "sha256": "0e24702e2d56331034672e35c3796eba91c6996a6099ff1b0eb6e1eaafb43c84"
+    },
+    {
+      "file": "audit-before.json",
+      "sha256": "3684113338714f523f40e6b6892afd30d5023b7ad39193cfd848fef44d282953"
+    },
+    {
+      "file": "baseline-server-error.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "baseline-server.log",
+      "sha256": "209884e1771f07127470f68530b2152df0bdad69dbe214c118542ace4e3479ca"
+    },
+    {
+      "file": "candidate-server-error.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "candidate-server.log",
+      "sha256": "877edcb89c622f70f0e9e9b70cdbb48c5e14f972339068305f764271c531ca7e"
+    }
+  ],
+  "reviewedChangedFiles": [
+    "AGENT_ROUTING.md",
+    "GOAL.md",
+    "docs/anniversary-assets.md",
+    "docs/anniversary.md",
+    "docs/integration/asset-map.md",
+    "docs/integration/m1-results.json",
+    "docs/integration/m1.md",
+    "docs/integration/m2-results.json",
+    "docs/integration/m2.md",
+    "docs/integration/m3-anniversary-assets.md",
+    "docs/integration/m3-results.json",
+    "docs/integration/m4-period-assets.md",
+    "docs/integration/m4-results.json",
+    "docs/integration/rollback.md",
+    "docs/integration/routing.md",
+    "docs/integration/source-audit.md",
+    "docs/integration/status.md",
+    "package-lock.json",
+    "package.json",
+    "playwright.anniversary.config.ts",
+    "playwright.period.config.ts",
+    "public/assets/cozy_days/anniversary/manifest.json",
+    "public/assets/cozy_days/period/manifest.json",
+    "public/review/anniversary-assets/index.html",
+    "public/review/anniversary-assets/reference.png",
+    "public/review/anniversary/delete-393.png",
+    "public/review/anniversary/editor-393.png",
+    "public/review/anniversary/empty-360.png",
+    "public/review/anniversary/empty-393.png",
+    "public/review/anniversary/empty-430.png",
+    "public/review/anniversary/index.html",
+    "public/review/anniversary/list-360.png",
+    "public/review/anniversary/list-393.png",
+    "public/review/anniversary/list-430.png",
+    "public/review/anniversary/month-360.png",
+    "public/review/anniversary/month-393.png",
+    "public/review/anniversary/month-430.png",
+    "public/review/anniversary/source.json",
+    "public/review/index.html",
+    "public/review/period-assets/evidence.html",
+    "public/review/period-assets/evidence.json",
+    "public/review/period-assets/evidence/assets-dark.png",
+    "public/review/period-assets/evidence/assets-light.png",
+    "public/review/period-assets/evidence/diary-360x740.png",
+    "public/review/period-assets/evidence/diary-393x852.png",
+    "public/review/period-assets/evidence/diary-430x932.png",
+    "public/review/period-assets/evidence/header-360x740.png",
+    "public/review/period-assets/evidence/header-393x852.png",
+    "public/review/period-assets/evidence/header-430x932.png",
+    "public/review/period-assets/evidence/tips-360x740.png",
+    "public/review/period-assets/evidence/tips-393x852.png",
+    "public/review/period-assets/evidence/tips-430x932.png",
+    "public/review/period-assets/index.html",
+    "public/review/period-assets/preview.js",
+    "public/review/period-assets/styles.css",
+    "public/review/period/evidence/01-home.png",
+    "public/review/period/evidence/02-calendar-selected.png",
+    "public/review/period/evidence/03-daily-selected.png",
+    "public/review/period/evidence/04-empty.png",
+    "public/review/period/evidence/05-cycle-updated.png",
+    "public/review/period/evidence/period-360x480-editor.png",
+    "public/review/period/evidence/period-360x480-settings.png",
+    "public/review/period/evidence/recovery-closed-tab-backup.png",
+    "public/review/period/evidence/recovery-explicit-confirmation.png",
+    "public/review/period/evidence/recovery-restored-persisted.png",
+    "public/review/period/evidence/recovery-save-failure.png",
+    "public/review/period/evidence/verification.json",
+    "public/review/period/index.html",
+    "src/data/database.ts",
+    "src/features/anniversary/AnniversaryPage.tsx",
+    "src/features/anniversary/anniversary.css",
+    "src/features/anniversary/artwork.ts",
+    "src/features/anniversary/model.ts",
+    "src/features/period/CycleSummary.tsx",
+    "src/features/period/DailyPeriodRecord.tsx",
+    "src/features/period/PeriodArt.tsx",
+    "src/features/period/PeriodCalendar.tsx",
+    "src/features/period/PeriodForms.tsx",
+    "src/features/period/PeriodPage.tsx",
+    "src/features/period/PeriodRecovery.tsx",
+    "src/features/period/PeriodReminders.tsx",
+    "src/features/period/PeriodTips.tsx",
+    "src/features/period/README.md",
+    "src/features/period/model.ts",
+    "src/features/period/period.css",
+    "src/features/period/recovery.ts",
+    "src/features/period/repository.ts",
+    "src/features/period/usePeriod.ts",
+    "tests/anniversary-assets.spec.ts",
+    "tests/anniversary-dates.spec.ts",
+    "tests/anniversary-m5-metadata.spec.ts",
+    "tests/anniversary-migration.spec.ts",
+    "tests/anniversary-storage.spec.ts",
+    "tests/anniversary.spec.ts",
+    "tests/period-assets.spec.ts",
+    "tests/period-m5-audit.spec.ts",
+    "tests/period-model.spec.ts",
+    "tests/period-recovery.spec.ts",
+    "tests/period.spec.ts",
+    "tests/todo.spec.ts"
+  ],
+  "unresolved": {
+    "P0": 0,
+    "P1": 0,
+    "androidDevice": "未验收",
+    "finalPreview": "pending coordinator",
+    "independentReview": "pending coordinator",
+    "finalHeadFullCI": "pending coordinator",
+    "artworkGaps": {
+      "anniversary": 9,
+      "period": 11
+    }
+  },
+  "remoteActions": "none; no APK publication or Android configuration edits"
+}

@@ -1,0 +1,138 @@
+name: Archive Android APK to existing draft
+
+on:
+  push:
+    branches: ['ops/android-draft-archive']
+  workflow_dispatch:
+    inputs:
+      source_run_id:
+        description: 'Successful Signed Android APK run in this repository'
+        required: true
+        default: '40102333492'
+        type: string
+      artifact_name:
+        description: 'Accepted APK artifact from that run'
+        required: true
+        default: 'little-days-0.2.1-code-1-38fa18df2455a635d93cd57f03d738eef2ddc8d3'
+        type: string
+      tag:
+        description: 'Existing draft release tag'
+        required: true
+        default: 'v0.2.1-android.1'
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: android-draft-archive
+  cancel-in-progress: false
+
+jobs:
+  archive:
+    if: github.repository == 'yez780055-cell/cozy-days-app' && github.event.repository.fork == false
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - name: Validate accepted APK and archive to draft
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SOURCE_RUN_ID: ${{ inputs.source_run_id || '40102333492' }}
+          ARTIFACT_NAME: ${{ inputs.artifact_name || 'little-days-0.2.1-code-1-38fa18df2455a635d93cd57f03d738eef2ddc8d3' }}
+          RELEASE_TAG: ${{ inputs.tag || 'v0.2.1-android.1' }}
+        run: |
+          python3 - <<'PY'
+          import hashlib
+          import json
+          import os
+          from pathlib import Path
+          import re
+          import shutil
+          import subprocess
+          import tempfile
+
+          def require(ok, message):
+              if not ok:
+                  raise SystemExit(message)
+
+          def run(*args):
+              return subprocess.check_output(args, text=True)
+
+          def api(path):
+              return json.loads(run('gh', 'api', path))
+
+          repo = os.environ['GITHUB_REPOSITORY']
+          require(repo == 'yez780055-cell/cozy-days-app', 'Unexpected repository')
+          run_id = os.environ['SOURCE_RUN_ID']
+          artifact = os.environ['ARTIFACT_NAME']
+          tag = os.environ['RELEASE_TAG']
+          require(re.fullmatch(r'[1-9][0-9]{0,19}', run_id), 'Invalid run ID')
+          require(re.fullmatch(r'little-days-[0-9]+\.[0-9]+\.[0-9]+-code-[1-9][0-9]*-[0-9a-f]{40}', artifact), 'Invalid artifact name')
+          require(re.fullmatch(r'v[0-9]+\.[0-9]+\.[0-9]+-android\.[1-9][0-9]*', tag), 'Invalid release tag')
+          source_run = api(f'repos/{repo}/actions/runs/{run_id}')
+          require(source_run['conclusion'] == 'success' and source_run['status'] == 'completed', 'Source run is not successful')
+          require(source_run['repository']['full_name'] == repo and source_run['head_repository']['full_name'] == repo, 'Source run is not from this repository')
+          require(source_run['path'] == '.github/workflows/android-apk.yml', 'Unexpected source workflow')
+          cert = 'c85fe70fff2425ad2b95d3dfa8f28ef7173027e744b03f57b721896fca40d3d8'
+          with tempfile.TemporaryDirectory(prefix='android-archive-', dir=os.environ['RUNNER_TEMP']) as folder:
+              root = Path(folder)
+              run('gh', 'run', 'download', run_id, '--repo', repo, '--name', artifact, '--dir', folder)
+              require(not any(p.is_symlink() for p in root.rglob('*')), 'Artifact contains symlinks')
+              metadata = list(root.rglob('release.json'))
+              apks = list(root.rglob('*.apk'))
+              require(len(metadata) == 1 and len(apks) == 1, 'Expected exactly one release.json and APK')
+              data = json.loads(metadata[0].read_text())
+              sha = data['sourceSha']
+              require(isinstance(sha, str) and re.fullmatch(r'[0-9a-f]{40}', sha), 'Invalid source SHA')
+              require(source_run['head_sha'] == sha and artifact.endswith('-' + sha), 'Source SHA mismatch')
+              require(str(data['githubRunId']) == run_id, 'Metadata run ID mismatch')
+              require(data['applicationId'] == 'com.littledays.app' and data['certificateSha256'].lower() == cert, 'Wrong package or signing identity')
+              digest = hashlib.file_digest(apks[0].open('rb'), 'sha256').hexdigest()
+              require(digest == data['sha256'], 'APK hash mismatch')
+              run('git', 'fetch', '--no-tags', 'origin', f'refs/tags/{tag}')
+              require(run('git', 'rev-parse', 'FETCH_HEAD^{commit}').strip() == sha, 'Tag does not point to accepted source')
+              # Use runner-provided Android tools only; never execute artifact contents.
+              build_tools = Path(os.environ['ANDROID_HOME']) / 'build-tools' / '35.0.0'
+              signer = build_tools / 'apksigner'
+              aapt = build_tools / 'aapt'
+              if not signer.is_file() or not aapt.is_file():
+                  subprocess.run(['sdkmanager', 'build-tools;35.0.0'], check=True)
+              require(signer.is_file() and aapt.is_file(), 'Android build-tools 35.0.0 unavailable')
+              print(f'APK verification tool: {signer}', flush=True)
+              verification = subprocess.run([str(signer), 'verify', '--print-certs', str(apks[0])], text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+              signature = verification.stdout
+              print(signature, flush=True)
+              verification.check_returncode()
+              fingerprints = re.findall(r'Signer #\d+ certificate SHA-256 digest: ([0-9a-fA-F]+)', signature)
+              require(bool(fingerprints) and all(value.lower() == cert for value in fingerprints), 'APK certificate mismatch')
+              badging = run(str(aapt), 'dump', 'badging', str(apks[0]))
+              require(re.search(r"^package: name='com\.littledays\.app' ", badging, re.MULTILINE), 'APK package mismatch')
+              name = f'cozy-days-{tag}.apk'
+
+              def release():
+                  value = json.loads(run('gh', 'release', 'view', tag, '--repo', repo, '--json', 'isDraft,tagName,assets,databaseId'))
+                  require(value['isDraft'] is True and value['tagName'] == tag, 'Existing release must remain draft with matching tag')
+                  return value
+
+              before = release()
+              require(not any(a['name'] == name for a in before['assets']), 'Asset already exists; release owner must review')
+              upload = root / name
+              require(not upload.exists(), 'Unexpected artifact filename collision')
+              shutil.copyfile(apks[0], upload)
+              run('gh', 'release', 'upload', tag, str(upload), '--repo', repo)
+              after = release()
+              require(after['databaseId'] == before['databaseId'], 'Release identity changed')
+              assets = api(f"repos/{repo}/releases/{after['databaseId']}/assets?per_page=100")
+              matches = [a for a in assets if a['name'] == name]
+              require(len(matches) == 1, 'Uploaded asset missing or ambiguous')
+              require(matches[0]['size'] == upload.stat().st_size and matches[0].get('digest') == 'sha256:' + digest, 'Uploaded asset size or digest mismatch')
+              release()
+              print(f'Archived {name}: sha256:{digest}; release remains draft')
+          PY

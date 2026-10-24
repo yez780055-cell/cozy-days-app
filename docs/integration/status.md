@@ -105,3 +105,8 @@ Remote checkpoint reconciliation (coordinator read-back, 2026-10-24): all seven 
 - Reviewed Luna High calibration eb7c314; labels/header/countdown overflow resolved, daily fieldset hint readable, viewport double column retained. Build and 12/12 period/assets tests passed. Real three-size captures in D:/cozy-days-v021-g2-high/artifacts/v021-g2; transient settings hint suppressed only in isolated evidence context.
 - Immutable period anchor checkpoint/v0.2.1-g2-period. No business/date/persistence or todo changes in visual phase.
 - G3 sole writer gpt-6-luna/medium for anniversary-only React/CSS and local SVG category art. Initial minimum sufficient model; no inherited High escalation. Independent worktree, original recurrence/CRUD/recovery preserved. Actual 3-size empty and four synthetic card captures required. Upgrade only if narrowed reproduced problems remain after Medium repair.
+
+### G3 Medium gate and one-level escalation
+- Medium f72b0de: build + 13 targeted tests pass. Initial actual 360 render had week overflow/deletion clipping; repaired render shows controls and notes but still has flower over note text, tape close to titles, date panel roughly 260px and flat hero/empty photo frames rather than the requested collage hierarchy.
+- Evidence D:/cozy-days-v021-g3/artifacts/v021-g3/anniversary-360-{top,scroll}.png reviewed. Functional PASS does not imply final visual PASS.
+- Sole writer Luna High assigned anniversary visual calibration after this narrowed Medium repair; no persistence/model/global/todo edits, no Extra High.

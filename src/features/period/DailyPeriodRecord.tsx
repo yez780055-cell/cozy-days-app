@@ -20,7 +20,7 @@ export function DailyPeriodRecord({ date, today, value, actual, onToggle, onChan
     <div className="period-record-layout">
       <div className="period-record-options">
         <div className="period-option-row period-toggle-fieldset" role="group" aria-label="生理期来了" aria-disabled={future}>
-          <span className="period-option-label"><Droplet size={16}/>生理期来了</span>
+          <span className="period-option-label">生理期来了</span>
           <div className="period-toggle-options">{[true,false].map(yes=><button className={yes?'period-toggle-yes':'period-toggle-no'} type="button" key={String(yes)} disabled={future} aria-pressed={actual===yes} onClick={()=>onToggle(yes)}>{yes?'是':'否'}</button>)}</div>
         </div>
         {groups.map(({label,Icon,options,field},row)=><div className="period-option-row" role="group" aria-label={label} aria-disabled={future} key={field}>

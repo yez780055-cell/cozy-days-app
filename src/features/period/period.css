@@ -41,9 +41,10 @@
   .period-legend i{width:8px;height:8px;flex:none}
   .period-selected{flex:none;margin:0;padding-top:3px;font-size:10px;line-height:1.2;white-space:normal}
   .period-summary{padding-left:8px;padding-right:8px}
-  .period-summary header{margin-bottom:0;flex-wrap:wrap}
-  .period-summary h2{font-size:12px;white-space:normal;min-width:0;flex:1 1 4em;overflow-wrap:anywhere}
-  .period-summary header>button{min-width:30px;min-height:30px}
+  .period-summary header{margin-bottom:0;flex-wrap:wrap;gap:3px}
+  .period-summary h2{font-size:12px;white-space:normal;min-width:0;flex:1 1 4em;overflow-wrap:anywhere;gap:3px}
+  .period-summary h2>span{font-size:12px}
+  .period-summary header>button{min-width:28px;min-height:30px}
   .period-cycle-line>p{font-size:12px;margin:0;white-space:normal}
   .period-cycle-line strong{font-size:26px}
   .period-countdown{font-size:10px;white-space:normal}
@@ -84,7 +85,7 @@
 @media(max-width:700px) and (max-height:760px){
   .period-header{height:auto;min-height:118px}
   .period-dashboard{min-height:254px}
-  .period-content{padding-top:6px;padding-bottom:0;gap:4px}
+  .period-content{padding-top:6px;padding-bottom:2px;gap:4px}
   .period-daily{padding-top:7px;padding-bottom:7px}
   .period-choices button{min-height:37px}
   .period-note{padding-top:5px;padding-bottom:5px}

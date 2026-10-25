@@ -21,13 +21,14 @@
   .period-header-copy>span{font-size:9px;letter-spacing:1px}
   .period-header h1{font-size:28px;margin:5px 0 3px;letter-spacing:1px}
   .period-header p{font-size:11px;line-height:1.45}
-  .period-art--header{height:calc(100% - 8px);width:min(57vw,230px)}
+  .period-art--header{height:calc(100% - 8px);width:min(57vw,250px)}
   .period-header-sticker{right:7px;top:7px;font-size:8px;padding:4px 6px}
   .period-header:after{font-size:21px;top:2px}
   .period-content{padding:7px 10px 8px;gap:7px}
   .period-dashboard{grid-template-columns:minmax(0,1.9fr) minmax(0,1fr);gap:6px;min-height:clamp(254px,32vh,286px);height:auto;align-items:stretch}
   .period-dashboard>.period-card{height:auto;min-height:0;padding-top:8px;padding-bottom:7px}
   .period-calendar{display:flex;flex-direction:column;padding-left:8px!important;padding-right:8px!important}
+  .period-calendar-flower{top:-16px}
   .period-calendar>header{flex:none;margin-bottom:2px;flex-wrap:wrap}
   .period-calendar header>div{margin-left:auto}
   .period-calendar header h2{font-size:15px}

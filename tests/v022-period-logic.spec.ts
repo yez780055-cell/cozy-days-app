@@ -1,5 +1,6 @@
 import { test, expect, type Page } from '@playwright/test';
 import { emptyData, type PeriodData } from '../src/features/period/model';
+test.use({timezoneId:'Asia/Shanghai'});
 
 // Playwright creates a fresh temporary browser context per test; only synthetic DB rows.
 async function seed(page:Page,data:PeriodData) {
@@ -82,4 +83,22 @@ test('legacy unknown fields survive period editor, settings and daily edits',asy
   await page.locator('.period-history-link').click();await page.getByRole('button',{name:'修改 2026-10-01'}).click();await page.getByLabel('结束日期（进行中可留空）').fill('2026-10-04');await page.getByRole('button',{name:'保存经期记录'}).click();
   const saved=await read(page) as typeof data;
   expect(saved.legacy).toBe('root');expect(saved.settings.legacy).toBe('settings');expect(saved.periods[0].legacy).toBe('period');expect(saved.days['2026-10-23'].legacy).toBe('daily');
+});
+test('crossing local midnight rejects truncation before any persistence call',async({page})=>{
+  const data={...emptyData(),periods:[{id:'open',start:'2026-10-20'}]};
+  await seed(page,data);await page.clock.setSystemTime(new Date('2026-10-23T15:59:00Z'));
+  await page.getByRole('button',{name:/^2026-10-21/}).click();await no(page).click();
+  const dialog=page.getByRole('dialog');await expect(dialog).toContainText('2026-10-21 至 2026-10-23');
+  await page.evaluate(()=>{(window as unknown as {periodWrites:number}).periodWrites=0;const put=IDBObjectStore.prototype.put;IDBObjectStore.prototype.put=function(...args:Parameters<IDBObjectStore['put']>){if(this.transaction.db.name==='cozy-days-period')(window as unknown as {periodWrites:number}).periodWrites++;return put.apply(this,args);};});
+  await page.clock.runFor(120_000);await dialog.getByRole('button',{name:'确认取消标记'}).click();
+  await expect(dialog.getByRole('alert')).toContainText('日期已变化');
+  expect(await page.evaluate(()=>(window as unknown as {periodWrites:number}).periodWrites)).toBe(0);
+  expect((await read(page)).periods).toEqual(data.periods);
+});
+test('prior record within recent 90 days requires an end even when no later record exists',async({page})=>{
+  const data={...emptyData(),periods:[{id:'prior',start:'2026-09-01',end:'2026-09-04'}]};await seed(page,data);
+  await page.getByRole('button',{name:/^2026-10-10/}).click();await yes(page).click();const dialog=page.getByRole('dialog');
+  await expect(dialog).toContainText('近90天');expect((await read(page)).periods).toEqual(data.periods);
+  await dialog.getByLabel('本次结束日期').fill('2026-10-15');await dialog.getByRole('button',{name:'保存补录经期'}).click();
+  expect((await read(page)).periods).toMatchObject([data.periods[0],{start:'2026-10-10',end:'2026-10-15'}]);
 });

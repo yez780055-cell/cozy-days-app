@@ -88,6 +88,9 @@
   .period-choices button{min-height:37px}
   .period-note{padding-top:5px;padding-bottom:5px}
   .period-art--note{height:58px}
+  .period-dashboard:has(.period-empty){height:286px}
+  .period-empty h3{margin:2px 0 4px}
+  .period-empty p{line-height:1.3;margin:0 0 6px}
 }
 
 /* Keep date bands continuous on desktop and mobile, with the original legend palette. */
@@ -99,8 +102,13 @@
 .period-date.predicted::before{background:#fbe2e7}
 .period-date.fertile::before{background:#eee6f8}
 .period-date.band-single::before,.period-date.outside.actual::before,.period-date.outside.predicted::before,.period-date.outside.fertile::before{left:2px;right:2px;border-radius:12px}
-.period-date.band-start::before{left:2px;right:-1px;border-radius:12px 0 0 12px}
-.period-date.band-middle::before{left:-1px;right:-1px}
-.period-date.band-end::before{left:-1px;right:2px;border-radius:0 12px 12px 0}
+.period-date.band-start::before{left:2px;right:-3px;border-radius:12px 0 0 12px}
+.period-date.band-middle::before{left:-3px;right:-3px}
+.period-date.band-end::before{left:-3px;right:2px;border-radius:0 12px 12px 0}
 .period-date.today{z-index:2}
 .period-date.chosen{z-index:3}
+@media(max-width:700px){
+  .period-date.band-start::before{right:-2px}
+  .period-date.band-middle::before{left:-2px;right:-2px}
+  .period-date.band-end::before{left:-2px}
+}

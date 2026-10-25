@@ -8,7 +8,8 @@ test.beforeEach(async({page})=>{
 });
 async function open(page:Page) { await page.getByRole('navigation').getByRole('button',{name:'生理期',exact:true}).click(); await expect(page.locator('.period-calendar')).toBeVisible(); }
 async function add(page:Page,start:string,end?:string) {
-  await page.getByRole('button',{name:/^记录第一次经期$|^记录经期$/}).click();
+  if(await page.getByRole('button',{name:'记录第一次经期',exact:true}).isVisible()) await page.getByRole('button',{name:'记录第一次经期',exact:true}).click();
+  else {await page.locator('.period-history-link').click();await page.getByRole('button',{name:'添加记录',exact:true}).click();}
   const dialog=page.getByRole('dialog');
   await dialog.getByLabel('开始日期',{exact:true}).fill(start);
   if(end) await dialog.getByLabel('结束日期（进行中可留空）').fill(end);
@@ -47,7 +48,7 @@ test('empty state, historical cycles, calendar, diary persistence, settings and 
   await expect(page.getByRole('button',{name:'腹痛',exact:true})).toHaveAttribute('aria-pressed','true');
   await expect(page.getByRole('button',{name:'疲惫',exact:true})).toHaveAttribute('aria-pressed','true');
   await page.getByRole('button',{name:/^2026-10-22/}).click();
-  await expect(page.getByRole('button',{name:'较多',exact:true})).toHaveAttribute('aria-pressed','false');
+  await expect(page.getByRole('button',{name:'较多',exact:true})).toHaveCount(0);
   await page.getByRole('button',{name:'平静',exact:true}).click();
   await page.getByRole('button',{name:'今天',exact:true}).click();
   await expect(page.getByRole('button',{name:'开心',exact:true})).toHaveAttribute('aria-pressed','true');
@@ -58,7 +59,7 @@ test('history edit, overlap rejection, deletion and setting fallback',async({pag
   await page.locator('.period-history-link').click(); await page.getByRole('button',{name:'修改 2026-10-01'}).click();
   await page.getByLabel('结束日期（进行中可留空）').fill('2026-10-04'); await page.getByRole('button',{name:'保存经期记录'}).click();
   await expect(page.locator('.period-averages')).toContainText('4');
-  await page.getByRole('button',{name:'记录经期',exact:true}).click(); await page.getByLabel('开始日期',{exact:true}).fill('2026-10-03');
+  await page.locator('.period-history-link').click();await page.getByRole('button',{name:'添加记录',exact:true}).click(); await page.getByLabel('开始日期',{exact:true}).fill('2026-10-03');
   await page.getByRole('button',{name:'保存经期记录'}).click(); await expect(page.getByRole('alert')).toContainText('重叠'); await page.keyboard.press('Escape');
   await page.getByRole('button',{name:'周期设置',exact:true}).click(); await page.getByLabel('默认周期长度（天）').fill('32'); await page.getByRole('button',{name:'保存周期设置'}).click();
   await expect(page.locator('.period-averages')).toContainText('32');
@@ -71,7 +72,9 @@ test('month navigation, adjacent date, future diary lock and todo isolation',asy
   await open(page);await add(page,'2026-10-01','2026-10-05');
   await page.getByRole('button',{name:'下个月',exact:true}).click();await expect(page.locator('.period-calendar h2')).toHaveText('2026年11月');
   await page.getByRole('button',{name:/^2026-12-01/}).click();await expect(page.locator('.period-calendar h2')).toHaveText('2026年12月');
-  await expect(page.getByRole('button',{name:'较多',exact:true})).toBeDisabled();
+  await expect(page.getByRole('button',{name:'较多',exact:true})).toHaveCount(0);
+  await expect(page.getByRole('button',{name:'是',exact:true})).toBeDisabled();
+  await expect(page.getByRole('button',{name:'腹痛',exact:true})).toBeDisabled();
   await page.getByRole('button',{name:'今天',exact:true}).click(); await expect(page.locator('.period-calendar h2')).toHaveText('2026年10月');
   await page.getByRole('navigation').getByRole('button',{name:'待办',exact:true}).click(); await expect(page.getByRole('button',{name:'编辑：保留待办',exact:true})).toBeVisible();
 });

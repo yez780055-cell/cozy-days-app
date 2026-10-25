@@ -16,7 +16,7 @@ export default function PeriodPage() {
   useEffect(()=>{mounted.current=true;return ()=>{mounted.current=false;};},[]);
   const {data,ready,error,saving,restoring,durable,conflict,conflictData,archives,restoreArchive,resolveConflict,notice,update,retry}=usePeriod();
   const [backups,setBackups]=useState(false),[confirmRestore,setConfirmRestore]=useState(false);
-  const [toggle,setToggle]=useState<{date:string;yes:boolean;id:string;baseline:string;plan:Extract<TogglePlan,{kind:'confirm-truncate'|'require-end'}>}>();
+  const [toggle,setToggle]=useState<{date:string;today:string;yes:boolean;id:string;baseline:string;plan:Extract<TogglePlan,{kind:'confirm-truncate'|'require-end'}>}>();
   const [toggleError,setToggleError]=useState('');
   const [today,setToday]=useState(localToday),[selected,setSelected]=useState(localToday),[month,setMonth]=useState(()=>localToday().slice(0,7));
   const [view,setView]=usePeriodDraft<{dialog?:'editor'|'history'|'settings';editing?:PeriodEntry}>('view',()=>({}),(v):v is {dialog?:'editor'|'history'|'settings';editing?:PeriodEntry}=>{const x=v as {dialog?:unknown;editing?:PeriodEntry};return (!x.dialog||['editor','history','settings'].includes(String(x.dialog)))&&(!x.editing||(typeof x.editing.id==='string'&&typeof x.editing.start==='string'&&(x.editing.end===undefined||typeof x.editing.end==='string')));});
@@ -30,7 +30,7 @@ export default function PeriodPage() {
   function togglePeriod(yes:boolean) {
     setToggleError('');
     const id=crypto.randomUUID(),plan=planPeriodToggle(data.periods,selected,today,yes,id);
-    if(plan.kind==='confirm-truncate'||plan.kind==='require-end') {setToggle({date:selected,yes,id,baseline:JSON.stringify(data.periods),plan});return;}
+    if(plan.kind==='confirm-truncate'||plan.kind==='require-end') {setToggle({date:selected,today,yes,id,baseline:JSON.stringify(data.periods),plan});return;}
     if(plan.kind==='error') {setToggleError(plan.message);return;}
     if(plan.kind==='ready') void update(d=>{const latest=planPeriodToggle(d.periods,selected,today,yes,id);return latest.kind==='ready'?{...d,periods:latest.periods}:d;});
   }
@@ -51,10 +51,17 @@ export default function PeriodPage() {
       <p className="period-storage" role="status">{saving?'正在保存…':error?(durable?'尚未保存到记录库 · '+notice:'尚未保存 · 仅内存保留，刷新或关闭页面会丢失，请重试'):'♡ 记录仅保存在这台设备 · 清除站点数据会丢失记录'}</p>
     </div>}
     {ready&&toggle&&<PeriodToggleDialog key={toggle.id} plan={toggle.plan} date={toggle.date} today={today} onClose={()=>setToggle(undefined)} onConfirm={async end=>{
+      // Reject before update: even an unchanged update creates a recovery write.
+      if(localToday()!==toggle.today) return '日期已变化，请关闭弹窗后重新选择，确认新的受影响范围。';
+      if(JSON.stringify(data.periods)!==toggle.baseline) return '经期记录已变化，请关闭弹窗后重新选择。';
+      if(toggle.plan.kind==='confirm-truncate') {
+        const current=planPeriodToggle(data.periods,toggle.date,toggle.today,toggle.yes,toggle.id);
+        if(current.kind!=='confirm-truncate'||current.from!==toggle.plan.from||current.through!==toggle.plan.through) return '受影响日期范围已变化，请关闭弹窗后重新选择。';
+      }
       let message:string|undefined;
       const ok=await update(d=>{
         if(JSON.stringify(d.periods)!==toggle.baseline) {message='经期记录已变化，请关闭弹窗后重新选择。';return d;}
-        const plan=planPeriodToggle(d.periods,toggle.date,today,toggle.yes,toggle.id,{confirm:true,...(end!==undefined?{end}:{})});
+        const plan=planPeriodToggle(d.periods,toggle.date,toggle.today,toggle.yes,toggle.id,{confirm:true,...(end!==undefined?{end}:{})});
         if(plan.kind==='error') message=plan.message;
         else if(plan.kind==='ready') return {...d,periods:plan.periods};
         else message='状态已变化，请关闭弹窗后重新选择。';

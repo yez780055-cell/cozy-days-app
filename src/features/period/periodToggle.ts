@@ -15,9 +15,9 @@ export function planPeriodToggle(periods:PeriodEntry[], date:string, today:strin
     if(date<today&&!options?.confirm) return {kind:'confirm-truncate',from:date,through:current.end||today};
     return {kind:'ready',periods:periods.flatMap(p=>p!==current?[p]:date===p.start?[]:[{...p,end:addDays(date,-1)}])};
   }
-  const later=periods.some(p=>p.start>date);
-  if(later&&!options) return {kind:'require-end'};
-  if(later&&!options?.end) return {kind:'error',message:'已有后续经期，请填写本次结束日期。'};
+  const protectedHistory=date<today&&periods.some(p=>p.start>date||(p.start<=today&&(p.end||today)>=addDays(today,-89)));
+  if(protectedHistory&&!options) return {kind:'require-end'};
+  if(protectedHistory&&!options?.end) return {kind:'error',message:'已有后续或近90天经期，请填写本次结束日期。'};
   const entry:PeriodEntry={id,start:date,...(options?.end?{end:options.end}:{})};
   const message=validatePeriod(entry,periods,today);
   return message?{kind:'error',message}:{kind:'ready',periods:[...periods,entry]};

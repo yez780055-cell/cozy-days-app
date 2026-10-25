@@ -27,6 +27,15 @@ test('historical insertion requires an explicit valid end before every later per
   expect(planPeriodToggle(later,'2026-10-24','2026-10-23',true,'new').kind).toBe('error');
 });
 
+test('historical insertion protects every interval intersecting the inclusive recent 90 days',()=>{
+  const today='2026-10-23', boundary=addDays(today,-89), older=addDays(boundary,-1);
+  for(const record of [{id:'edge',start:boundary,end:boundary},{id:'cross',start:'2026-01-01',end:boundary}])
+    expect(planPeriodToggle([record],'2026-10-10',today,true,'new').kind).toBe('require-end');
+  const old=[{id:'old',start:'2026-01-01',end:older}];
+  expect(planPeriodToggle(old,'2026-10-10',today,true,'new').kind).toBe('ready');
+  expect(planPeriodToggle([{id:'recent',start:boundary,end:boundary}],today,today,true,'new').kind).toBe('ready');
+});
+
 test('date-only arithmetic handles leap years, month boundaries and DST days',()=>{
   expect(addDays('2024-02-28',1)).toBe('2024-02-29');
   expect(addDays('2025-02-28',1)).toBe('2025-03-01');

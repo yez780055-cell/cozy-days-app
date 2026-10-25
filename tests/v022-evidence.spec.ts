@@ -41,9 +41,15 @@ for(const height of [480,640])test(`short screen ${height} with 150 percent font
   for(const name of all){const button=page.getByRole('button',{name,exact:true});await button.scrollIntoViewIfNeeded();await expect(button).toBeInViewport({ratio:1});}
   await shot(page,`period-360x${height}-normal`);
   await page.locator('.period-page :is(h1,h2,h3,p,span,small,b,strong,button)').evaluateAll(elements=>{const sizes=elements.map(el=>parseFloat(getComputedStyle(el).fontSize)*1.5);elements.forEach((el,i)=>(el as HTMLElement).style.setProperty('font-size',sizes[i]+'px','important'));});await settle(page);
+  const grid=await page.locator('.period-grid').boundingBox(),legend=await page.locator('.period-legend').boundingBox();expect(grid!.y+grid!.height).toBeLessThanOrEqual(legend!.y);
+  const cells=await page.locator('.period-date').evaluateAll(nodes=>nodes.map(el=>{const r=el.getBoundingClientRect();return {top:r.top,bottom:r.bottom,left:r.left,right:r.right,scroll:el.scrollWidth,client:el.clientWidth};}));for(let i=7;i<cells.length;i++)expect(cells[i-7].bottom).toBeLessThanOrEqual(cells[i].top);
+  const summary=await page.locator('.period-summary').boundingBox(),last=await page.locator('.period-averages button').last().boundingBox(),title=page.locator('.period-summary h2');expect(last!.y+last!.height).toBeLessThanOrEqual(summary!.y+summary!.height);expect(await title.evaluate(el=>el.scrollWidth-el.clientWidth)).toBeLessThanOrEqual(1);
   expect(await page.locator('.period-page').evaluate(el=>el.scrollHeight>el.clientHeight)).toBe(true);
-  for(const name of all){const button=page.getByRole('button',{name,exact:true});await button.scrollIntoViewIfNeeded();await expect(button).toBeInViewport({ratio:1});}
+  for(const control of [...await page.locator('.period-calendar button,.period-summary button').all(),...all.map(name=>page.getByRole('button',{name,exact:true}))]){await control.scrollIntoViewIfNeeded();await expect(control).toBeInViewport({ratio:1});}
+  const nav=await page.locator('.bottom-nav').boundingBox(),mood=page.getByRole('button',{name:'易怒',exact:true});const moodBox=await mood.boundingBox(),label=await mood.locator(':scope >span').last().boundingBox();expect(label!.y+label!.height).toBeLessThanOrEqual(moodBox!.y+moodBox!.height);expect(label!.y+label!.height).toBeLessThanOrEqual(nav!.y);
   expect(await page.evaluate(()=>document.body.scrollWidth)).toBe(360);
+  await page.locator('.period-page').evaluate(el=>el.scrollTop=el.scrollHeight);
+  await expect(page.locator('.period-storage')).toBeInViewport({ratio:1});
   await shot(page,`period-360x${height}-font150-bottom`);await page.locator('.period-page').evaluate(el=>el.scrollTop=0);await shot(page,`period-360x${height}-font150-top`);
 });
 for(const width of [393,900])test(`today and chosen backgrounds stay connected at width ${width}`,async({page})=>{
@@ -55,6 +61,8 @@ test('bands break at weeks and months, preserve palette and real status priority
   await page.setViewportSize({width:393,height:852});const data:PeriodData={...emptyData(),periods:[{id:'band',start:'2026-09-25',end:'2026-10-04'},{id:'recent',start:'2026-10-20',end:'2026-10-25'}]};await seed(page,data);
   const cell=(date:string)=>page.getByRole('button',{name:new RegExp(`^${date}`)});
   await expect(cell('2026-10-01')).toHaveClass(/band-start/);await expect(cell('2026-10-03')).toHaveClass(/band-end/);await expect(cell('2026-10-04')).toHaveClass(/band-single/);
+  await expect(cell('2026-09-30')).toHaveAttribute('aria-label',/经期/);
+  expect(await cell('2026-09-30').evaluate(el=>({color:getComputedStyle(el).color,background:getComputedStyle(el,'::before').backgroundColor}))).toEqual({color:'rgb(167, 155, 147)',background:'rgba(0, 0, 0, 0)'});
   await expect(cell('2026-10-25')).toHaveClass(/actual/);await expect(cell('2026-10-25')).not.toHaveClass(/predicted|fertile|ovulation/);
   async function bandEdges(date:string) {return cell(date).evaluate(el=>{const r=el.getBoundingClientRect(),s=getComputedStyle(el),b=getComputedStyle(el,'::before');return {left:r.left+parseFloat(s.borderLeftWidth)+parseFloat(b.left),right:r.right-parseFloat(s.borderRightWidth)-parseFloat(b.right)};});}
   // Oct 22 is selected; Oct 25 is today. Both must retain a connected band.
@@ -73,4 +81,3 @@ test('bands break at weeks and months, preserve palette and real status priority
   }
   await shot(page,'period-band-palette');
 });
-

@@ -92,6 +92,7 @@ test('touch date gestures are scoped, click safe, and month dates clamp', async 
   const todoDialog = page.getByRole('dialog', { name: '新建待办' });
   await todoDialog.getByRole('textbox', { name: '想做些什么？' }).fill('Swipe boundary check');
   await todoDialog.getByRole('button', { name: '保存', exact: true }).click();
+  await expect(todoDialog).not.toBeVisible();
   const todoCard = page.getByTestId('todo-card');
   const liveDateBox = await date.boundingBox();
   await touchSwipe(page, liveDateBox!.x + liveDateBox!.width / 2, liveDateBox!.y + liveDateBox!.height / 2, -72);
@@ -128,9 +129,16 @@ test('touch date gestures are scoped, click safe, and month dates clamp', async 
   const monthBox = await page.locator('.period-calendar').boundingBox();
   await touchSwipe(page, monthBox!.x + monthBox!.width / 2, monthBox!.y + monthBox!.height * .72, -30);
   await expect(month).toHaveText('2026年11月');
+  await expect(selected).toHaveAttribute('aria-label', /^2026-11-30/);
   await touchSwipe(page, monthBox!.x + monthBox!.width / 2, monthBox!.y + monthBox!.height * .72, 0, -75);
   await expect(month).toHaveText('2026年11月');
   await touchMultiSwipe(page, monthBox!.x + monthBox!.width / 2, monthBox!.y + monthBox!.height * .72, -72);
+  await expect(month).toHaveText('2026年11月');
+
+  await touchSwipe(page, monthBox!.x + monthBox!.width / 2, monthBox!.y + monthBox!.height * .72, 72);
+  await expect(month).toHaveText('2026年10月');
+  await expect(selected).toHaveAttribute('aria-label', /^2026-10-30/);
+  await page.getByRole('button', { name: '下个月', exact: true }).click();
   await expect(month).toHaveText('2026年11月');
 
   await page.getByRole('button', { name: '上个月', exact: true }).click();

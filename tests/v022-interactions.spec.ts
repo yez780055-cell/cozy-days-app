@@ -72,6 +72,8 @@ async function touchMultiSwipe(page: Page, x: number, y: number, dx: number) {
 test('touch date gestures are scoped, click safe, and month dates clamp', async ({ page }) => {
   await seedPeriod(page);
   await expect(page.locator('.date-browsing')).toBeVisible();
+  const navigation = await page.locator('.date-navigation').boundingBox(), tabs = await page.locator('.view-tabs').boundingBox();
+  expect(Math.abs(navigation!.y - tabs!.y)).toBeLessThanOrEqual(1);
   const date = page.locator('.date-button'), box = await date.boundingBox();
   expect(box).not.toBeNull();
   await touchSwipe(page, box!.x + box!.width / 2, box!.y + box!.height / 2, -72);
@@ -108,6 +110,10 @@ test('touch date gestures are scoped, click safe, and month dates clamp', async 
   expect(cardBox).not.toBeNull();
   await touchSwipe(page, cardBox!.x + cardBox!.width / 2, cardBox!.y + cardBox!.height / 2, -72);
   await expect(date).toContainText('10月25日');
+  await expect(page.getByRole('dialog')).toHaveCount(0);
+  // Existing TodoCard suppresses clicks for 400ms after a horizontal gesture.
+  // Advance the installed virtual clock before testing a new, deliberate tap.
+  await page.clock.runFor(401);
   await page.getByRole('button', { name: '编辑：Swipe boundary check', exact: true }).click();
   await expect(page.getByRole('dialog', { name: '编辑待办' })).toBeVisible();
   await page.keyboard.press('Escape');

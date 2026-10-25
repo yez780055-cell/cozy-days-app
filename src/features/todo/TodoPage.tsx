@@ -114,15 +114,13 @@ export function TodoView({ store, initialDialog }: { store: TodoStore; initialDi
       <Asset name="originalCheer" className="original-cheer"/>
     </header>
     <section className="date-section" aria-label="日期与视图">
-      <div className="date-browsing" aria-label="浏览日期" style={{ touchAction: 'pan-y' }} {...dateSwipe}>
-      <div className="date-row"><button className="date-button" aria-label="选择日期" onClick={() => setDialog('calendar')}>
+      <div className="date-row date-browsing" aria-label="浏览日期" style={{ touchAction: 'pan-y' }} {...dateSwipe}><button className="date-button" aria-label="选择日期" onClick={() => setDialog('calendar')}>
         <span>{formatDate(date)}</span><span className="date-weekday">{weekday(date)}</span><ChevronDown size={16}/></button>
         <Button variant="soft" className="today-button" onClick={() => selectDate(todayKey())}><CalendarDays size={15}/>今天</Button>
       </div>
-      <div className="date-navigation"><button className="icon-button" aria-label="前一天" onClick={() => selectDate(shiftDate(date, -1))}><ChevronLeft size={16}/></button>
+      <div className="date-navigation" style={{ touchAction: 'pan-y' }} {...dateSwipe}><button className="icon-button" aria-label="前一天" onClick={() => selectDate(shiftDate(date, -1))}><ChevronLeft size={16}/></button>
         <span>{date === todayKey() ? '留一点时间，给喜欢的自己' : date.split('-').join(' / ')}</span>
         <button className="icon-button" aria-label="后一天" onClick={() => selectDate(shiftDate(date, 1))}><ChevronRight size={16}/></button>
-      </div>
       </div>
       <div className="view-tabs" role="group" aria-label="待办视图">
         <button className={view === 'date' ? 'active' : ''} aria-pressed={view === 'date'} onClick={() => setView('date')}>当前日期 <span>{dateTodos.filter(todo => !todo.completed).length}</span></button>

@@ -152,3 +152,9 @@ Remote checkpoint reconciliation (coordinator read-back, 2026-10-24): all seven 
 - Contract: periods are authoritative; toggle derives actual membership. Truncation preserves days/opaque fields; historical truncation needs affected-range confirmation; later existing intervals require explicit historical end and overlap validation. Adjacent intervals remain separate with explanation. Future actual writes disabled. Existing local-date model preserved.
 - Pending: implementation, three-size before/after evidence, full E2E/Pages/build, independent review, push/PR and current-head Cloudflare Preview. Historical deployment evidence is not current-head acceptance.
 - This task does not authorize merge, Android versionCode changes, APK generation or signing. Stop after preview delivery for explicit user approval.
+
+### v0.2.2 E checkpoint
+- Integrated Sol Medium commit 415f5f2 as 92e19d5; 12 targeted model/E2E tests and Web build passed in its isolated worktree. No schema change. Unknown root/interval/day/settings fields round-trip through toggles and edits.
+- Sole source writer switched to Luna Medium at D:/cozy-days-v022-ui: date-area-only todo swipe, period calendar swipe and selection clamp, continuous ranges, hierarchy/legend, and measured one-screen layout. Standard-size complete visibility is required; inner scrolling alone is not acceptance. No TodoCard algorithm changes authorized.
+- Independent Sol Medium reader audits the integrated interval implementation while UI work proceeds. Final full suite and source-bound evidence remain pending.
+- Before captures on unchanged main source use fresh Playwright contexts, synthetic periods (2026-09-20..25 and 2026-10-20..today), today 2026-10-25 12:00 Asia/Shanghai. At 360/393/430, page client/scroll heights were 668/875, 780/924, 860/924 respectively; stored locally in artifacts/v022-before for later review packaging.

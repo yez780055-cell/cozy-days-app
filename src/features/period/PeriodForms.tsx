@@ -12,7 +12,7 @@ export function PeriodEditor({ entry, data, today, selected, onSave, onClose }: 
   const [saving,setSaving]=useState(false);
   const [error,setError]=useState('');
   async function submit(event:FormEvent) {
-    event.preventDefault(); const value={id:draft.id,start,end:end||undefined};
+    event.preventDefault(); const value={...entry,id:draft.id,start,end:end||undefined};
     const message=validatePeriod(value,data.periods,today);
     if(message) {setError(message);return;}
     setSaving(true); const ok=await onSave(value); setSaving(false); if(!ok) setError('保存失败，表单草稿已保留，请重试。');

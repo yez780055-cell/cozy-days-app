@@ -1,5 +1,31 @@
 import { test, expect } from '@playwright/test';
 import { addDays, cycleStats, dateStatus, dayNumber, daysBetween, emptyData, monthGrid, shiftMonth, validatePeriod } from '../src/features/period/model';
+import { actualPeriod, planPeriodToggle } from '../src/features/period/periodToggle';
+
+test('toggle derives truth from intervals, truncates only periods, and keeps adjacent segments separate',()=>{
+  const rows=[{id:'a',start:'2026-10-20',end:'2026-10-22',legacy:{keep:true}}];
+  expect(actualPeriod('2026-10-22',rows,'2026-10-23')?.id).toBe('a');
+  expect(actualPeriod('2026-10-24',rows,'2026-10-23')).toBeUndefined();
+  expect(planPeriodToggle(rows,'2026-10-23','2026-10-23',true,'new')).toMatchObject({kind:'ready',periods:[rows[0],{id:'new',start:'2026-10-23'}]});
+  expect(planPeriodToggle(rows,'2026-10-21','2026-10-23',false,'new')).toMatchObject({kind:'confirm-truncate',from:'2026-10-21',through:'2026-10-22'});
+  const result=planPeriodToggle(rows,'2026-10-21','2026-10-23',false,'new',{confirm:true});
+  expect(result).toMatchObject({kind:'ready',periods:[{...rows[0],end:'2026-10-20'}]});
+  expect(rows[0].end).toBe('2026-10-22');
+  expect(planPeriodToggle([{id:'one',start:'2026-10-23'}],'2026-10-23','2026-10-23',false,'new')).toMatchObject({kind:'ready',periods:[]});
+  expect(planPeriodToggle([{id:'open',start:'2026-10-20'}],'2026-10-23','2026-10-23',false,'new')).toMatchObject({kind:'ready',periods:[{id:'open',start:'2026-10-20',end:'2026-10-22'}]});
+  expect(planPeriodToggle(rows,'2026-10-20','2026-10-23',false,'new',{confirm:true})).toMatchObject({kind:'ready',periods:[]});
+  expect(planPeriodToggle(rows,'2026-10-21','2026-10-23',true,'new').kind).toBe('unchanged');
+});
+
+test('historical insertion requires an explicit valid end before every later period',()=>{
+  const later=[{id:'later',start:'2026-10-21'}];
+  expect(planPeriodToggle([],'2026-10-10','2026-10-23',true,'new')).toMatchObject({kind:'ready',periods:[{id:'new',start:'2026-10-10'}]});
+  expect(planPeriodToggle(later,'2026-10-10','2026-10-23',true,'new').kind).toBe('require-end');
+  for(const end of ['', '2026-02-30','2026-10-09','2026-10-24','2026-10-21'])
+    expect(planPeriodToggle(later,'2026-10-10','2026-10-23',true,'new',{end}).kind).toBe('error');
+  expect(planPeriodToggle(later,'2026-10-10','2026-10-23',true,'new',{end:'2026-10-20'})).toMatchObject({kind:'ready',periods:[later[0],{id:'new',start:'2026-10-10',end:'2026-10-20'}]});
+  expect(planPeriodToggle(later,'2026-10-24','2026-10-23',true,'new').kind).toBe('error');
+});
 
 test('date-only arithmetic handles leap years, month boundaries and DST days',()=>{
   expect(addDays('2024-02-28',1)).toBe('2024-02-29');

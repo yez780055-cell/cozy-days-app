@@ -162,6 +162,18 @@
     }
   ],
   "status": "PASS_WITH_RETRY",
+  "subsequentTestCorrection": {
+    "actualTestCommit": "c3eff85d317ddc3cb510934d666737de7db9627e",
+    "integrationEquivalentTestCommit": "184aae5b1300f3eee412b7ebbb356e3f75f3157a",
+    "testBlob": "b55719f100c3af292808c1666b6371de3ee0bfbd",
+    "scope": "tests/v022-interactions.spec.ts only; application source and all 18 captures unchanged",
+    "reason": "Native vertical scrolling invalidated cached viewport coordinates; remeasure and assert calendar hit before every month gesture",
+    "directedChecks": { "originalGestureRepeat": "3/3", "interactionFile": "8/8", "webBuild": "PASS", "retries": 0 },
+    "originalRemoteRun": "https://github.com/yez780055-cell/cozy-days-app/actions/runs/40252387309",
+    "diagnosis": "docs/v022/gesture-ci-40252387309/README.md",
+    "latestRemoteResults": "https://github.com/yez780055-cell/cozy-days-app/pull/17",
+    "note": "Historical local test/image provenance above remains unchanged. Subsequent corrected-test CI results are reported on the PR; this is not a relabeling of old captures."
+  },
   "checks": {
     "pages": {
       "failed": 0,

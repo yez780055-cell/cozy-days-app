@@ -67,7 +67,7 @@ for (const viewport of viewports) {
     expect(overlaps(tape!, diaryHeading!)).toBe(false);
     expect(overlaps(tape!, diaryDate!)).toBe(false);
     await page.screenshot({ path: `artifacts/v021-g4/period-${viewport.width}-record.png`, animations: 'disabled' });
-    const moodFaces = await page.locator('.period-record-options fieldset').nth(2).locator('.period-cat-face').evaluateAll(faces => faces.map(face => face.innerHTML));
+    const moodFaces = await page.getByRole('group',{name:'今日心情'}).locator('.period-cat-face').evaluateAll(faces => faces.map(face => face.innerHTML));
     expect(moodFaces).toHaveLength(5);
     expect(new Set(moodFaces).size).toBe(5);
 

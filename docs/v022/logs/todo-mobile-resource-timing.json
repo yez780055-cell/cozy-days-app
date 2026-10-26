@@ -1,0 +1,186 @@
+{
+  "slowestCompleted": [
+    {
+      "startedDateTime": "2026-10-26T00:54:06.098Z",
+      "time": 8082.964,
+      "url": "http://127.0.0.1:5173/",
+      "status": 200
+    },
+    {
+      "startedDateTime": "2026-10-26T00:54:49.535Z",
+      "time": 6978.509,
+      "url": "http://127.0.0.1:5173/?preview=1&scenario=normal",
+      "status": 200
+    },
+    {
+      "startedDateTime": "2026-10-26T00:54:38.795Z",
+      "time": 5939.544,
+      "url": "http://127.0.0.1:5173/",
+      "status": 200
+    },
+    {
+      "startedDateTime": "2026-10-26T00:54:21.185Z",
+      "time": 5668.826999999999,
+      "url": "http://127.0.0.1:5173/?preview=1&scenario=normal",
+      "status": 200
+    },
+    {
+      "startedDateTime": "2026-10-26T00:54:33.028Z",
+      "time": 5196.43,
+      "url": "http://127.0.0.1:5173/src/assets/fonts/yozai-v0.868/Yozai-Medium.woff2",
+      "status": 200
+    }
+  ],
+  "pendingAtBudgetCancellation": [
+    {
+      "startedDateTime": "2026-10-26T00:54:04.395Z",
+      "time": -1,
+      "url": "http://127.0.0.1:5173/assets/cozy_days/raster/original/cheer.png",
+      "status": -1
+    },
+    {
+      "startedDateTime": "2026-10-26T00:54:04.395Z",
+      "time": -1,
+      "url": "http://127.0.0.1:5173/assets/cozy_days/raster/original/books-bubble.png",
+      "status": -1
+    },
+    {
+      "startedDateTime": "2026-10-26T00:54:04.395Z",
+      "time": -1,
+      "url": "http://127.0.0.1:5173/assets/cozy_days/raster/original/peeking-cat.png",
+      "status": -1
+    },
+    {
+      "startedDateTime": "2026-10-26T00:54:04.425Z",
+      "time": -1,
+      "url": "http://127.0.0.1:5173/src/assets/fonts/yozai-v0.868/Yozai-Regular.woff2",
+      "status": -1
+    },
+    {
+      "startedDateTime": "2026-10-26T00:54:04.426Z",
+      "time": -1,
+      "url": "http://127.0.0.1:5173/src/assets/fonts/yozai-v0.868/Yozai-Medium.woff2",
+      "status": -1
+    },
+    {
+      "startedDateTime": "2026-10-26T00:54:04.466Z",
+      "time": -1,
+      "url": "http://127.0.0.1:5173/assets/cozy_days/raster/decor/washi_pink.png",
+      "status": -1
+    },
+    {
+      "startedDateTime": "2026-10-26T00:54:04.466Z",
+      "time": -1,
+      "url": "http://127.0.0.1:5173/assets/cozy_days/raster/decor/flower_pink.png",
+      "status": -1
+    },
+    {
+      "startedDateTime": "2026-10-26T00:54:04.466Z",
+      "time": -1,
+      "url": "http://127.0.0.1:5173/assets/cozy_days/raster/characters/cats_empty_state.png",
+      "status": -1
+    },
+    {
+      "startedDateTime": "2026-10-26T00:54:04.791Z",
+      "time": -1,
+      "url": "http://127.0.0.1:5173/assets/cozy_days/raster/stationery/pencil_cup.png",
+      "status": -1
+    },
+    {
+      "startedDateTime": "2026-10-26T00:54:05.241Z",
+      "time": -1,
+      "url": "http://127.0.0.1:5173/assets/cozy_days/raster/decor/sprout.png",
+      "status": -1
+    },
+    {
+      "startedDateTime": "2026-10-26T00:54:05.689Z",
+      "time": -1,
+      "url": "http://127.0.0.1:5173/assets/cozy_days/raster/tasks/task_book.png",
+      "status": -1
+    },
+    {
+      "startedDateTime": "2026-10-26T00:54:06.062Z",
+      "time": -1,
+      "url": "http://127.0.0.1:5173/assets/cozy_days/raster/tasks/task_stretch.png",
+      "status": -1
+    },
+    {
+      "startedDateTime": "2026-10-26T00:54:21.091Z",
+      "time": -1,
+      "url": "http://127.0.0.1:5173/src/assets/fonts/yozai-v0.868/Yozai-Regular.woff2",
+      "status": -1
+    },
+    {
+      "startedDateTime": "2026-10-26T00:54:21.091Z",
+      "time": -1,
+      "url": "http://127.0.0.1:5173/src/assets/fonts/yozai-v0.868/Yozai-Medium.woff2",
+      "status": -1
+    },
+    {
+      "startedDateTime": "2026-10-26T00:54:21.109Z",
+      "time": -1,
+      "url": "http://127.0.0.1:5173/assets/cozy_days/raster/decor/washi_pink.png",
+      "status": -1
+    },
+    {
+      "startedDateTime": "2026-10-26T00:54:21.11Z",
+      "time": -1,
+      "url": "http://127.0.0.1:5173/assets/cozy_days/raster/stationery/pencil_cup.png",
+      "status": -1
+    },
+    {
+      "startedDateTime": "2026-10-26T00:54:21.11Z",
+      "time": -1,
+      "url": "http://127.0.0.1:5173/assets/cozy_days/raster/decor/sprout.png",
+      "status": -1
+    },
+    {
+      "startedDateTime": "2026-10-26T00:54:21.11Z",
+      "time": -1,
+      "url": "http://127.0.0.1:5173/assets/cozy_days/raster/tasks/task_stretch.png",
+      "status": -1
+    },
+    {
+      "startedDateTime": "2026-10-26T00:54:21.11Z",
+      "time": -1,
+      "url": "http://127.0.0.1:5173/assets/cozy_days/raster/decor/flower_pink.png",
+      "status": -1
+    },
+    {
+      "startedDateTime": "2026-10-26T00:54:49.445Z",
+      "time": -1,
+      "url": "http://127.0.0.1:5173/src/assets/fonts/yozai-v0.868/Yozai-Regular.woff2",
+      "status": -1
+    },
+    {
+      "startedDateTime": "2026-10-26T00:54:49.445Z",
+      "time": -1,
+      "url": "http://127.0.0.1:5173/src/assets/fonts/yozai-v0.868/Yozai-Medium.woff2",
+      "status": -1
+    },
+    {
+      "startedDateTime": "2026-10-26T00:54:49.464Z",
+      "time": -1,
+      "url": "http://127.0.0.1:5173/assets/cozy_days/raster/tasks/task_book.png",
+      "status": -1
+    },
+    {
+      "startedDateTime": "2026-10-26T00:54:56.596Z",
+      "time": -1,
+      "url": "http://127.0.0.1:5173/@vite/client",
+      "status": -1
+    },
+    {
+      "startedDateTime": "2026-10-26T00:54:56.596Z",
+      "time": -1,
+      "url": "http://127.0.0.1:5173/src/main.tsx",
+      "status": -1
+    },
+    {
+      "startedDateTime": "2026-10-26T00:54:56.601Z",
+      "time": -1,
+      "url": "http://127.0.0.1:5173/@react-refresh",
+      "status": -1
+    }
+  ]
+}

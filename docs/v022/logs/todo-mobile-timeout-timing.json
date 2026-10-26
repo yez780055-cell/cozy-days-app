@@ -1,0 +1,64 @@
+[
+  {
+    "callId": "bwvw@20853",
+    "startTime": 943030.653,
+    "title": "Before Hooks",
+    "params": {}
+  },
+  {
+    "callId": "bwvw@20888",
+    "startTime": 943131.395,
+    "title": "Navigate",
+    "params": {
+      "url": "/"
+    }
+  },
+  {
+    "callId": "bwvw@20924",
+    "startTime": 951952.376,
+    "title": "Navigate",
+    "params": {
+      "url": "/"
+    }
+  },
+  {
+    "callId": "bwvw@20932",
+    "startTime": 967012.185,
+    "title": "Screenshot",
+    "params": {
+      "type": "png"
+    }
+  },
+  {
+    "callId": "bwvw@20934",
+    "startTime": 967039.868,
+    "title": "Navigate",
+    "params": {
+      "url": "/?preview=1&scenario=normal"
+    }
+  },
+  {
+    "callId": "bwvw@20950",
+    "startTime": 984649.415,
+    "title": "Navigate",
+    "params": {
+      "url": "/"
+    }
+  },
+  {
+    "callId": "bwvw@20958",
+    "startTime": 995356.019,
+    "title": "Screenshot",
+    "params": {
+      "type": "png"
+    }
+  },
+  {
+    "callId": "bwvw@20960",
+    "startTime": 995389.925,
+    "title": "Navigate",
+    "params": {
+      "url": "/?preview=1&scenario=normal"
+    }
+  }
+]

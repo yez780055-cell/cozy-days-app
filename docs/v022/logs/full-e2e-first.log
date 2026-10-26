@@ -1,0 +1,77 @@
+
+> little-days-app@0.2.2 test:e2e
+> playwright test --output=artifacts/v022-full-e2e --reporter=line
+
+
+[WebServer] (node:29744) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 160 tests using 1 worker
+
+
+(node:11684) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+[1/160] [chromium] › tests\anniversary-assets.spec.ts:10:3 › anniversary assets and full card framing at 360px
+[chromium] › tests\anniversary-assets.spec.ts:10:3 › anniversary assets and full card framing at 360px
+M3 asset audit 360: [{"name":"cats_header.png","hash":"01c839801c4a78ce4c37433db0ee63e4a171fe3b19645c3b5756d37dde05e59a","width":1602,"height":884,"clearFraction":0.4186014653628666,"solidFraction":0},{"name":"bedroom_header.png","hash":"81a9a0f06760ac474e1865d8c88c52984eb547b298995c319bf23e1ab541cba6","width":1672,"height":941,"clearFraction":0,"solidFraction":1},{"name":"flower_pink.png","hash":"563d9fe84ad9482987dcad02852c3fa80326fb084f1a500cfb7a3c6231e6f5f5","width":139,"height":138,"clearFraction":0.4442185382129079,"solidFraction":0.528047127515379},{"name":"heart_pink_outline.svg","hash":"d85097dde592cff0ea27227bbbf7ecd3dc2d3f4d6e47b572cb38257b3aae0c16","width":128,"height":128,"clearFraction":0.7938232421875,"solidFraction":0.1390380859375},{"name":"star_cream.svg","hash":"c725117c9e0860cd89d4c6c205003cc60f8dbdf7dc236b55d65bd6c280df0494","width":128,"height":128,"clearFraction":0.5589599609375,"solidFraction":0.41839599609375},{"name":"sparkle_gold.svg","hash":"50e8ae3b016d0dbd60ae9b6b9c213310a33f338ffd39a700210436bd18bbb887","width":128,"height":128,"clearFraction":0.72198486328125,"solidFraction":0.2554931640625},{"name":"washi_pink.png","hash":"67d472011ab6ed8e0df6876308fe9dbceb03e210246ecb7e5b03b01c12d7b3cb","width":302,"height":179,"clearFraction":0.4642421103259462,"solidFraction":0.5185171482481779}]
+
+[2/160] [chromium] › tests\anniversary-assets.spec.ts:10:3 › anniversary assets and full card framing at 393px
+[chromium] › tests\anniversary-assets.spec.ts:10:3 › anniversary assets and full card framing at 393px
+M3 asset audit 393: [{"name":"cats_header.png","hash":"01c839801c4a78ce4c37433db0ee63e4a171fe3b19645c3b5756d37dde05e59a","width":1602,"height":884,"clearFraction":0.4186014653628666,"solidFraction":0},{"name":"bedroom_header.png","hash":"81a9a0f06760ac474e1865d8c88c52984eb547b298995c319bf23e1ab541cba6","width":1672,"height":941,"clearFraction":0,"solidFraction":1},{"name":"flower_pink.png","hash":"563d9fe84ad9482987dcad02852c3fa80326fb084f1a500cfb7a3c6231e6f5f5","width":139,"height":138,"clearFraction":0.4442185382129079,"solidFraction":0.528047127515379},{"name":"heart_pink_outline.svg","hash":"d85097dde592cff0ea27227bbbf7ecd3dc2d3f4d6e47b572cb38257b3aae0c16","width":128,"height":128,"clearFraction":0.7938232421875,"solidFraction":0.1390380859375},{"name":"star_cream.svg","hash":"c725117c9e0860cd89d4c6c205003cc60f8dbdf7dc236b55d65bd6c280df0494","width":128,"height":128,"clearFraction":0.5589599609375,"solidFraction":0.41839599609375},{"name":"sparkle_gold.svg","hash":"50e8ae3b016d0dbd60ae9b6b9c213310a33f338ffd39a700210436bd18bbb887","width":128,"height":128,"clearFraction":0.72198486328125,"solidFraction":0.2554931640625},{"name":"washi_pink.png","hash":"67d472011ab6ed8e0df6876308fe9dbceb03e210246ecb7e5b03b01c12d7b3cb","width":302,"height":179,"clearFraction":0.4642421103259462,"solidFraction":0.5185171482481779}]
+
+[3/160] [chromium] › tests\anniversary-assets.spec.ts:10:3 › anniversary assets and full card framing at 430px
+[chromium] › tests\anniversary-assets.spec.ts:10:3 › anniversary assets and full card framing at 430px
+M3 asset audit 430: [{"name":"cats_header.png","hash":"01c839801c4a78ce4c37433db0ee63e4a171fe3b19645c3b5756d37dde05e59a","width":1602,"height":884,"clearFraction":0.4186014653628666,"solidFraction":0},{"name":"bedroom_header.png","hash":"81a9a0f06760ac474e1865d8c88c52984eb547b298995c319bf23e1ab541cba6","width":1672,"height":941,"clearFraction":0,"solidFraction":1},{"name":"flower_pink.png","hash":"563d9fe84ad9482987dcad02852c3fa80326fb084f1a500cfb7a3c6231e6f5f5","width":139,"height":138,"clearFraction":0.4442185382129079,"solidFraction":0.528047127515379},{"name":"heart_pink_outline.svg","hash":"d85097dde592cff0ea27227bbbf7ecd3dc2d3f4d6e47b572cb38257b3aae0c16","width":128,"height":128,"clearFraction":0.7938232421875,"solidFraction":0.1390380859375},{"name":"star_cream.svg","hash":"c725117c9e0860cd89d4c6c205003cc60f8dbdf7dc236b55d65bd6c280df0494","width":128,"height":128,"clearFraction":0.5589599609375,"solidFraction":0.41839599609375},{"name":"sparkle_gold.svg","hash":"50e8ae3b016d0dbd60ae9b6b9c213310a33f338ffd39a700210436bd18bbb887","width":128,"height":128,"clearFraction":0.72198486328125,"solidFraction":0.2554931640625},{"name":"washi_pink.png","hash":"67d472011ab6ed8e0df6876308fe9dbceb03e210246ecb7e5b03b01c12d7b3cb","width":302,"height":179,"clearFraction":0.4642421103259462,"solidFraction":0.5185171482481779}]
+
+[4/160] [chromium] › tests\anniversary-assets.spec.ts:96:1 › anniversary asset gallery checks reference fit and transparent edges on light and dark backgrounds
+[5/160] [chromium] › tests\anniversary-dates.spec.ts:5:1 › 单次事件、今天、过去、跨年与真实天数
+[6/160] [chromium] › tests\anniversary-dates.spec.ts:12:1 › 年度事件下一次、今天、未来起始年和累计周年
+[7/160] [chromium] › tests\anniversary-dates.spec.ts:19:1 › 2月29日平年回落2月28日，闰年恢复，世纪闰年规则
+[8/160] [chromium] › tests\anniversary-dates.spec.ts:26:1 › 有效日期拒绝自动溢出的日期与非法格式
+[9/160] [chromium] › tests\anniversary-dates.spec.ts:32:3 › 本地日期、UTC跨日与夏令时：America/Los_Angeles
+[10/160] [chromium] › tests\anniversary-dates.spec.ts:32:3 › 本地日期、UTC跨日与夏令时：Pacific/Kiritimati
+[11/160] [chromium] › tests\anniversary-m5-metadata.spec.ts:6:1 › anniversary manifest SHA matches canonical git bytes and served resource bytes
+
+[chromium] › tests\anniversary-m5-metadata.spec.ts:6:1 › anniversary manifest SHA matches canonical git bytes and served resource bytes
+
+
+
+
+
+
+
+
+
+
+
+[12/160] [chromium] › tests\anniversary-migration.spec.ts:20:1 › v3→v4完整保留既有表字段、主键、自定义分类和所有索引
+[13/160] [chromium] › tests\anniversary-modal-guard.spec.ts:3:52 › anniversary save: busy close attempt cannot lock dialog after a failed write
+[14/160] [chromium] › tests\anniversary-modal-guard.spec.ts:3:52 › anniversary remove: busy close attempt cannot lock dialog after a failed write
+[15/160] [chromium] › tests\anniversary-storage.spec.ts:30:1 › 新增提交成功后刷新失败：明确已保存，刷新重试不会重复新增
+[16/160] [chromium] › tests\anniversary-storage.spec.ts:53:1 › 删除提交成功后刷新失败：明确已删除并提供只读重试
+[chromium] › tests\anniversary-storage.spec.ts:53:1 › 删除提交成功后刷新失败：明确已删除并提供只读重试
+Delete result with persisted count 0 已删除，但暂时无法刷新收藏。请重新读取，无需重复删除。
+
+[17/160] [chromium] › tests\anniversary-storage.spec.ts:71:1 › 写入真正失败保留草稿，重试保存仅产生一条记录
+[18/160] [chromium] › tests\anniversary-storage.spec.ts:89:1 › 同一事件循环连续提交时仅提交一次
+[19/160] [chromium] › tests\anniversary-storage.spec.ts:106:1 › 首次读取失败禁新增，切换模块后恢复并保留旧记录
+[20/160] [chromium] › tests\anniversary-visual.spec.ts:3:1 › four scrapbook categories fit at phone widths and remain scrollable
+[21/160] [chromium] › tests\anniversary.spec.ts:24:1 › 空状态、新增、全部字段编辑、刷新/模块切换保留、删除确认与数量
+[22/160] [chromium] › tests\anniversary.spec.ts:65:1 › 动态筛选、周标记、月视图与跨月选择
+[23/160] [chromium] › tests\anniversary.spec.ts:91:3 › 移动布局、缩短视口与真实截图 360
+[24/160] [chromium] › tests\anniversary.spec.ts:91:3 › 移动布局、缩短视口与真实截图 393
+[25/160] [chromium] › tests\anniversary.spec.ts:91:3 › 移动布局、缩短视口与真实截图 430
+[26/160] [chromium] › tests\anniversary.spec.ts:126:1 › 从v3升级保留待办与分类数据
+[27/160] [chromium] › tests\anniversary.spec.ts:151:1 › 插画缺失仍可显示，离线新增后重新进入仍保留
+[28/160] [chromium] › tests\anniversary.spec.ts:166:1 › 360×480编辑完整字段与六行月历操作可滚动使用
+[29/160] [chromium] › tests\audit-regressions.spec.ts:3:1 › valid local dates save in UTC+14 while impossible dates are rejected
+[30/160] [chromium] › tests\audit-regressions.spec.ts:20:1 › the saved current font can be retried after startup loading fails
+[31/160] [chromium] › tests\categories-time.spec.ts:27:1 › 默认分类与自定义分类新增/改名/筛选持久化，拒绝重名
+[32/160] [chromium] › tests\categories-time.spec.ts:41:1 › 删除自定义分类只移入生活，保留已完成任务和时间；旧撤销不复活已删分类
+[33/160] [chromium] › tests\categories-time.spec.ts:58:1 › 可选时间、跨日期编辑和分类筛选组合即时更新，未设时间不造默认值
+[34/160] [chromium] › tests\categories-time.spec.ts:78:1 › v2 旧任务迁移保留命名分类/完成/收藏，缺少时间不补值
+[35/160] [chromium] › tests\categories-time.spec.ts:97:61 › 奶油卡片、独立滚动及渐变触控 360x740
+[36/160] [chromium] › tests\categories-time.spec.ts:97:61 › 奶油卡片、独立滚动及渐变触控 393x852
+[37/160] [chromium] › tests\categories-time.spec.ts:97:61 › 奶油卡片、独立滚动及渐变触控 430x932
+INTERRUPTED: source scope changed to clarify outside-month rendering; intermediate run is not a passing result.

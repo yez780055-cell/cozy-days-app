@@ -1,0 +1,80 @@
+
+[WebServer] (node:26588) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 2 tests using 1 worker
+
+
+(node:25104) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+[1/2] [chromium] › tests\period-model.spec.ts:30:1 › historical insertion protects every interval intersecting the inclusive recent 90 days
+  1) [chromium] › tests\period-model.spec.ts:30:1 › historical insertion protects every interval intersecting the inclusive recent 90 days 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: "require-end"
+    Received: "ready"
+
+      31 |   const today='2026-10-23', boundary=addDays(today,-89), older=addDays(boundary,-1);
+      32 |   for(const record of [{id:'edge',start:boundary,end:boundary},{id:'cross',start:'2026-01-01',end:boundary},{id:'open',start:boundary}])
+    > 33 |     expect(planPeriodToggle([record],'2026-10-10',today,true,'new').kind).toBe('require-end');
+         |                                                                           ^
+      34 |   const old=[{id:'old',start:'2026-01-01',end:older}];
+      35 |   expect(planPeriodToggle(old,'2026-10-10',today,true,'new').kind).toBe('ready');
+      36 |   expect(planPeriodToggle([{id:'recent',start:boundary,end:boundary}],today,today,true,'new').kind).toBe('ready');
+        at D:\cozy-days-v022-verification\tests\period-model.spec.ts:33:75
+
+    Error Context: test-results\period-model-historical-in-e3656-he-inclusive-recent-90-days-chromium\error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\period-model-historical-in-e3656-he-inclusive-recent-90-days-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\period-model-historical-in-e3656-he-inclusive-recent-90-days-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+
+(node:11644) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+[2/2] [chromium] › tests\v022-period-logic.spec.ts:86:1 › crossing local midnight rejects truncation before any persistence call
+  2) [chromium] › tests\v022-period-logic.spec.ts:86:1 › crossing local midnight rejects truncation before any persistence call 
+
+    Error: expect(locator).toContainText(expected) failed
+
+    Locator: getByRole('dialog').getByRole('alert')
+    Expected substring: "日期已变化"
+    Timeout: 6000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toContainText" getByRole('dialog').getByRole('alert') with timeout 6000ms
+      - waiting for getByRole('dialog').getByRole('alert')
+
+
+      91 |   await page.evaluate(()=>{(window as unknown as {periodWrites:number}).periodWrites=0;const put=IDBObjectStore.prototype.put;IDBObjectStore.prototype.put=function(...args:Parameters<IDBObjectStore['put']>){if(this.transaction.db.name==='cozy-days-period')(window as unknown as {periodWrites:number}).periodWrites++;return put.apply(this,args);};});
+      92 |   await page.clock.runFor(120_000);await dialog.getByRole('button',{name:'确认取消标记'}).click();
+    > 93 |   await expect(dialog.getByRole('alert')).toContainText('日期已变化');
+         |                                           ^
+      94 |   expect(await page.evaluate(()=>(window as unknown as {periodWrites:number}).periodWrites)).toBe(0);
+      95 |   expect((await read(page)).periods).toEqual(data.periods);
+      96 | });
+        at D:\cozy-days-v022-verification\tests\v022-period-logic.spec.ts:93:43
+
+    Error Context: test-results\v022-period-logic-crossing-9afb6-before-any-persistence-call-chromium\error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\v022-period-logic-crossing-9afb6-before-any-persistence-call-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\v022-period-logic-crossing-9afb6-before-any-persistence-call-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+  2 failed
+    [chromium] › tests\period-model.spec.ts:30:1 › historical insertion protects every interval intersecting the inclusive recent 90 days 
+    [chromium] › tests\v022-period-logic.spec.ts:86:1 › crossing local midnight rejects truncation before any persistence call 

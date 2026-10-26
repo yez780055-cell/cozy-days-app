@@ -1,0 +1,22 @@
+[WebServer] (node:11436) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+
+Running 3 tests using 1 worker
+
+
+(node:21612) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+[1/3] [chromium] › tests\v022-interactions.spec.ts:82:1 › touch date gestures are scoped, click safe, and month dates clamp
+
+
+(node:30596) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[2/3] [chromium] › tests\v022-interactions.spec.ts:82:1 › touch date gestures are scoped, click safe, and month dates clamp
+(node:22956) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+[3/3] [chromium] › tests\v022-interactions.spec.ts:82:1 › touch date gestures are scoped, click safe, and month dates clamp
+  3 passed (31.7s)

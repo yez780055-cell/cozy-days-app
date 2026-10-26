@@ -1,0 +1,39 @@
+{
+  "sourceSHA": "bbeaa4cc608e0f0036a15143db65b28a8d74050a",
+  "clock": "2026-10-25T04:00:00Z",
+  "timezone": "Asia/Shanghai",
+  "synthetic": true,
+  "capturedAt": "2026-10-25T06:16:41.190Z",
+  "results": [
+    {
+      "width": 360,
+      "height": 740,
+      "path": "artifacts/v022-before/period-360x740-before.png",
+      "hash": "14a158fccc494824ba65d9c5473b64a5fae175b8965c41e0ac46122e22e31f3e",
+      "geometry": {
+        "clientHeight": 668,
+        "scrollHeight": 875
+      }
+    },
+    {
+      "width": 393,
+      "height": 852,
+      "path": "artifacts/v022-before/period-393x852-before.png",
+      "hash": "5693da5431505d3a4454beff41ef075a484d9e4626c934c199af97ecfd74e6e6",
+      "geometry": {
+        "clientHeight": 780,
+        "scrollHeight": 924
+      }
+    },
+    {
+      "width": 430,
+      "height": 932,
+      "path": "artifacts/v022-before/period-430x932-before.png",
+      "hash": "4f303672014c90cd9839a2fa729d71156106b7ef176c9c087dee2187eec2f9cd",
+      "geometry": {
+        "clientHeight": 860,
+        "scrollHeight": 924
+      }
+    }
+  ]
+}

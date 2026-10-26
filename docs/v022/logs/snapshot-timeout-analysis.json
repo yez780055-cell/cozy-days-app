@@ -1,0 +1,17 @@
+{
+  "failure": "Whole-test timeout during reload/load; no business assertion failed",
+  "wholeTestBudgetMs": 30000,
+  "test": "tests/swipe.spec.ts:98",
+  "reloadWaitMs": 11045.601,
+  "nextRun": "CLI --timeout=60000; same source, assertions, no retries",
+  "source": "afc908261f20646e2307c119dc32e9c02f5eecbc",
+  "preReloadMs": 19220.694,
+  "reloadEndedMs": 773515.415,
+  "cancelledLocalRequests": [
+    "/src/styles/motion.ts",
+    "/src/features/settings/SettingsPage.tsx",
+    "/src/styles/fontRegistry.ts"
+  ],
+  "reloadStartedMs": 762469.814,
+  "beforeHooksMs": 743249.12
+}

@@ -1,0 +1,13 @@
+{
+  "cachedPoint": {
+    "x": 575.15625,
+    "y": 459.2
+  },
+  "scrollTop": 101,
+  "calendar": {
+    "y": 135,
+    "bottom": 445
+  },
+  "target": "SECTION.period-card period-daily",
+  "calendarHit": false
+}

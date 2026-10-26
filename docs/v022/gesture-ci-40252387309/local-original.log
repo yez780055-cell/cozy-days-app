@@ -1,0 +1,12 @@
+[WebServer] (node:18576) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+
+Running 1 test using 1 worker
+
+(node:9784) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+[1/1] artifacts\v022-remote-gesture\diagnostic.spec.ts:72:1 › touch date gestures are scoped, click safe, and month dates clamp
+  1 passed (17.3s)

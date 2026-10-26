@@ -69,6 +69,16 @@ async function touchMultiSwipe(page: Page, x: number, y: number, dx: number) {
   await cdp.detach();
 }
 
+async function calendarTouchPoint(page: Page) {
+  // Vertical gestures may scroll the page; never reuse a previous viewport rect.
+  const calendar = await page.locator('.period-calendar').boundingBox();
+  expect(calendar).not.toBeNull();
+  const point = { x: calendar!.x + calendar!.width / 2, y: calendar!.y + calendar!.height * .72 };
+  expect(await page.evaluate(({ x, y }) =>
+    !!document.elementFromPoint(x, y)?.closest('.period-calendar'), point)).toBe(true);
+  return point;
+}
+
 test('touch date gestures are scoped, click safe, and month dates clamp', async ({ page }) => {
   await seedPeriod(page);
   await expect(page.locator('.date-browsing')).toBeVisible();
@@ -126,22 +136,24 @@ test('touch date gestures are scoped, click safe, and month dates clamp', async 
   await expect(page.locator('.period-calendar')).toBeVisible();
   const month = page.locator('.period-calendar h2'), selected = page.locator('.period-date.chosen');
   await page.getByRole('button', { name: /^2026-10-31/ }).click();
-  const calendar = await page.locator('.period-calendar').boundingBox();
-  expect(calendar).not.toBeNull();
-  await touchSwipe(page, calendar!.x + calendar!.width / 2, calendar!.y + calendar!.height * .72, -72);
+  let point = await calendarTouchPoint(page);
+  await touchSwipe(page, point.x, point.y, -72);
   await expect(month).toHaveText('2026年11月');
   await expect(selected).toHaveAttribute('aria-label', /^2026-11-30/);
   await expect(page.getByRole('dialog')).toHaveCount(0);
-  const monthBox = await page.locator('.period-calendar').boundingBox();
-  await touchSwipe(page, monthBox!.x + monthBox!.width / 2, monthBox!.y + monthBox!.height * .72, -30);
+  point = await calendarTouchPoint(page);
+  await touchSwipe(page, point.x, point.y, -30);
   await expect(month).toHaveText('2026年11月');
   await expect(selected).toHaveAttribute('aria-label', /^2026-11-30/);
-  await touchSwipe(page, monthBox!.x + monthBox!.width / 2, monthBox!.y + monthBox!.height * .72, 0, -75);
+  point = await calendarTouchPoint(page);
+  await touchSwipe(page, point.x, point.y, 0, -75);
   await expect(month).toHaveText('2026年11月');
-  await touchMultiSwipe(page, monthBox!.x + monthBox!.width / 2, monthBox!.y + monthBox!.height * .72, -72);
+  point = await calendarTouchPoint(page);
+  await touchMultiSwipe(page, point.x, point.y, -72);
   await expect(month).toHaveText('2026年11月');
 
-  await touchSwipe(page, monthBox!.x + monthBox!.width / 2, monthBox!.y + monthBox!.height * .72, 72);
+  point = await calendarTouchPoint(page);
+  await touchSwipe(page, point.x, point.y, 72);
   await expect(month).toHaveText('2026年10月');
   await expect(selected).toHaveAttribute('aria-label', /^2026-10-30/);
   await page.getByRole('button', { name: '下个月', exact: true }).click();

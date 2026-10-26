@@ -1,0 +1,200 @@
+[
+  {
+    "time": 12612,
+    "x": 665.7100219726562,
+    "y": 454,
+    "pointerType": "mouse",
+    "isPrimary": true,
+    "target": "SPAN.",
+    "calendarHit": true,
+    "aria": null,
+    "calendar": {
+      "x": 457.5,
+      "y": 236,
+      "width": 235.3125,
+      "height": 310,
+      "bottom": 546
+    },
+    "scrollTop": 0
+  },
+  {
+    "time": 12656,
+    "x": 575.15625,
+    "y": 459.20001220703125,
+    "pointerType": "touch",
+    "isPrimary": true,
+    "target": "SPAN.",
+    "calendarHit": true,
+    "aria": null,
+    "calendar": {
+      "x": 457.5,
+      "y": 236,
+      "width": 235.3125,
+      "height": 310,
+      "bottom": 546
+    },
+    "scrollTop": 0
+  },
+  {
+    "time": 12804,
+    "x": 575.15625,
+    "y": 459.20001220703125,
+    "pointerType": "touch",
+    "isPrimary": true,
+    "target": "SPAN.",
+    "calendarHit": true,
+    "aria": null,
+    "calendar": {
+      "x": 457.5,
+      "y": 236,
+      "width": 235.3125,
+      "height": 310,
+      "bottom": 546
+    },
+    "scrollTop": 0
+  },
+  {
+    "time": 12971,
+    "x": 575.15625,
+    "y": 459.20001220703125,
+    "pointerType": "touch",
+    "isPrimary": true,
+    "target": "SPAN.",
+    "calendarHit": true,
+    "aria": null,
+    "calendar": {
+      "x": 457.5,
+      "y": 236,
+      "width": 235.3125,
+      "height": 310,
+      "bottom": 546
+    },
+    "scrollTop": 0
+  },
+  {
+    "time": 13121,
+    "x": 575.15625,
+    "y": 459.20001220703125,
+    "pointerType": "touch",
+    "isPrimary": true,
+    "target": "P.period-selected",
+    "calendarHit": true,
+    "aria": null,
+    "calendar": {
+      "x": 457.5,
+      "y": 167,
+      "width": 235.3125,
+      "height": 310,
+      "bottom": 477
+    },
+    "scrollTop": 69
+  },
+  {
+    "time": 13122,
+    "x": 583.15625,
+    "y": 467.20001220703125,
+    "pointerType": "touch",
+    "isPrimary": false,
+    "target": "SECTION.period-card period-calendar",
+    "calendarHit": true,
+    "aria": "生理期日历",
+    "calendar": {
+      "x": 457.5,
+      "y": 167,
+      "width": 235.3125,
+      "height": 310,
+      "bottom": 477
+    },
+    "scrollTop": 69
+  },
+  {
+    "time": 13256,
+    "x": 575.15625,
+    "y": 459.20001220703125,
+    "pointerType": "touch",
+    "isPrimary": true,
+    "target": "P.period-selected",
+    "calendarHit": true,
+    "aria": null,
+    "calendar": {
+      "x": 457.5,
+      "y": 167,
+      "width": 235.3125,
+      "height": 310,
+      "bottom": 477
+    },
+    "scrollTop": 69
+  },
+  {
+    "time": 13410,
+    "x": 626.9500122070312,
+    "y": 199,
+    "pointerType": "mouse",
+    "isPrimary": true,
+    "target": "svg.[object SVGAnimatedString]",
+    "calendarHit": true,
+    "aria": null,
+    "calendar": {
+      "x": 457.5,
+      "y": 167,
+      "width": 235.3125,
+      "height": 310,
+      "bottom": 477
+    },
+    "scrollTop": 69
+  },
+  {
+    "time": 13460,
+    "x": 590.9500122070312,
+    "y": 199,
+    "pointerType": "mouse",
+    "isPrimary": true,
+    "target": "svg.[object SVGAnimatedString]",
+    "calendarHit": true,
+    "aria": null,
+    "calendar": {
+      "x": 457.5,
+      "y": 167,
+      "width": 235.3125,
+      "height": 310,
+      "bottom": 477
+    },
+    "scrollTop": 69
+  },
+  {
+    "time": 13509,
+    "x": 662.9500122070312,
+    "y": 199,
+    "pointerType": "mouse",
+    "isPrimary": true,
+    "target": "BUTTON.period-today",
+    "calendarHit": true,
+    "aria": null,
+    "calendar": {
+      "x": 457.5,
+      "y": 167,
+      "width": 235.3125,
+      "height": 310,
+      "bottom": 477
+    },
+    "scrollTop": 69
+  },
+  {
+    "time": 13540,
+    "x": 484.59375,
+    "y": 385,
+    "pointerType": "touch",
+    "isPrimary": true,
+    "target": "SPAN.",
+    "calendarHit": true,
+    "aria": null,
+    "calendar": {
+      "x": 457.5,
+      "y": 167,
+      "width": 235.3125,
+      "height": 310,
+      "bottom": 477
+    },
+    "scrollTop": 69
+  }
+]

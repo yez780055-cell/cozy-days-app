@@ -1,0 +1,54 @@
+
+[WebServer] (node:13924) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 7 tests using 1 worker
+
+
+(node:14432) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+[1/7] [chromium] › tests\v022-evidence.spec.ts:21:62 › matched baseline evidence 360x740
+[2/7] [chromium] › tests\v022-evidence.spec.ts:21:62 › matched baseline evidence 393x852
+[3/7] [chromium] › tests\v022-evidence.spec.ts:21:62 › matched baseline evidence 430x932
+[4/7] [chromium] › tests\v022-evidence.spec.ts:30:1 › empty summary plus top24 bottom24 safe area stays on one screen
+[5/7] [chromium] › tests\v022-evidence.spec.ts:39:31 › short screen 480 with 150 percent font scrolls safely
+[6/7] [chromium] › tests\v022-evidence.spec.ts:39:31 › short screen 640 with 150 percent font scrolls safely
+[7/7] [chromium] › tests\v022-evidence.spec.ts:48:1 › bands break at weeks and months, preserve palette and real status priority
+  1) [chromium] › tests\v022-evidence.spec.ts:48:1 › bands break at weeks and months, preserve palette and real status priority 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('.period-date.ovulation:not(.outside)').first()
+    Expected: visible
+    Timeout: 6000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" locator('.period-date.ovulation:not(.outside)').first() with timeout 6000ms
+      - waiting for locator('.period-date.ovulation:not(.outside)').first()
+
+
+      59 |   await page.getByRole('button',{name:'下个月',exact:true}).click();await settle(page);
+      60 |   for(const kind of ['predicted','fertile','ovulation']) {
+    > 61 |     const day=page.locator(`.period-date.${kind}:not(.outside)`).first();await expect(day).toBeVisible();
+         |                                                                                            ^
+      62 |     expect(await day.evaluate((el,k)=>getComputedStyle(el,k==='ovulation'?undefined:'::before').backgroundColor,kind)).toBe(await page.locator(`.period-legend i.${kind}`).evaluate(el=>getComputedStyle(el).backgroundColor));
+      63 |   }
+      64 |   await shot(page,'period-band-palette');
+        at D:\cozy-days-v022-verification\tests\v022-evidence.spec.ts:61:92
+
+    Error Context: test-results\v022-evidence-bands-break--598a4-te-and-real-status-priority-chromium\error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\v022-evidence-bands-break--598a4-te-and-real-status-priority-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\v022-evidence-bands-break--598a4-te-and-real-status-priority-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+  1 failed
+    [chromium] › tests\v022-evidence.spec.ts:48:1 › bands break at weeks and months, preserve palette and real status priority 
+  6 passed (24.6s)

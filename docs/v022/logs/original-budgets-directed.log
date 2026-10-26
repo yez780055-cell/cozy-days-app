@@ -1,0 +1,13 @@
+
+[WebServer] (node:11988) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 2 tests using 1 worker
+
+(node:31668) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+[1/2] [chromium] › tests\swipe.spec.ts:98:1 › 完整快照撤销保留 ID/分类/日期/时间/收藏/贴纸与原始排序
+[2/2] [chromium] › tests\todo.spec.ts:102:1 › 两种手机尺寸：长列表滚动、导航与截图
+  2 passed (17.3s)

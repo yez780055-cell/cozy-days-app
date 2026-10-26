@@ -1,0 +1,364 @@
+{
+  "version": "0.2.2",
+  "actualTestSourceCommit": "afc908261f20646e2307c119dc32e9c02f5eecbc",
+  "integrationEquivalentSourceCommit": "eda099dfc92d913562581bbc5a6b4e3138162ed2",
+  "equivalence": {
+    "blobManifestSHA256": "adf7c2dbb04fe717e333e79df83336029ee557b318f3a8c84b670c5b0314e2a4",
+    "exitCode": 0,
+    "blobManifest": "source-blobs.txt",
+    "note": "Cherry-pick equivalent source; tests actually ran on actualTestSourceCommit, not on the integration SHA.",
+    "method": "git diff --exit-code actual equivalent -- src tests package.json package-lock.json",
+    "blobManifestHashCanonicalization": "UTF-8 with LF newlines; stable across Windows and Linux checkouts"
+  },
+  "capturedBy": "Playwright Chromium; fresh isolated contexts; synthetic IndexedDB only",
+  "packagedAt": "2026-10-26T00:59:32.6952371Z",
+  "matchedComparisonFixture": {
+    "periods": [
+      {
+        "start": "2026-09-20",
+        "end": "2026-09-25"
+      },
+      {
+        "start": "2026-10-20"
+      }
+    ],
+    "visualWait": "Yozai font-face loaded, document.fonts.ready, all images decoded",
+    "settings": {
+      "cycleLength": 30,
+      "periodLength": 6
+    },
+    "timezone": "Asia/Shanghai",
+    "clock": "2026-10-25T04:00:00Z",
+    "todayDiary": {
+      "flow": "适中",
+      "mood": "平静",
+      "symptoms": [
+        "疲惫"
+      ]
+    }
+  },
+  "before": {
+    "source": "before-source.json",
+    "threeHashesVerified": true,
+    "sourceCommit": "bbeaa4cc608e0f0036a15143db65b28a8d74050a"
+  },
+  "afterGeometry": [
+    {
+      "viewport": {
+        "width": 360,
+        "height": 740
+      },
+      "fixture": {
+        "periods": [
+          {
+            "id": "sep",
+            "start": "2026-09-20",
+            "end": "2026-09-25"
+          },
+          {
+            "id": "oct",
+            "start": "2026-10-20"
+          }
+        ],
+        "days": {
+          "2026-10-25": {
+            "date": "2026-10-25",
+            "flow": "适中",
+            "symptoms": [
+              "疲惫"
+            ],
+            "mood": "平静"
+          }
+        },
+        "settings": {
+          "cycleLength": 30,
+          "periodLength": 6
+        }
+      },
+      "clock": "2026-10-25T04:00:00Z",
+      "timezone": "Asia/Shanghai",
+      "geometry": {
+        "clientHeight": 668,
+        "scrollHeight": 668
+      }
+    },
+    {
+      "viewport": {
+        "width": 393,
+        "height": 852
+      },
+      "fixture": {
+        "periods": [
+          {
+            "id": "sep",
+            "start": "2026-09-20",
+            "end": "2026-09-25"
+          },
+          {
+            "id": "oct",
+            "start": "2026-10-20"
+          }
+        ],
+        "days": {
+          "2026-10-25": {
+            "date": "2026-10-25",
+            "flow": "适中",
+            "symptoms": [
+              "疲惫"
+            ],
+            "mood": "平静"
+          }
+        },
+        "settings": {
+          "cycleLength": 30,
+          "periodLength": 6
+        }
+      },
+      "clock": "2026-10-25T04:00:00Z",
+      "timezone": "Asia/Shanghai",
+      "geometry": {
+        "clientHeight": 780,
+        "scrollHeight": 780
+      }
+    },
+    {
+      "viewport": {
+        "width": 430,
+        "height": 932
+      },
+      "fixture": {
+        "periods": [
+          {
+            "id": "sep",
+            "start": "2026-09-20",
+            "end": "2026-09-25"
+          },
+          {
+            "id": "oct",
+            "start": "2026-10-20"
+          }
+        ],
+        "days": {
+          "2026-10-25": {
+            "date": "2026-10-25",
+            "flow": "适中",
+            "symptoms": [
+              "疲惫"
+            ],
+            "mood": "平静"
+          }
+        },
+        "settings": {
+          "cycleLength": 30,
+          "periodLength": 6
+        }
+      },
+      "clock": "2026-10-25T04:00:00Z",
+      "timezone": "Asia/Shanghai",
+      "geometry": {
+        "clientHeight": 860,
+        "scrollHeight": 860
+      }
+    }
+  ],
+  "status": "PASS_WITH_RETRY",
+  "checks": {
+    "pages": {
+      "failed": 0,
+      "passed": 4,
+      "log": "docs/v022/logs/pages.log"
+    },
+    "firstCompleteRun": {
+      "failed": 4,
+      "passed": 156,
+      "log": "docs/v022/logs/full-e2e-first-complete-failed.log",
+      "allFourProductFailuresRepaired": true,
+      "sourceCommit": "7fc573b3052e4b4d94676063a225be3885966880"
+    },
+    "complete30SecondBudgetRun": {
+      "timing": "docs/v022/logs/snapshot-timeout-analysis.json",
+      "expectBudgetMs": 6000,
+      "retries": 0,
+      "passed": 159,
+      "failure": "Snapshot original30s total budget: reload began after19.221s and waited11.046s",
+      "command": "npm run test:e2e -- --output=artifacts/v022-final-complete-e2e --reporter=line",
+      "failed": 1,
+      "log": "docs/v022/logs/full-e2e-30s-timeout.log",
+      "sourceCommit": "afc908261f20646e2307c119dc32e9c02f5eecbc"
+    },
+    "build": {
+      "log": "docs/v022/logs/build.log",
+      "result": "PASS"
+    },
+    "originalCardGestureAfterGridRepair": {
+      "baselineOriginalPassed": 1,
+      "readOnlyProbePassed": 3,
+      "originalUnchangedTestPassed": 3,
+      "baselineIndependentPort": 5297
+    },
+    "coverage": {
+      "assertionsAndSourceUnchanged": true,
+      "uniqueTestsWithPassingEvidenceAcrossTwoCompleteRuns": 160,
+      "singleCompleteRunAllGreen": false,
+      "note": "PASS_WITH_RETRY: two complete159/160 runs failed on different load-time total-budget cases; both original cases passed their original budgets in the directed run."
+    },
+    "originalBudgetDirected": {
+      "failed": 0,
+      "log": "docs/v022/logs/original-budgets-directed.log",
+      "snapshotBudgetMs": 30000,
+      "passed": 2,
+      "mobileExplicitBudgetMs": 60000,
+      "command": "npx playwright test tests/swipe.spec.ts tests/todo.spec.ts --grep \"完整快照撤销|两种手机尺寸\" --output=artifacts/v022-original-budgets-directed --reporter=line",
+      "sourceCommit": "afc908261f20646e2307c119dc32e9c02f5eecbc"
+    },
+    "complete60SecondBudgetRun": {
+      "timing": "docs/v022/logs/todo-mobile-timeout-analysis.json",
+      "expectBudgetMs": 6000,
+      "retries": 0,
+      "passed": 159,
+      "failure": "Original mobile test explicitly sets60000ms; final goto began after52.359s and waited8.309s",
+      "command": "npm run test:e2e -- --timeout=60000 --output=artifacts/v022-final-complete-e2e-60s --reporter=line",
+      "failed": 1,
+      "log": "docs/v022/logs/full-e2e-60s-mobile-timeout.log",
+      "sourceCommit": "afc908261f20646e2307c119dc32e9c02f5eecbc"
+    },
+    "buildPages": {
+      "log": "docs/v022/logs/build-pages.log",
+      "result": "PASS"
+    }
+  },
+  "artifacts": [
+    {
+      "sha256": "ba85fcb1a330f80a63ea425c6bdb6e2961308cc415bf9e981fce0b01d9d44c6c",
+      "fixture": "see matchedComparisonFixture; empty/palette/short-screen variants are named",
+      "sourceCommit": "afc908261f20646e2307c119dc32e9c02f5eecbc",
+      "path": "evidence/period-360x480-font150-bottom.png",
+      "status": "accepted Playwright capture"
+    },
+    {
+      "sha256": "ed603dbd5592f17ba039bdc1e5fa3fdd2a3a14475b0dd5f7c0a894b5b303efce",
+      "fixture": "see matchedComparisonFixture; empty/palette/short-screen variants are named",
+      "sourceCommit": "afc908261f20646e2307c119dc32e9c02f5eecbc",
+      "path": "evidence/period-360x480-font150-top.png",
+      "status": "accepted Playwright capture"
+    },
+    {
+      "sha256": "e161f9cd9e702fb17307311d27b04c18a9376110e3ca50855094c58f356f013a",
+      "fixture": "see matchedComparisonFixture; empty/palette/short-screen variants are named",
+      "sourceCommit": "afc908261f20646e2307c119dc32e9c02f5eecbc",
+      "path": "evidence/period-360x480-normal.png",
+      "status": "accepted Playwright capture"
+    },
+    {
+      "sha256": "3c8a073f53c195b285bafc3856e32a5a8e9dafa88af234e80e14d49df4a7c65e",
+      "fixture": "see matchedComparisonFixture; empty/palette/short-screen variants are named",
+      "sourceCommit": "afc908261f20646e2307c119dc32e9c02f5eecbc",
+      "path": "evidence/period-360x640-font150-bottom.png",
+      "status": "accepted Playwright capture"
+    },
+    {
+      "sha256": "d5afa25b15511e0d7a742abb292f9137917a014bb374897e7411b6ca931bc99e",
+      "fixture": "see matchedComparisonFixture; empty/palette/short-screen variants are named",
+      "sourceCommit": "afc908261f20646e2307c119dc32e9c02f5eecbc",
+      "path": "evidence/period-360x640-font150-top.png",
+      "status": "accepted Playwright capture"
+    },
+    {
+      "sha256": "f3a98113fc06b760222af4e572f19654c57ab2e320100a97080412dd54bf9375",
+      "fixture": "see matchedComparisonFixture; empty/palette/short-screen variants are named",
+      "sourceCommit": "afc908261f20646e2307c119dc32e9c02f5eecbc",
+      "path": "evidence/period-360x640-normal.png",
+      "status": "accepted Playwright capture"
+    },
+    {
+      "sha256": "5dbeb41912135d638d100b6236ca727dcea0ee816e0bb875bc34e1539a15cca6",
+      "fixture": "see matchedComparisonFixture; empty/palette/short-screen variants are named",
+      "sourceCommit": "afc908261f20646e2307c119dc32e9c02f5eecbc",
+      "path": "evidence/period-360x740-after.png",
+      "status": "accepted Playwright capture"
+    },
+    {
+      "sha256": "14a158fccc494824ba65d9c5473b64a5fae175b8965c41e0ac46122e22e31f3e",
+      "fixture": "see matchedComparisonFixture; empty/palette/short-screen variants are named",
+      "sourceCommit": "bbeaa4cc608e0f0036a15143db65b28a8d74050a",
+      "path": "evidence/period-360x740-before.png",
+      "status": "accepted Playwright capture"
+    },
+    {
+      "sha256": "df37788a9337c3e7f2a58452d1561f25b210ab2dbf082a348f7c19865989d851",
+      "fixture": "see matchedComparisonFixture; empty/palette/short-screen variants are named",
+      "sourceCommit": "afc908261f20646e2307c119dc32e9c02f5eecbc",
+      "path": "evidence/period-360x740-empty-safe24.png",
+      "status": "accepted Playwright capture"
+    },
+    {
+      "sha256": "7aef6dae2336338bb94aee6d6e5be31c489ca2267a3a10f524dbf53f8f770f40",
+      "fixture": "independent May six-week fixture; not a comparison image",
+      "sourceCommit": "afc908261f20646e2307c119dc32e9c02f5eecbc",
+      "path": "evidence/period-360x740-safe24-fit-check.png",
+      "status": "accepted Playwright capture"
+    },
+    {
+      "sha256": "4f217b367692350ddd594b8b8da6651f9e82611b429f2711ba280cf90b106c53",
+      "fixture": "see matchedComparisonFixture; empty/palette/short-screen variants are named",
+      "sourceCommit": "afc908261f20646e2307c119dc32e9c02f5eecbc",
+      "path": "evidence/period-393x852-after.png",
+      "status": "accepted Playwright capture"
+    },
+    {
+      "sha256": "5693da5431505d3a4454beff41ef075a484d9e4626c934c199af97ecfd74e6e6",
+      "fixture": "see matchedComparisonFixture; empty/palette/short-screen variants are named",
+      "sourceCommit": "bbeaa4cc608e0f0036a15143db65b28a8d74050a",
+      "path": "evidence/period-393x852-before.png",
+      "status": "accepted Playwright capture"
+    },
+    {
+      "sha256": "dd170822e597dab4a5bf2dfd06b5de9e4214a6aef782adef31398d0e8d2f7ff7",
+      "fixture": "see matchedComparisonFixture; empty/palette/short-screen variants are named",
+      "sourceCommit": "afc908261f20646e2307c119dc32e9c02f5eecbc",
+      "path": "evidence/period-430x932-after.png",
+      "status": "accepted Playwright capture"
+    },
+    {
+      "sha256": "4f303672014c90cd9839a2fa729d71156106b7ef176c9c087dee2187eec2f9cd",
+      "fixture": "see matchedComparisonFixture; empty/palette/short-screen variants are named",
+      "sourceCommit": "bbeaa4cc608e0f0036a15143db65b28a8d74050a",
+      "path": "evidence/period-430x932-before.png",
+      "status": "accepted Playwright capture"
+    },
+    {
+      "sha256": "8bfcbd2b8717455dfa786b3a0096283b7e99e5c54fb75bd1f867b42b79033910",
+      "fixture": "see matchedComparisonFixture; empty/palette/short-screen variants are named",
+      "sourceCommit": "afc908261f20646e2307c119dc32e9c02f5eecbc",
+      "path": "evidence/period-band-crossmonth.png",
+      "status": "accepted Playwright capture"
+    },
+    {
+      "sha256": "412c45e3f78f60310a49c6b7c0e2abb2dbd198a99c1eb137f3393584524f96bf",
+      "fixture": "see matchedComparisonFixture; empty/palette/short-screen variants are named",
+      "sourceCommit": "afc908261f20646e2307c119dc32e9c02f5eecbc",
+      "path": "evidence/period-band-palette.png",
+      "status": "accepted Playwright capture"
+    },
+    {
+      "sha256": "a59c9ba714f34f08bcbed01462a43102fdb7df0eae6b30ec5761a303821c1a91",
+      "fixture": "see matchedComparisonFixture; empty/palette/short-screen variants are named",
+      "sourceCommit": null,
+      "path": "failures/period-360x480-font150-bottom.png",
+      "status": "preserved failing intermediate working tree before intrinsic layout repair"
+    },
+    {
+      "sha256": "20484ba280061a9c3be9f91d000abbed12e325abcf54e5a5d24e506c9fc43c23",
+      "fixture": "see matchedComparisonFixture; empty/palette/short-screen variants are named",
+      "sourceCommit": null,
+      "path": "failures/period-360x480-font150-top.png",
+      "status": "preserved failing intermediate working tree before intrinsic layout repair"
+    }
+  ],
+  "limitations": [
+    "Local complete runs each had one load-time total-budget timeout; no single complete run is claimed green.",
+    "Independent remote Linux regression is pending and handled by the parent agent.",
+    "Android native keyboard and safe areas not tested on a physical device.",
+    "No remote PR or Cloudflare deployment was performed by this verification agent."
+  ]
+}

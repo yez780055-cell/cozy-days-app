@@ -1,0 +1,25 @@
+
+[WebServer] (node:15368) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 14 tests using 1 worker
+
+(node:19080) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[1/14] [chromium] › tests\period-model.spec.ts:5:1 › toggle derives truth from intervals, truncates only periods, and keeps adjacent segments separate
+[2/14] [chromium] › tests\period-model.spec.ts:20:1 › historical insertion requires an explicit valid end before every later period
+[3/14] [chromium] › tests\period-model.spec.ts:30:1 › historical insertion protects every interval intersecting the inclusive recent 90 days
+[4/14] [chromium] › tests\period-model.spec.ts:39:1 › date-only arithmetic handles leap years, month boundaries and DST days
+[5/14] [chromium] › tests\period-model.spec.ts:54:1 › statistics use complete history, distinguish settings, and do not invent missed cycles
+[6/14] [chromium] › tests\period-model.spec.ts:68:1 › validation rejects overlap, invalid and future records; allows adjacent and self edits
+[7/14] [chromium] › tests\period-model.spec.ts:77:1 › statistics limit observations to latest six intervals and completed durations
+[8/14] [chromium] › tests\v022-period-logic.spec.ts:28:1 › today toggle persists intervals, hides flow, retains diary and unknown fields
+[9/14] [chromium] › tests\v022-period-logic.spec.ts:40:1 › historical removal confirms exact suffix, cancellation does not mutate, future is locked
+[10/14] [chromium] › tests\v022-period-logic.spec.ts:49:1 › historical insertion with later record immediately requires bounded end and protects later record
+[11/14] [chromium] › tests\v022-period-logic.spec.ts:58:1 › historical insertion without later record covers selected through today
+[12/14] [chromium] › tests\v022-period-logic.spec.ts:64:1 › failed toggle save keeps latest state and retry persists it without touching daily records
+[13/14] [chromium] › tests\v022-period-logic.spec.ts:78:1 › legacy unknown fields survive period editor, settings and daily edits
+[14/14] [chromium] › tests\v022-period-logic.spec.ts:87:1 › crossing local midnight rejects truncation before any persistence call
+  14 passed (11.0s)

@@ -1,0 +1,91 @@
+
+[WebServer] (node:15416) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 2 tests using 1 worker
+
+(node:13548) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+[1/2] [chromium] › tests\v022-evidence.spec.ts:39:31 › short screen 480 with 150 percent font scrolls safely
+  1) [chromium] › tests\v022-evidence.spec.ts:39:31 › short screen 480 with 150 percent font scrolls safely 
+
+    Error: expect(locator).toBeInViewport() failed
+
+    Locator:  locator('.period-storage')
+    Expected: in viewport
+    Received: viewport ratio 0.9934895634651184
+    Timeout:  6000ms
+
+    Call log:
+      - Expect "toBeInViewport" locator('.period-storage') with timeout 6000ms
+      - waiting for locator('.period-storage')
+        16 × locator resolved to <p role="status" class="period-storage">♡ 记录仅保存在这台设备 · 清除站点数据会丢失记录</p>
+           - unexpected value "viewport ratio 0.9934895634651184"
+
+
+      50 |   expect(await page.evaluate(()=>document.body.scrollWidth)).toBe(360);
+      51 |   await page.locator('.period-page').evaluate(el=>el.scrollTop=el.scrollHeight);
+    > 52 |   await expect(page.locator('.period-storage')).toBeInViewport({ratio:1});
+         |                                                 ^
+      53 |   await shot(page,`period-360x${height}-font150-bottom`);await page.locator('.period-page').evaluate(el=>el.scrollTop=0);await shot(page,`period-360x${height}-font150-top`);
+      54 | });
+      55 | for(const width of [393,900])test(`today and chosen backgrounds stay connected at width ${width}`,async({page})=>{
+        at D:\cozy-days-v022-verification\tests\v022-evidence.spec.ts:52:49
+
+    Error Context: test-results\v022-evidence-short-screen-533d9-percent-font-scrolls-safely-chromium\error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\v022-evidence-short-screen-533d9-percent-font-scrolls-safely-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\v022-evidence-short-screen-533d9-percent-font-scrolls-safely-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+
+(node:25016) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+[2/2] [chromium] › tests\v022-evidence.spec.ts:39:31 › short screen 640 with 150 percent font scrolls safely
+  2) [chromium] › tests\v022-evidence.spec.ts:39:31 › short screen 640 with 150 percent font scrolls safely 
+
+    Error: expect(locator).toBeInViewport() failed
+
+    Locator:  locator('.period-storage')
+    Expected: in viewport
+    Received: viewport ratio 0.9934895634651184
+    Timeout:  6000ms
+
+    Call log:
+      - Expect "toBeInViewport" locator('.period-storage') with timeout 6000ms
+      - waiting for locator('.period-storage')
+        16 × locator resolved to <p role="status" class="period-storage">♡ 记录仅保存在这台设备 · 清除站点数据会丢失记录</p>
+           - unexpected value "viewport ratio 0.9934895634651184"
+
+
+      50 |   expect(await page.evaluate(()=>document.body.scrollWidth)).toBe(360);
+      51 |   await page.locator('.period-page').evaluate(el=>el.scrollTop=el.scrollHeight);
+    > 52 |   await expect(page.locator('.period-storage')).toBeInViewport({ratio:1});
+         |                                                 ^
+      53 |   await shot(page,`period-360x${height}-font150-bottom`);await page.locator('.period-page').evaluate(el=>el.scrollTop=0);await shot(page,`period-360x${height}-font150-top`);
+      54 | });
+      55 | for(const width of [393,900])test(`today and chosen backgrounds stay connected at width ${width}`,async({page})=>{
+        at D:\cozy-days-v022-verification\tests\v022-evidence.spec.ts:52:49
+
+    Error Context: test-results\v022-evidence-short-screen-da76a-percent-font-scrolls-safely-chromium\error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\v022-evidence-short-screen-da76a-percent-font-scrolls-safely-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\v022-evidence-short-screen-da76a-percent-font-scrolls-safely-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+  2 failed
+    [chromium] › tests\v022-evidence.spec.ts:39:31 › short screen 480 with 150 percent font scrolls safely 
+    [chromium] › tests\v022-evidence.spec.ts:39:31 › short screen 640 with 150 percent font scrolls safely 

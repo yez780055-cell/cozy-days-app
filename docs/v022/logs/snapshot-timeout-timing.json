@@ -1,0 +1,56 @@
+[
+  {
+    "callId": "oktr@19426",
+    "startTime": 761706.007,
+    "title": "Expect \"toHaveCount\"",
+    "subtitle": "locator('.undo-toast')"
+  },
+  {
+    "callId": "oktr@19428",
+    "startTime": 761731.898,
+    "title": "Expect \"toBeVisible\"",
+    "subtitle": "getByTestId('todo-card').filter({ has: getByRole('button', { name: '编辑：中间要保留所有字段', exact: true }) })"
+  },
+  {
+    "callId": "oktr@19432",
+    "startTime": 761741.21,
+    "title": "Expect \"toEqual\"",
+    "subtitle": null
+  },
+  {
+    "callId": "oktr@19435",
+    "startTime": 761754.331,
+    "title": "Expect \"toEqual\"",
+    "subtitle": null
+  },
+  {
+    "callId": "oktr@19436",
+    "startTime": 761754.628,
+    "title": "Click",
+    "subtitle": "getByRole('button', { name: '更多操作：中间要保留所有字段', exact: true })"
+  },
+  {
+    "callId": "oktr@19438",
+    "startTime": 761771.999,
+    "title": "Click",
+    "subtitle": "getByRole('button', { name: '完成：中间要保留所有字段', exact: true })"
+  },
+  {
+    "callId": "oktr@19440",
+    "startTime": 762139.042,
+    "title": "Expect \"not toBeVisible\"",
+    "subtitle": "getByRole('dialog', { name: '这件小事' })"
+  },
+  {
+    "callId": "oktr@19442",
+    "startTime": 762142.473,
+    "title": "Expect \"toBeVisible\"",
+    "subtitle": "getByRole('button', { name: '已完成 1', exact: true })"
+  },
+  {
+    "callId": "oktr@19444",
+    "startTime": 762469.814,
+    "title": "Reload",
+    "subtitle": null
+  }
+]

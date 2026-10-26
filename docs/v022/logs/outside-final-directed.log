@@ -1,0 +1,20 @@
+
+[WebServer] (node:9424) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 9 tests using 1 worker
+
+
+(node:26824) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+[1/9] [chromium] › tests\v022-evidence.spec.ts:21:62 › matched baseline evidence 360x740
+[2/9] [chromium] › tests\v022-evidence.spec.ts:21:62 › matched baseline evidence 393x852
+[3/9] [chromium] › tests\v022-evidence.spec.ts:21:62 › matched baseline evidence 430x932
+[4/9] [chromium] › tests\v022-evidence.spec.ts:30:1 › empty summary plus top24 bottom24 safe area stays on one screen
+[5/9] [chromium] › tests\v022-evidence.spec.ts:39:31 › short screen 480 with 150 percent font scrolls safely
+[6/9] [chromium] › tests\v022-evidence.spec.ts:39:31 › short screen 640 with 150 percent font scrolls safely
+[7/9] [chromium] › tests\v022-evidence.spec.ts:49:30 › today and chosen backgrounds stay connected at width 393
+[8/9] [chromium] › tests\v022-evidence.spec.ts:49:30 › today and chosen backgrounds stay connected at width 900
+[9/9] [chromium] › tests\v022-evidence.spec.ts:54:1 › bands break at weeks and months, preserve palette and real status priority
+  9 passed (25.1s)

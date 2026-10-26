@@ -1,0 +1,37 @@
+{
+  "topProcessCPU": [
+    {
+      "Name": "pwsh#2",
+      "IDProcess": 26348,
+      "PercentProcessorTime": 80
+    },
+    {
+      "Name": "WmiPrvSE#2",
+      "IDProcess": 27000,
+      "PercentProcessorTime": 34
+    },
+    {
+      "Name": "svchost#9",
+      "IDProcess": 2168,
+      "PercentProcessorTime": 15
+    },
+    {
+      "Name": "ChatGPT#2",
+      "IDProcess": 3948,
+      "PercentProcessorTime": 3
+    },
+    {
+      "Name": "AggregatorHost",
+      "IDProcess": 7980,
+      "PercentProcessorTime": 0
+    }
+  ],
+  "playwrightBrowserRootsAfterSuite": 0,
+  "observedAt": "2026-10-26T08:57:41.3605538+08:00",
+  "freeMemoryMB": 3474.0,
+  "note": "No task browser roots remain after completed suite; unrelated Codex runtime processes were not changed.",
+  "totalMemoryMB": 16123.0,
+  "cpuLoadPercent": [
+    0
+  ]
+}

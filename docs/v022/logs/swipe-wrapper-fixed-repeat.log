@@ -1,0 +1,25 @@
+
+[WebServer] (node:30020) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 6 tests using 1 worker
+
+(node:11752) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+[1/6] [chromium] › tests\swipe.spec.ts:128:1 › 快速连续操作支持独立撤销，同一任务删除后撤销不重复创建
+[2/6] [chromium] › tests\v022-swipe-diagnostic.spec.ts:29:1 › 快速连续操作支持独立撤销，同一任务删除后撤销不重复创建
+
+(node:30004) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+[3/6] [chromium] › tests\swipe.spec.ts:128:1 › 快速连续操作支持独立撤销，同一任务删除后撤销不重复创建
+[4/6] [chromium] › tests\v022-swipe-diagnostic.spec.ts:29:1 › 快速连续操作支持独立撤销，同一任务删除后撤销不重复创建
+(node:3368) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+[5/6] [chromium] › tests\swipe.spec.ts:128:1 › 快速连续操作支持独立撤销，同一任务删除后撤销不重复创建
+[6/6] [chromium] › tests\v022-swipe-diagnostic.spec.ts:29:1 › 快速连续操作支持独立撤销，同一任务删除后撤销不重复创建
+  6 passed (45.8s)

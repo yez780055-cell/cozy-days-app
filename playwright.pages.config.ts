@@ -3,7 +3,7 @@ import { defineConfig, devices } from '@playwright/test';
 const remoteURL = process.env.PAGES_URL;
 export default defineConfig({
   testDir: './tests',
-  testMatch: 'pages.spec.ts',
+  testMatch: ['pages.spec.ts', 'pwa.spec.ts'],
   workers: 1,
   timeout: 60_000,
   expect: { timeout: 10_000 },

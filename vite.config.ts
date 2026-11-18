@@ -2,6 +2,7 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { pwaBuild } from './scripts/pwa-build';
 
 function reviewBuildInfo() {
   let outDir = resolve(process.cwd(), 'dist');
@@ -29,7 +30,7 @@ function reviewBuildInfo() {
 }
 
 export default defineConfig({
-  plugins: [react(), reviewBuildInfo()],
+  plugins: [react(), reviewBuildInfo(), pwaBuild()],
   server: { host: '0.0.0.0' },
 });
 

@@ -12,7 +12,13 @@ npm run dev
 npm run build
 ```
 
-开发地址为 `http://localhost:5173/`。在开发模式打开 `/?preview=1` 可查看独立的组件演示。Web 正式版部署在 [GitHub Pages](https://yez780055-cell.github.io/cozy-days-app/)，PR 使用独立域名预览。已打开的页面可以离线记录，Web 版重新打开页面仍依赖站点可达。
+开发地址为 `http://localhost:5173/`。在开发模式打开 `/?preview=1` 可查看独立的组件演示。Web 正式版部署在 [GitHub Pages](https://yez780055-cell.github.io/cozy-days-app/)，PR 使用独立域名预览。
+
+## 安装与离线
+
+在线打开正式站点后，使用浏览器的安装菜单。桌面 Chrome 和 Edge 可安装为独立窗口，Android Chrome 可安装到主屏幕，iPhone Safari 可通过分享菜单添加到主屏幕。
+
+首次在线加载并缓存应用后，可以断网重新打开并读写本地记录。自定义字体按需缓存，离线时尚未缓存的字体会使用系统字体。新版本在线下载完成后，关闭此站点的所有应用窗口或浏览器标签页，再打开即可使用新版本。版本切换只清理旧版应用资源缓存，现有 IndexedDB 记录会保留。
 
 ## 数据备份与恢复
 
@@ -33,6 +39,7 @@ npm run build
 npx playwright install chromium
 npx playwright test tests/data-safety.spec.ts
 npm run build:pages
+npm run test:pages -- tests/pwa.spec.ts
 npm run test:pages
 ```
 

@@ -1,6 +1,9 @@
-import { ArrowLeft, Check, Type } from 'lucide-react';
+import { useState } from 'react';
+import { ArrowLeft, Check, ChevronRight, DatabaseBackup, Type } from 'lucide-react';
 import type { FontId } from '../../styles/fontRegistry';
 import { fontRegistry, getFontOption } from '../../styles/fontRegistry';
+
+import { BackupPage } from './BackupPage';
 
 export function SettingsPage({ fontId, pendingFontId, onSelect, onBack }: {
   fontId: FontId;
@@ -8,13 +11,18 @@ export function SettingsPage({ fontId, pendingFontId, onSelect, onBack }: {
   onSelect: (id: FontId) => void;
   onBack: () => void;
 }) {
+  const [showBackup, setShowBackup] = useState(false);
   const selected = getFontOption(fontId);
+  if (showBackup) return <BackupPage onBack={() => setShowBackup(false)}/>;
   return <section className="settings-page" aria-label="应用设置">
     <header className="settings-header">
       <button type="button" className="settings-back icon-button" aria-label="返回上一页" onClick={onBack}><ArrowLeft size={19}/></button>
       <span className="settings-icon"><Type size={20}/></span>
       <div><span className="eyebrow">MAKE IT YOURS</span><h1>字体设置</h1></div>
     </header>
+    <button type="button" className="backup-entry" onClick={() => setShowBackup(true)}>
+      <DatabaseBackup size={20}/><span>数据备份与恢复</span><ChevronRight size={18}/>
+    </button>
     <p className="settings-intro">选一种喜欢的字，让每个小日子都更像你。</p>
     <section className="font-preview-card" aria-label="当前字体预览">
       <span>实时预览 · {selected.name}</span>

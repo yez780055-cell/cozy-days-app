@@ -1,3 +1,4 @@
+import { localId } from '../../data/localId';
 import { useState, type FormEvent } from 'react';
 import { Pencil, Trash2, Plus } from 'lucide-react';
 import { usePeriodDraft, recoveryNotice } from './recovery';
@@ -5,7 +6,7 @@ import { Modal } from '../../components/Modal';
 import { cycleStats, shortDate, sortedPeriods, validatePeriod, type CycleSettings, type PeriodData, type PeriodEntry } from './model';
 
 export function PeriodEditor({ entry, data, today, selected, onSave, onClose }: {entry?:PeriodEntry;data:PeriodData;today:string;selected:string;onSave:(entry:PeriodEntry)=>Promise<boolean>;onClose:()=>void}) {
-  const [draft,setDraft]=usePeriodDraft('editor-'+(entry?.id??'new'),()=>({id:entry?.id??crypto.randomUUID(),start:entry?.start??(selected>today?today:selected),end:entry?.end??''}));
+  const [draft,setDraft]=usePeriodDraft('editor-'+(entry?.id??'new'),()=>({id:entry?.id??localId(),start:entry?.start??(selected>today?today:selected),end:entry?.end??''}));
   const {start,end}=draft;
   const setStart=(start:string)=>setDraft({...draft,start});
   const setEnd=(end:string)=>setDraft({...draft,end});

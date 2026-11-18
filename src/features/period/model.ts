@@ -55,3 +55,13 @@ export function dateStatus(date: string, data: PeriodData, today: string) {
   if (stats.ovulation && date >= addDays(stats.ovulation,-5) && date <= addDays(stats.ovulation,1)) return 'fertile';
   return '';
 }
+
+export function validPeriodData(value: unknown): value is PeriodData {
+  if (!value || typeof value !== 'object') return false;
+  const d = value as PeriodData;
+  const date = (s: unknown) => typeof s === 'string' && Number.isFinite(dayNumber(s));
+  return Array.isArray(d.periods) && Array.from(d.periods).every(p => p && typeof p.id === 'string' && !!p.id && date(p.start) && (p.end === undefined || (date(p.end) && p.end >= p.start)))
+    && new Set(d.periods.map(p => p.id)).size === d.periods.length
+    && !!d.days && typeof d.days === 'object' && !Array.isArray(d.days) && Object.entries(d.days).every(([key, e]) => date(key) && e && e.date === key && Array.isArray(e.symptoms) && Array.from(e.symptoms).every(s => typeof s === 'string') && (e.flow === undefined || typeof e.flow === 'string') && (e.mood === undefined || typeof e.mood === 'string'))
+    && !!d.settings && Number.isInteger(d.settings.cycleLength) && d.settings.cycleLength >= 15 && d.settings.cycleLength <= 90 && Number.isInteger(d.settings.periodLength) && d.settings.periodLength >= 1 && d.settings.periodLength <= Math.min(15, d.settings.cycleLength);
+}

@@ -1,8 +1,9 @@
+import { localId } from '../../data/localId';
 import { useState } from 'react';
 const key = 'cozy-days-period-recovery-v1';
 const prefix = key + '-document-';
 type Recovery = { pending?: {data:unknown;base:string}; drafts?: Record<string, unknown>; stamp?: number; conflicts?: unknown[]; owner?:string; tab?:string };
-const owner=crypto.randomUUID(), localKey=prefix+owner;
+const owner=localId(), localKey=prefix+owner;
 let kind: 'local'|'session'|'memory' = 'memory';
 function parse(raw:string|null):Recovery|undefined {
   try { const value=raw?JSON.parse(raw):undefined;return value&&typeof value==='object'&&!Array.isArray(value)&&Number.isSafeInteger(value.stamp)&&value.stamp>=0?value:undefined; } catch { return undefined; }
@@ -22,7 +23,7 @@ let memory:Recovery=candidates[0]?.value??{};
 kind=candidates[0]?.kind??'memory';
 // Each document owns its local slot. Reloads and duplicate tabs never overwrite
 // another document's pending snapshot; per-tab session state selects continuity.
-memory={...memory,owner,tab:session?.tab??crypto.randomUUID()};
+memory={...memory,owner,tab:session?.tab??localId()};
 export function persistRecovery() {
   memory.stamp = Math.max(Date.now(), (memory.stamp ?? 0) + 1);
   kind='memory';
@@ -55,6 +56,8 @@ export function usePeriodDraft<T extends object>(name: string, initial: () => T,
     const fallback=initial(), stored=memory.drafts?.[name];
     const valid=stored && typeof stored==='object' && !Array.isArray(stored) && (validate?validate(stored):!Object.entries(fallback).some(([key,value])=>typeof (stored as Record<string,unknown>)[key]!==typeof value));
     const result=valid?stored as T:fallback;
+    // Opening an untouched view should not create a persistent document slot.
+    if (!valid && Object.keys(result).length === 0) return result;
     memory.drafts={...(memory.drafts && typeof memory.drafts==='object'?memory.drafts:{}),[name]:result};
     persistRecovery();
     return result;

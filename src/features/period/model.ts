@@ -27,11 +27,11 @@ export function monthGrid(month: string) {
   return Array.from({ length: Math.ceil((offset + count) / 7) * 7 }, (_, i) => dateKey(first - offset + i));
 }
 export const sortedPeriods = (entries: PeriodEntry[]) => [...entries].sort((a,b) => a.start.localeCompare(b.start));
-export function validatePeriod(entry: PeriodEntry, entries: PeriodEntry[], today: string): string | undefined {
+export function validatePeriod(entry: PeriodEntry, entries: PeriodEntry[], maxDate?: string): string | undefined {
   if (!Number.isFinite(dayNumber(entry.start)) || (entry.end && !Number.isFinite(dayNumber(entry.end)))) return '请填写有效日期。';
-  if (entry.start > today || (entry.end && entry.end > today)) return '真实经期不能记录未来日期。';
+  if (maxDate && (entry.start > maxDate || (entry.end && entry.end > maxDate))) return '真实经期不能记录未来日期。';
   if (entry.end && entry.end < entry.start) return '结束日期不能早于开始日期。';
-  if (entries.some(p => p.id !== entry.id && entry.start <= (p.end || today) && (entry.end || today) >= p.start)) return '这段日期与已有经期重叠，请修改原记录。';
+  if (entries.some(p => p.id !== entry.id && (!p.end || entry.start <= p.end) && (!entry.end || entry.end >= p.start))) return '这段日期与已有经期重叠，请修改原记录。';
 }
 const average = (values: number[], fallback: number) => values.length ? Math.round(values.reduce((a,b) => a+b,0)/values.length) : fallback;
 export function cycleStats(data: PeriodData, today: string) {
@@ -47,7 +47,7 @@ export function cycleStats(data: PeriodData, today: string) {
     next, remaining: next ? daysBetween(today,next) : undefined, ovulation: next ? addDays(next,-14) : undefined };
 }
 export function dateStatus(date: string, data: PeriodData, today: string) {
-  if (data.periods.some(p => date >= p.start && date <= (p.end || today))) return 'actual';
+  if (data.periods.some(p => date >= p.start && (p.end ? date <= p.end : date <= today || date === p.start))) return 'actual';
   const stats = cycleStats(data,today);
   if (!stats.next || date < today) return '';
   if (date >= stats.next && date < addDays(stats.next,stats.periodLength)) return 'predicted';

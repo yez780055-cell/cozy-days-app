@@ -1,4 +1,4 @@
-import { validDate, themes, colors, type Anniversary } from '../features/anniversary/model';
+import { validDate, themes, colors, timingModes, type Anniversary } from '../features/anniversary/model';
 import { createSeed, decorationIdentity, resolveDecoration, reviseDecoration } from '../features/todo/decorations';
 import { CategoryError, canonicalTime, categoryKey, cleanCategoryName, type Category } from './categories';
 import { categoryFor, database, fallbackCategory, type Todo } from './localDatabase';
@@ -9,7 +9,8 @@ export const anniversaryRepository = {
   all: () => withDataAccess(() => database.anniversaries.orderBy('createdAt').toArray()),
   save: (value: Anniversary) => withDataAccess(() => database.transaction('rw', database.anniversaries, async () => {
     const name = value.name.trim();
-    if (!name || name.length > 60 || !validDate(value.date) || !themes.includes(value.theme) || !colors.includes(value.color)) {
+    if (!name || name.length > 60 || !validDate(value.date) || !themes.includes(value.theme) || !colors.includes(value.color) ||
+        (value.timingMode !== undefined && !timingModes.includes(value.timingMode))) {
       throw new Error('请填写名称和有效日期。');
     }
     const current = value.id === undefined ? undefined : await database.anniversaries.get(value.id);

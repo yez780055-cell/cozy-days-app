@@ -1,0 +1,28 @@
+
+[WebServer] (node:30240) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 17 tests using 1 worker
+
+(node:26712) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+[1/17] [chromium] › tests\v022-evidence.spec.ts:21:62 › matched baseline evidence 360x740
+[2/17] [chromium] › tests\v022-evidence.spec.ts:21:62 › matched baseline evidence 393x852
+[3/17] [chromium] › tests\v022-evidence.spec.ts:21:62 › matched baseline evidence 430x932
+[4/17] [chromium] › tests\v022-evidence.spec.ts:30:1 › empty summary plus top24 bottom24 safe area stays on one screen
+[5/17] [chromium] › tests\v022-evidence.spec.ts:39:31 › short screen 480 with 150 percent font scrolls safely
+[6/17] [chromium] › tests\v022-evidence.spec.ts:39:31 › short screen 640 with 150 percent font scrolls safely
+[7/17] [chromium] › tests\v022-evidence.spec.ts:53:30 › today and chosen backgrounds stay connected at width 393
+[8/17] [chromium] › tests\v022-evidence.spec.ts:53:30 › today and chosen backgrounds stay connected at width 900
+[9/17] [chromium] › tests\v022-evidence.spec.ts:58:1 › bands break at weeks and months, preserve palette and real status priority
+[10/17] [chromium] › tests\v022-interactions.spec.ts:72:1 › touch date gestures are scoped, click safe, and month dates clamp
+[11/17] [chromium] › tests\v022-interactions.spec.ts:156:3 › period controls fit 360x740
+[12/17] [chromium] › tests\v022-interactions.spec.ts:156:3 › period controls fit 393x852
+[13/17] [chromium] › tests\v022-interactions.spec.ts:156:3 › period controls fit 430x932
+[14/17] [chromium] › tests\v022-interactions.spec.ts:197:1 › six week calendar and 24px safe inset budget remain usable
+[15/17] [chromium] › tests\v022-interactions.spec.ts:223:3 › empty cycle summary stays inside its card at 360x740
+[16/17] [chromium] › tests\v022-interactions.spec.ts:223:3 › empty cycle summary stays inside its card at 393x852
+[17/17] [chromium] › tests\v022-interactions.spec.ts:223:3 › empty cycle summary stays inside its card at 430x932
+  17 passed (50.7s)

@@ -1,0 +1,750 @@
+[
+  {
+    "path": "public/review/anniversary-assets/index.html",
+    "sha256": "a28a4723b0fa40afe8b7e65e1bf6cb56f0c2f71198bf09d8dbd414f69ca37d9e"
+  },
+  {
+    "path": "public/review/anniversary-assets/reference.png",
+    "sha256": "a3ededfd945b608f6c3534282359964563d5baf799ef9c4a62ee2d180aa3209b"
+  },
+  {
+    "path": "public/review/anniversary/delete-393.png",
+    "sha256": "586c4ff334c5274d1015bc78a9e8f2edcce5e7afba526b88e855f2ccdb533c06"
+  },
+  {
+    "path": "public/review/anniversary/editor-393.png",
+    "sha256": "2b7b4ed6e8054bf6c65c39e1190550394f0795f8a08fcd9e4ce317a70c20080d"
+  },
+  {
+    "path": "public/review/anniversary/empty-360.png",
+    "sha256": "371278088d069fd7b3f16e125fe40da96f2ea573e826e0d6d325fc2776f34419"
+  },
+  {
+    "path": "public/review/anniversary/empty-393.png",
+    "sha256": "53201c63609a08ac5a312ee3247455cc1c3e376ee9f1b020e6b9fdab4ac58de2"
+  },
+  {
+    "path": "public/review/anniversary/empty-430.png",
+    "sha256": "722d98e52915b41bde52fe99409912b0646efd1b497d20492421940407ea8e1a"
+  },
+  {
+    "path": "public/review/anniversary/index.html",
+    "sha256": "1db375deb3c5cbd335199f92860a2b6e11012b82b531ac42022c283d10be1ce5"
+  },
+  {
+    "path": "public/review/anniversary/list-360.png",
+    "sha256": "52c9f10b6acd15c48041275f4a8f2f2d821ce73149429eace6f97226f9af6155"
+  },
+  {
+    "path": "public/review/anniversary/list-393.png",
+    "sha256": "2a8e5126ea47c1b6d1df38199a33c0b320f041818c24c02e0245e30ad75ca8ff"
+  },
+  {
+    "path": "public/review/anniversary/list-430.png",
+    "sha256": "7f6156306741a18c7d64e402a955e58f75673818430e28ab5f65955168b8e15b"
+  },
+  {
+    "path": "public/review/anniversary/month-360.png",
+    "sha256": "1c16bec77ce1b6c727ce38429e2d8e1930c22ab6641774a5141f8cb1b3b861a1"
+  },
+  {
+    "path": "public/review/anniversary/month-393.png",
+    "sha256": "633f16f8095b1aba62fc78bf0b9f6b06dff73715ff48814a110816a500cbe69f"
+  },
+  {
+    "path": "public/review/anniversary/month-430.png",
+    "sha256": "6e6f4a2c9ac415f7db2183ed7dbb05d0c7bd4444bc653d1834a8994066df13f3"
+  },
+  {
+    "path": "public/review/anniversary/source.json",
+    "sha256": "de9654292286a085dc30221f63e1b14368b160b13bdf55993a545623ce06eb8d"
+  },
+  {
+    "path": "public/review/evidence/illustrations/asset-audit.json",
+    "sha256": "305b9635446bd190360e75f7a561fd45b23771e8d0b5fa1e76edab0a2691a1f4"
+  },
+  {
+    "path": "public/review/evidence/illustrations/before-after.png",
+    "sha256": "693254a73d2cee6403f719af66b5c5cf388fed20c5a806e16dae3cff4bbd9746"
+  },
+  {
+    "path": "public/review/evidence/illustrations/books-bubble-after.png",
+    "sha256": "009726937676e55be84b722e089c5c5cb653aaa2f4f258cf65496553d0e14053"
+  },
+  {
+    "path": "public/review/evidence/illustrations/books-bubble-before.png",
+    "sha256": "009726937676e55be84b722e089c5c5cb653aaa2f4f258cf65496553d0e14053"
+  },
+  {
+    "path": "public/review/evidence/illustrations/cheer-after.png",
+    "sha256": "a2c3119ddaf09f4936e79a4b5b5db55bf809f9a0d09e06fb8e9483e2e82ba2d0"
+  },
+  {
+    "path": "public/review/evidence/illustrations/cheer-before.png",
+    "sha256": "5672ae31f6659e809e72bde8c653f8661090261c282a6a2c0c6302cd139f0342"
+  },
+  {
+    "path": "public/review/evidence/illustrations/peeking-cat-after.png",
+    "sha256": "ca8dc6a3f80e92bd8727a10e00437d61083dee6bea49ed6263c5684110d7119c"
+  },
+  {
+    "path": "public/review/evidence/illustrations/peeking-cat-before.png",
+    "sha256": "5229c0906bc56462ca20debb3004bb426975efe6ea38eaeb6760a63a1fe047e5"
+  },
+  {
+    "path": "public/review/evidence/illustrations/plant-after.png",
+    "sha256": "6e2e2cd3b1ed10f1e23d36026973f4d428218dd667b620cdda4d91e7d168b916"
+  },
+  {
+    "path": "public/review/evidence/illustrations/plant-before.png",
+    "sha256": "6e2e2cd3b1ed10f1e23d36026973f4d428218dd667b620cdda4d91e7d168b916"
+  },
+  {
+    "path": "public/review/evidence/illustrations/three-viewports.png",
+    "sha256": "d2e7533ca51cf28fe69d9e75d1cc01a231114badf5097c4ddc2c6bdee1a5ada8"
+  },
+  {
+    "path": "public/review/evidence/illustrations/verification.json",
+    "sha256": "c36b76719830f6fd948118624e385368757101244d73e09b5d1e23f69768ae6f"
+  },
+  {
+    "path": "public/review/evidence/reference/original-design.png",
+    "sha256": "bf2eb322ccaa2736222770bcfeb4ca1d34da4bb8b2f0aa11d623be729da86b51"
+  },
+  {
+    "path": "public/review/evidence/screenshots/360x740.png",
+    "sha256": "9728a3375d883032db9b1fa70bdac0ada2bb60b86ff7f7c89d28635866bfe930"
+  },
+  {
+    "path": "public/review/evidence/screenshots/393x852.png",
+    "sha256": "758f1e8fca61ab3f1934f651e311291466c361e4be799a810de80c88cccc035c"
+  },
+  {
+    "path": "public/review/evidence/screenshots/430x932.png",
+    "sha256": "964ff612f11c5b0560517074e3d3acb7664acb81dc022469315396c5e1786126"
+  },
+  {
+    "path": "public/review/evidence/screenshots/category-360x740.png",
+    "sha256": "12d0ad469b73e3282d0e6003b7ebd2427954807e50b62fc343776775b7aafc7f"
+  },
+  {
+    "path": "public/review/evidence/screenshots/category-393x852.png",
+    "sha256": "34a88f907af314276b6cdcfbb9eddf9f816b3f9ecf6691c3c66cd82339bc06b3"
+  },
+  {
+    "path": "public/review/evidence/screenshots/category-430x932.png",
+    "sha256": "4614237a2b526c61b6d20051d94497dab74f4088dbb431a4548f3cb3ed806cd9"
+  },
+  {
+    "path": "public/review/evidence/screenshots/completed-360x740.png",
+    "sha256": "a1a7e89c67c64b0d06314e7c5bf50267c0510b6bbb4c4b28c6e4ecfc51e3a751"
+  },
+  {
+    "path": "public/review/evidence/screenshots/completed-393x852.png",
+    "sha256": "d7f4379580d83c2c656751180c2d82db71899c39510a5c13ea88d62e08625c9b"
+  },
+  {
+    "path": "public/review/evidence/screenshots/completed-430x932.png",
+    "sha256": "9b24b3b293787f488850f2a1f4f6e32eafccf46a8dad2eceb25941532bfd3629"
+  },
+  {
+    "path": "public/review/evidence/screenshots/date-360x740.png",
+    "sha256": "22ec8cacf04243ea410459679d024b6726a328917c9478a7ef987057aee1af23"
+  },
+  {
+    "path": "public/review/evidence/screenshots/date-393x852.png",
+    "sha256": "f30d35e54cd10bbaf50aec61f02eb513ed3f6147ff15beefe70335186791e16f"
+  },
+  {
+    "path": "public/review/evidence/screenshots/date-430x932.png",
+    "sha256": "953fe257ef1b39d827e51761787f67daec8a2dd290e0bb1121fe5dad1765907a"
+  },
+  {
+    "path": "public/review/evidence/screenshots/empty-360x740.png",
+    "sha256": "47f3c259ad663f3da7f562094af7c61c1d3f1e9fa4fef68cc2683b70ebf35d31"
+  },
+  {
+    "path": "public/review/evidence/screenshots/empty-393x852.png",
+    "sha256": "dce3bd94a9e9d402cd485e25408de4dfd911f7e268e412787534df14e0f7d1d5"
+  },
+  {
+    "path": "public/review/evidence/screenshots/empty-430x932.png",
+    "sha256": "4916bb4fa2f64061a17bd00aebe6a7e6d6042fb1e3093f82443e2b2ac613e0b3"
+  },
+  {
+    "path": "public/review/evidence/screenshots/illustrations-360x740.png",
+    "sha256": "96f3f83d8013308f6e91361e31a724a58d0f910fe94c3db37bd26076e329e6c5"
+  },
+  {
+    "path": "public/review/evidence/screenshots/illustrations-393x852.png",
+    "sha256": "6a823c77c4669c4fc6526981f8d4b2ca56c2dd8c118fdbf7a40b63bfd7c757cd"
+  },
+  {
+    "path": "public/review/evidence/screenshots/illustrations-430x932.png",
+    "sha256": "fbde2017a0a89b9f472ddff6e7c5034e89f002ebb0f4048d3c79389be626f5d8"
+  },
+  {
+    "path": "public/review/evidence/screenshots/illustrations-empty-360x740.png",
+    "sha256": "5ff9bfb6c033ea6f4f851600b1c73dea6fec4f97df8e0b48c689032c47b19185"
+  },
+  {
+    "path": "public/review/evidence/screenshots/illustrations-empty-393x852.png",
+    "sha256": "dce3bd94a9e9d402cd485e25408de4dfd911f7e268e412787534df14e0f7d1d5"
+  },
+  {
+    "path": "public/review/evidence/screenshots/illustrations-empty-430x932.png",
+    "sha256": "4916bb4fa2f64061a17bd00aebe6a7e6d6042fb1e3093f82443e2b2ac613e0b3"
+  },
+  {
+    "path": "public/review/evidence/screenshots/illustrations-safe-area-360x740.png",
+    "sha256": "d745847b57ac241b707af1df5dbc458ee39bcc065a0a447f4b31689218f299cb"
+  },
+  {
+    "path": "public/review/evidence/screenshots/illustrations-safe-area-393x852.png",
+    "sha256": "7ca87a7c45a332b024cde9d35dd111f19048cbde59d35a829c22b0491e441e78"
+  },
+  {
+    "path": "public/review/evidence/screenshots/illustrations-safe-area-430x932.png",
+    "sha256": "733136aab2902a1541612f1fb9ea6d123a581f6afb8944aa6f648b8afb766ac8"
+  },
+  {
+    "path": "public/review/evidence/screenshots/illustrations-scrolled-360x740.png",
+    "sha256": "d7e1a3f5cf86adc91e45979b4cb81de3e10bef29f83e18f8019aed6a614122fc"
+  },
+  {
+    "path": "public/review/evidence/screenshots/illustrations-scrolled-393x852.png",
+    "sha256": "a70bd319f436ab4800b56e9f95627271a92ce456d02a97a6383d6efa6d72f4a3"
+  },
+  {
+    "path": "public/review/evidence/screenshots/illustrations-scrolled-430x932.png",
+    "sha256": "b16de0e9dbeb17f3079f1c14511a8eda6a9643f7b350747252bacf9b38cb7a2f"
+  },
+  {
+    "path": "public/review/evidence/screenshots/illustrations-undo-360x740.png",
+    "sha256": "526a099e651d58746c6eb782003a2c98187245be428f08f613d037fdac8294fd"
+  },
+  {
+    "path": "public/review/evidence/screenshots/illustrations-undo-393x852.png",
+    "sha256": "b3d447db0518396509dd862f39d5c5f8f9b6837efa7c6e748a37fc6738a960ec"
+  },
+  {
+    "path": "public/review/evidence/screenshots/illustrations-undo-430x932.png",
+    "sha256": "515a1559a88fcb6a9005bde86d0279a0b8ae7dd94127b07ed4e86d58584075ef"
+  },
+  {
+    "path": "public/review/evidence/screenshots/time-360x740.png",
+    "sha256": "97b013ec2ea9efb04dfd971e3db9cd66f4fb11484d13c67ff2285f7e876d16cd"
+  },
+  {
+    "path": "public/review/evidence/screenshots/time-393x852.png",
+    "sha256": "f2a2760ffa428a788670d62ab32577bfcabff42a9d07a4979c3237915e009eeb"
+  },
+  {
+    "path": "public/review/evidence/screenshots/time-430x932.png",
+    "sha256": "a5eb272fc4db1380fb9d820d06fa6a32499035fed0ad877269e3f040cda40039"
+  },
+  {
+    "path": "public/review/evidence/screenshots/undo-360x740.png",
+    "sha256": "a2790c4da6ffcc9c7a121b8fc3acf8bfdb7fd6bbd4a476cefc999288c5d1267e"
+  },
+  {
+    "path": "public/review/evidence/screenshots/undo-393x852.png",
+    "sha256": "60c4f9cbc7839d593d97534cd6784dc1a56f1a6c6fa855ff7a34dde250a67c60"
+  },
+  {
+    "path": "public/review/evidence/screenshots/undo-430x932.png",
+    "sha256": "47ae8fcb30d7521788ac10af1d201b4a8220f43177878d5ba3d53ce4c551d739"
+  },
+  {
+    "path": "public/review/evidence/source.json",
+    "sha256": "09e85ff074f829a2960b21634b6fd3311fd2867c6380e962232d8a3473a82586"
+  },
+  {
+    "path": "public/review/evidence/videos/360x740.webm",
+    "sha256": "e5853d689aba15cfd5513250b8bc7bb5659593fd696b0e74a848003bb4d42c74"
+  },
+  {
+    "path": "public/review/evidence/videos/393x852.webm",
+    "sha256": "477fd9bba624ec100392d1f595784040217dec8a32b75a9541044491d1548fae"
+  },
+  {
+    "path": "public/review/evidence/videos/430x932.webm",
+    "sha256": "d8d2392003b2a28bfecf90500c3369ed1d472be9a59d764f4ea178cd174e469d"
+  },
+  {
+    "path": "public/review/index.html",
+    "sha256": "925524e4e4372d6af50285726b97e6b690589e9091a0d509887c651b16e19ac2"
+  },
+  {
+    "path": "public/review/m5-modal-guard/anniversary-360x740.png",
+    "sha256": "a3bcc782503ae3e5fd38183e2b3638bc50809d3b35eb2884bbee7ccefd3ecaea"
+  },
+  {
+    "path": "public/review/m5-modal-guard/anniversary-393x852.png",
+    "sha256": "5ab176d163f45a594c541dcd88dbc1a1d7e82750ac905d7a57adbaf2a97e8227"
+  },
+  {
+    "path": "public/review/m5-modal-guard/anniversary-430x932.png",
+    "sha256": "c07c9ae53c7648159dac32979e37a9288da964e4ee04260b0842e12fd9079c43"
+  },
+  {
+    "path": "public/review/m5-modal-guard/anniversary-card-360x740.png",
+    "sha256": "6d979599e176fe5153dcf023f09cc51ecd202672de5db608864a86fe6f4ae45b"
+  },
+  {
+    "path": "public/review/m5-modal-guard/anniversary-card-393x852.png",
+    "sha256": "5ab176d163f45a594c541dcd88dbc1a1d7e82750ac905d7a57adbaf2a97e8227"
+  },
+  {
+    "path": "public/review/m5-modal-guard/anniversary-card-430x932.png",
+    "sha256": "c07c9ae53c7648159dac32979e37a9288da964e4ee04260b0842e12fd9079c43"
+  },
+  {
+    "path": "public/review/m5-modal-guard/first-missing-baseline-360x740.png",
+    "sha256": "e2bd7e2c2e330f9ec97816f0ab0b030eec5e3689b99885c225511521b5f6bc69"
+  },
+  {
+    "path": "public/review/m5-modal-guard/first-missing-candidate-360x740.png",
+    "sha256": "dc028b00120df8576d480903b3c597b486f9bccbf3904dfb9dad931bcc67e333"
+  },
+  {
+    "path": "public/review/m5-modal-guard/geometry-assets-diagnostic.json",
+    "sha256": "ee2a948b3b31b931c80cb85d57cfd9506c4ddd496720d0f254d69385b88d7b99"
+  },
+  {
+    "path": "public/review/m5-modal-guard/historical-09-source.json",
+    "sha256": "6a40ff506fe73b71459dd57aee75a85a9c30ec420823ce8650c560bd79f376b9"
+  },
+  {
+    "path": "public/review/m5-modal-guard/index.html",
+    "sha256": "4e6800899f68c30b2d3885ac46a66a9d86cbae6896793c2ecead5309a172892e"
+  },
+  {
+    "path": "public/review/m5-modal-guard/period-diary-360x740.png",
+    "sha256": "be5d3af2e3dab04aa53638370e917225fdfebf619177cafe4f2e4e8a053aff1f"
+  },
+  {
+    "path": "public/review/m5-modal-guard/period-diary-393x852.png",
+    "sha256": "7467107139ab280434f59fb05bc61817e99bb2c8e3e4c5e485aded7f9242d58c"
+  },
+  {
+    "path": "public/review/m5-modal-guard/period-diary-430x932.png",
+    "sha256": "2e8e91129a6448b1be269a63840b1e1fc59a34074a7f1116c533bb8845532cdc"
+  },
+  {
+    "path": "public/review/m5-modal-guard/period-header-360x740.png",
+    "sha256": "4674746e8caea722327a86c432d6f7e655e371012aba0cbbccba0508638b0278"
+  },
+  {
+    "path": "public/review/m5-modal-guard/period-header-393x852.png",
+    "sha256": "8d6e24d5a96b2656e096becb779d61bf4bfd7059a96b87a5828bc4176a4b0937"
+  },
+  {
+    "path": "public/review/m5-modal-guard/period-header-430x932.png",
+    "sha256": "204ffb12882293681986157fcef21a11ecc620225ae43b5e22f7b811f3df48c7"
+  },
+  {
+    "path": "public/review/m5-modal-guard/pixel-diagnostic.json",
+    "sha256": "ff23424dcd044157e577d6dc5b62a18b2da5b13e2a93431e6d0fcab8ef3dba42"
+  },
+  {
+    "path": "public/review/m5-modal-guard/remove-failure.png",
+    "sha256": "2c23fcad2a0c6ad51c6b53a152eda815ba4a64feab4db04e32f8bf2fdd87b1bb"
+  },
+  {
+    "path": "public/review/m5-modal-guard/save-failure.png",
+    "sha256": "6a50c4bb001b8e31918ce7d8e9e588f819c9a3b397fad0da395ae4cdf25315f9"
+  },
+  {
+    "path": "public/review/m5-modal-guard/source.json",
+    "sha256": "6eae367a0ba47dc76b9447365de5916d0f9a36e50db4cec07f2f3da0f9b39f62"
+  },
+  {
+    "path": "public/review/m5-modal-guard/todo-baseline-360x740.png",
+    "sha256": "dc31435ac7fe64e291f4236bfcf00fcb7c477486da7cc6be4896f07dbb1ed1d4"
+  },
+  {
+    "path": "public/review/m5-modal-guard/todo-baseline-393x852.png",
+    "sha256": "7a558ff573124d1bb7f749a2f67404bb29ea38417aa123f28f3edf069fa70209"
+  },
+  {
+    "path": "public/review/m5-modal-guard/todo-baseline-430x932.png",
+    "sha256": "ba9384d25dcd2ed4cde68d0c73fde79bd3aa2eafde3c08ae7933756638107219"
+  },
+  {
+    "path": "public/review/m5-modal-guard/todo-candidate-360x740.png",
+    "sha256": "dc028b00120df8576d480903b3c597b486f9bccbf3904dfb9dad931bcc67e333"
+  },
+  {
+    "path": "public/review/m5-modal-guard/todo-candidate-393x852.png",
+    "sha256": "d242acb1bf1fb2c5cc24b61b3c590e8c1a91e56081146f78be2a49dbe6565f99"
+  },
+  {
+    "path": "public/review/m5-modal-guard/todo-candidate-430x932.png",
+    "sha256": "ba9384d25dcd2ed4cde68d0c73fde79bd3aa2eafde3c08ae7933756638107219"
+  },
+  {
+    "path": "public/review/m5-modal-guard/todo-diff-360x740.png",
+    "sha256": "c368eb924efca4fc184d8b204439d99adbbb5df40106afa619f0b7fcf15284a4"
+  },
+  {
+    "path": "public/review/m5-modal-guard/todo-diff-393x852.png",
+    "sha256": "fc9b587c374964bbac46cb13698a15a9776f81633bd1cf9d0d4b942c6d64dd38"
+  },
+  {
+    "path": "public/review/m5-modal-guard/todo-diff-430x932.png",
+    "sha256": "61b093d35fd7d8e828003427d67dae4e93d4347ca0b7439917c07bdb772b2445"
+  },
+  {
+    "path": "public/review/m5/anniversary-360x740.png",
+    "sha256": "a3bcc782503ae3e5fd38183e2b3638bc50809d3b35eb2884bbee7ccefd3ecaea"
+  },
+  {
+    "path": "public/review/m5/anniversary-393x852.png",
+    "sha256": "5ab176d163f45a594c541dcd88dbc1a1d7e82750ac905d7a57adbaf2a97e8227"
+  },
+  {
+    "path": "public/review/m5/anniversary-430x932.png",
+    "sha256": "c07c9ae53c7648159dac32979e37a9288da964e4ee04260b0842e12fd9079c43"
+  },
+  {
+    "path": "public/review/m5/anniversary-card-360x740.png",
+    "sha256": "6d979599e176fe5153dcf023f09cc51ecd202672de5db608864a86fe6f4ae45b"
+  },
+  {
+    "path": "public/review/m5/anniversary-card-393x852.png",
+    "sha256": "5ab176d163f45a594c541dcd88dbc1a1d7e82750ac905d7a57adbaf2a97e8227"
+  },
+  {
+    "path": "public/review/m5/anniversary-card-430x932.png",
+    "sha256": "c07c9ae53c7648159dac32979e37a9288da964e4ee04260b0842e12fd9079c43"
+  },
+  {
+    "path": "public/review/m5/history-delete-failure.png",
+    "sha256": "0b56633a0bbdc52d941e8686fe4085a93e50568af12bcfd55e0e88ac2da0b717"
+  },
+  {
+    "path": "public/review/m5/index.html",
+    "sha256": "339c0a8d2cdb962cfdcea50b828012695f969f3aeeeae87205ab98baef3b23d4"
+  },
+  {
+    "path": "public/review/m5/period-diary-360x740.png",
+    "sha256": "be5d3af2e3dab04aa53638370e917225fdfebf619177cafe4f2e4e8a053aff1f"
+  },
+  {
+    "path": "public/review/m5/period-diary-393x852.png",
+    "sha256": "7467107139ab280434f59fb05bc61817e99bb2c8e3e4c5e485aded7f9242d58c"
+  },
+  {
+    "path": "public/review/m5/period-diary-430x932.png",
+    "sha256": "2e8e91129a6448b1be269a63840b1e1fc59a34074a7f1116c533bb8845532cdc"
+  },
+  {
+    "path": "public/review/m5/period-header-360x740.png",
+    "sha256": "4674746e8caea722327a86c432d6f7e655e371012aba0cbbccba0508638b0278"
+  },
+  {
+    "path": "public/review/m5/period-header-393x852.png",
+    "sha256": "8d6e24d5a96b2656e096becb779d61bf4bfd7059a96b87a5828bc4176a4b0937"
+  },
+  {
+    "path": "public/review/m5/period-header-430x932.png",
+    "sha256": "204ffb12882293681986157fcef21a11ecc620225ae43b5e22f7b811f3df48c7"
+  },
+  {
+    "path": "public/review/m5/source.json",
+    "sha256": "1bf65956f918f2ab532b5a9b9f22e1e1382016662813fa574a91e6aa5c8760f3"
+  },
+  {
+    "path": "public/review/m5/todo-baseline-360x740.png",
+    "sha256": "dc028b00120df8576d480903b3c597b486f9bccbf3904dfb9dad931bcc67e333"
+  },
+  {
+    "path": "public/review/m5/todo-baseline-393x852.png",
+    "sha256": "fa8930d8beff677bfbc1c04925e05de737c1c1f101ea43a3de033b04008cbdb2"
+  },
+  {
+    "path": "public/review/m5/todo-baseline-430x932.png",
+    "sha256": "ba9384d25dcd2ed4cde68d0c73fde79bd3aa2eafde3c08ae7933756638107219"
+  },
+  {
+    "path": "public/review/m5/todo-candidate-360x740.png",
+    "sha256": "dc028b00120df8576d480903b3c597b486f9bccbf3904dfb9dad931bcc67e333"
+  },
+  {
+    "path": "public/review/m5/todo-candidate-393x852.png",
+    "sha256": "fa8930d8beff677bfbc1c04925e05de737c1c1f101ea43a3de033b04008cbdb2"
+  },
+  {
+    "path": "public/review/m5/todo-candidate-430x932.png",
+    "sha256": "ba9384d25dcd2ed4cde68d0c73fde79bd3aa2eafde3c08ae7933756638107219"
+  },
+  {
+    "path": "public/review/m5/todo-diff-360x740.png",
+    "sha256": "07df52b638f19b4192a1064c0ab3b3799166d11d0ccdb02bce5d2c6df62146fc"
+  },
+  {
+    "path": "public/review/m5/todo-diff-393x852.png",
+    "sha256": "7efb86fc12fa38e270d912ce8310e26c12c118ac3ba1ee930e17e56f5ff1de2b"
+  },
+  {
+    "path": "public/review/m5/todo-diff-430x932.png",
+    "sha256": "61b093d35fd7d8e828003427d67dae4e93d4347ca0b7439917c07bdb772b2445"
+  },
+  {
+    "path": "public/review/period-assets/evidence.html",
+    "sha256": "a92b3cf317debe494e79560d9a902d2b8311683c743d7a1745bed5767e9e225c"
+  },
+  {
+    "path": "public/review/period-assets/evidence.json",
+    "sha256": "d7ceed47fc3e8bd271f02a55176c5eec4ea66a4123b2d6a0807178191948c0b2"
+  },
+  {
+    "path": "public/review/period-assets/evidence/assets-dark.png",
+    "sha256": "936e6f687ad39a3695514e636e3208ed1140592aab89280b803fc173acc0bc5f"
+  },
+  {
+    "path": "public/review/period-assets/evidence/assets-light.png",
+    "sha256": "9ccdd1c2bb744081ea4a0e0f4e47b476fe885cbb01fc8d93c462ac59847a1c4f"
+  },
+  {
+    "path": "public/review/period-assets/evidence/diary-360x740.png",
+    "sha256": "ac5c1b5aad4477fe9c181fba2471c049387bef54ad2f2de8af93585673b5029c"
+  },
+  {
+    "path": "public/review/period-assets/evidence/diary-393x852.png",
+    "sha256": "6a50e18230623c9755d088c6da9bd5880260f70b2cc7404dbea7bcc2e0b90d44"
+  },
+  {
+    "path": "public/review/period-assets/evidence/diary-430x932.png",
+    "sha256": "c149972668d02904d8c2029e02dd296104293fc1d886888271deb918e0e7daaa"
+  },
+  {
+    "path": "public/review/period-assets/evidence/header-360x740.png",
+    "sha256": "0d7f82e96d1e121a7d0e91017b0b8b14a047f4c65737b14b74e369670fd59334"
+  },
+  {
+    "path": "public/review/period-assets/evidence/header-393x852.png",
+    "sha256": "d49663e793f0b65ec514935fadf170d12dccf2b923dfc5e0ac1595af4753a224"
+  },
+  {
+    "path": "public/review/period-assets/evidence/header-430x932.png",
+    "sha256": "18b32ca339c4bb21df9942ef0e9beba8bf0b0ce53baa12d81b5fbab6d54af861"
+  },
+  {
+    "path": "public/review/period-assets/evidence/tips-360x740.png",
+    "sha256": "123533f49cbf88ad3d4abab1c6fb232e8b1f059d04e49fc3e89f09a68d9ba0e0"
+  },
+  {
+    "path": "public/review/period-assets/evidence/tips-393x852.png",
+    "sha256": "f120b55e75b6fc2d63d911c00996619bf7f5ecf363af244bfd39705a2e73c84f"
+  },
+  {
+    "path": "public/review/period-assets/evidence/tips-430x932.png",
+    "sha256": "03927e551a8bbfd62c3841327203b4a62fb17c25e65f7d97017c9ccf666ad58c"
+  },
+  {
+    "path": "public/review/period-assets/index.html",
+    "sha256": "c5536ba2c6ce34dd41624634be43f0a939af454b49759538b0039c2133af6ee0"
+  },
+  {
+    "path": "public/review/period-assets/preview.js",
+    "sha256": "a874440942614ab9b9a2ba796c938e8c51c31b96b9961edff4ac70646b5f6368"
+  },
+  {
+    "path": "public/review/period-assets/styles.css",
+    "sha256": "543299dea9299ae8660215d8fa0684369316100a351e7e616b3c19871b1f5020"
+  },
+  {
+    "path": "public/review/period/evidence/01-home.png",
+    "sha256": "0353a5de0f3e63ad3b92c2ac3f19db6f20ea59967adf2a0750fbd1457cf5a98c"
+  },
+  {
+    "path": "public/review/period/evidence/02-calendar-selected.png",
+    "sha256": "c6bbf20f7c881668868d0c1e6c5b715c7f9c520caf6c89024458eb99e457086e"
+  },
+  {
+    "path": "public/review/period/evidence/03-daily-selected.png",
+    "sha256": "0893d60ce305f76474c9bc38ecb178158670e0a9efd942410f5b4f879e102267"
+  },
+  {
+    "path": "public/review/period/evidence/04-empty.png",
+    "sha256": "d305939d5ca485b5c554fe2f60233e49561b601796e4aa9b5f44d79bec417408"
+  },
+  {
+    "path": "public/review/period/evidence/05-cycle-updated.png",
+    "sha256": "9bf947fdae1c57a24705ebbaa011d2c02589809db0c87702a8653668dd414447"
+  },
+  {
+    "path": "public/review/period/evidence/period-360x480-editor.png",
+    "sha256": "4a18f76713c6bf651853107414edbc47e85cfba9ce1e59a54b78a48dc2301d12"
+  },
+  {
+    "path": "public/review/period/evidence/period-360x480-settings.png",
+    "sha256": "3d010d94a792c8126f6f872aa539fb5149f9c0c20caa37a06535a1744811f77c"
+  },
+  {
+    "path": "public/review/period/evidence/recovery-closed-tab-backup.png",
+    "sha256": "8063abeac1ab58c6bb1a6251dc85cec68be4881d3c3a51c97d4d81f6e8132117"
+  },
+  {
+    "path": "public/review/period/evidence/recovery-explicit-confirmation.png",
+    "sha256": "57cd235f261bb1c8cdc7fd4fb3735ae9e3962b421157bfcecb77ea346233ee66"
+  },
+  {
+    "path": "public/review/period/evidence/recovery-restored-persisted.png",
+    "sha256": "cf998436664c559e21e98a9270917c329604e404f8b19b4554cb32c912905173"
+  },
+  {
+    "path": "public/review/period/evidence/recovery-save-failure.png",
+    "sha256": "438d722f1d24a0d50736778bf33ac8026777e8841bdab7d51eae0b9ef8214477"
+  },
+  {
+    "path": "public/review/period/evidence/verification.json",
+    "sha256": "1c9b41f570aec7484327c1064dfd5e9b5b162046bf7d58aedaf7a14810327ca4"
+  },
+  {
+    "path": "public/review/period/index.html",
+    "sha256": "1b2cea8b8de6f9e31b6f0ebd5821693cb933613f86d1d7a79aa2f853a20e198a"
+  },
+  {
+    "path": "public/review/review.css",
+    "sha256": "c0ac259799f64ea1c732152fe78501c55b422fcd02a471c66644fb4033396606"
+  },
+  {
+    "path": "public/review/review.js",
+    "sha256": "e78ceed3f436c3585d6ec28c6c71ed5e41a8b202210f81ee584ddeb9f187517d"
+  },
+  {
+    "path": "public/review/v021/anniversary-360-card-1.png",
+    "sha256": "fdf0973ff1757bea12825c9bcdb31203ee3e97660a8d08fbd7f7d08d16e4574b"
+  },
+  {
+    "path": "public/review/v021/anniversary-360-card-2.png",
+    "sha256": "684a72e3038238ec1f73ae540ba75f4250eac2edd5ed5a6bc26396ebd961f6ec"
+  },
+  {
+    "path": "public/review/v021/anniversary-360-card-3.png",
+    "sha256": "15bcf2943a0138392047e660611d5691b426af9f0e1a4cb5cfc285d7e7ec078c"
+  },
+  {
+    "path": "public/review/v021/anniversary-360-card-4.png",
+    "sha256": "15bcf2943a0138392047e660611d5691b426af9f0e1a4cb5cfc285d7e7ec078c"
+  },
+  {
+    "path": "public/review/v021/anniversary-360-top.png",
+    "sha256": "fdf0973ff1757bea12825c9bcdb31203ee3e97660a8d08fbd7f7d08d16e4574b"
+  },
+  {
+    "path": "public/review/v021/anniversary-393-card-1.png",
+    "sha256": "30f4bb2495fbe16c4d3e20b68196616e3929cd78f353fbbdba9b72aa71f835e3"
+  },
+  {
+    "path": "public/review/v021/anniversary-393-card-2.png",
+    "sha256": "30f4bb2495fbe16c4d3e20b68196616e3929cd78f353fbbdba9b72aa71f835e3"
+  },
+  {
+    "path": "public/review/v021/anniversary-393-card-3.png",
+    "sha256": "bf4aa097d924e4c8adab90191c0c865dd918ec607cf1981a53f51bba0d9f0b4c"
+  },
+  {
+    "path": "public/review/v021/anniversary-393-card-4.png",
+    "sha256": "a2f087dbcf8026f8a66916ad172616713f076fdf1d2fae45befb5b5857bb55ab"
+  },
+  {
+    "path": "public/review/v021/anniversary-393-top.png",
+    "sha256": "30f4bb2495fbe16c4d3e20b68196616e3929cd78f353fbbdba9b72aa71f835e3"
+  },
+  {
+    "path": "public/review/v021/anniversary-430-card-1.png",
+    "sha256": "f9a002205ad2d25b535dbf25c06a7305187432f1c78aaad765531f84eb4945af"
+  },
+  {
+    "path": "public/review/v021/anniversary-430-card-2.png",
+    "sha256": "f9a002205ad2d25b535dbf25c06a7305187432f1c78aaad765531f84eb4945af"
+  },
+  {
+    "path": "public/review/v021/anniversary-430-card-3.png",
+    "sha256": "f9a002205ad2d25b535dbf25c06a7305187432f1c78aaad765531f84eb4945af"
+  },
+  {
+    "path": "public/review/v021/anniversary-430-card-4.png",
+    "sha256": "c8e8705d456f8ccd709d24aa2d2b6eb3cdb884d44177af8e1b810eae08f1dcf9"
+  },
+  {
+    "path": "public/review/v021/anniversary-430-top.png",
+    "sha256": "f9a002205ad2d25b535dbf25c06a7305187432f1c78aaad765531f84eb4945af"
+  },
+  {
+    "path": "public/review/v021/anniversary-delete.png",
+    "sha256": "cd9ab55f82c70aa0996548be7a47ab449f9d41d54399b4c8387ba10ed8e2928d"
+  },
+  {
+    "path": "public/review/v021/anniversary-edit.png",
+    "sha256": "c3767c84ab818539bb3a4da977f5953f5168a045325d42df1a5c35f9e36cd434"
+  },
+  {
+    "path": "public/review/v021/anniversary-month.png",
+    "sha256": "fe52e0e517aeea72cf4553cdddde87ef68e110944e00a3744434e99a5f0ecae5"
+  },
+  {
+    "path": "public/review/v021/index.html",
+    "sha256": "4435bdf65e0d3d5f3789eba449fba31f75ccac06dde5f3e114010a0458bc4341"
+  },
+  {
+    "path": "public/review/v021/period-360-record.png",
+    "sha256": "3e2f7170340fb7e10e43bf5c3024de3efb449bf33c42f2b3b0f43176d2dbf552"
+  },
+  {
+    "path": "public/review/v021/period-360-top.png",
+    "sha256": "0307b926d37036cac0bd3cf602e9d5a28ce40882ffe99a56f0b38134462eea1f"
+  },
+  {
+    "path": "public/review/v021/period-393-record.png",
+    "sha256": "dce17fd6c9c6c03e1ca03526857f1dcab4a702c5ec68808aa359b5df1aca01c5"
+  },
+  {
+    "path": "public/review/v021/period-393-top.png",
+    "sha256": "4a18aacd8782739e9152a35e8e9a8af09add2d20c06a0f0117c50fe48f665b44"
+  },
+  {
+    "path": "public/review/v021/period-430-record.png",
+    "sha256": "7494c9d87e7513ea59f168d8804839f8710e3b9487820983d6639fdf351d8c9f"
+  },
+  {
+    "path": "public/review/v021/period-430-top.png",
+    "sha256": "acc4c7b49d1c19f8dfad7d646671742a2c8f376ba2fa1bf63cf5f8260861d7a8"
+  },
+  {
+    "path": "public/review/v021/reference-anniversary.png",
+    "sha256": "a3ededfd945b608f6c3534282359964563d5baf799ef9c4a62ee2d180aa3209b"
+  },
+  {
+    "path": "public/review/v021/reference-period.png",
+    "sha256": "39a85e2febb3f6417844eaf83d2dfd590c4076f2ff6717d8d1f338478adb6d31"
+  },
+  {
+    "path": "public/review/v021/results.json",
+    "sha256": "88a86c35dcb4a6f14898c397ddc7d3fa8f5ce7970391f2df01442bf2c4588c32"
+  },
+  {
+    "path": "public/review/v021/source.json",
+    "sha256": "f5c96db790a6fc9a539b495ed97b164a44e524828b1db9cd5c224f7f888506c4"
+  },
+  {
+    "path": "public/review/v021/todo-360x740.png",
+    "sha256": "ac495cfd3ad0e65eed9d5ab16b78a4c80ba5abf7842d78d764b004a4a8f481bc"
+  },
+  {
+    "path": "public/review/v021/todo-393x852.png",
+    "sha256": "d7b920bff7981f5ed6b118a2bf35ffcf3a6ec3e9e7a2f2f35f28de11220553d1"
+  },
+  {
+    "path": "public/review/v021/todo-430x932.png",
+    "sha256": "8e6e24ad529cf2be6bd58b75156244ecc43ce40ff0f7b1e3bc742dbc18eb0c30"
+  },
+  {
+    "path": "public/review/v021/todo-comparison.json",
+    "sha256": "3f3be3862abaeb7c17ab26a0a6bababa75ca680c377c04b88c1358e3d7a1658f"
+  }
+]

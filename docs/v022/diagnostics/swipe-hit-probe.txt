@@ -1,0 +1,47 @@
+import { test, expect, type Page, type Locator } from '@playwright/test';
+import { taskAction } from './task-actions';
+
+async function add(page: Page,text:string) {
+  await page.getByRole('button',{name:'新增待办',exact:true}).click();
+  await page.getByRole('textbox',{name:'想做些什么？'}).fill(text);
+  await page.getByRole('button',{name:'保存',exact:true}).click();
+  await expect(page.getByRole('dialog')).not.toBeVisible();
+}
+const card=(page:Page,text:string)=>page.getByTestId('todo-card').filter({has:page.getByRole('button',{name:`编辑：${text}`,exact:true})});
+async function drag(page:Page,element:Locator,dx:number,release=true) {
+  await element.scrollIntoViewIfNeeded();
+  const r=(await element.boundingBox())!;
+  const x=r.x+r.width*(dx<0?.75:.25),y=r.y+r.height*.5;
+  await page.mouse.move(x,y);await page.mouse.down();
+  await page.mouse.move(x+dx,y,{steps:12});
+  if(release) await page.mouse.up();
+}
+async function rows(page:Page) {
+  return page.evaluate(()=>new Promise<any[]>((resolve,reject)=>{
+    const open=indexedDB.open('little-days');open.onerror=()=>reject(open.error);open.onsuccess=()=>{
+      const db=open.result,tx=db.transaction('todos','readonly'),get=tx.objectStore('todos').getAll();
+      tx.oncomplete=()=>{db.close();resolve(get.result);};tx.onerror=()=>reject(tx.error);
+    };
+  }));
+}
+async function undo(page:Page) { const count=await page.locator('.undo-toast').count();await page.getByRole('button',{name:'撤销',exact:true}).last().click();await expect(page.locator('.undo-toast')).toHaveCount(count-1); }
+
+test('快速连续操作支持独立撤销，同一任务删除后撤销不重复创建',async({page})=>{
+  await page.goto('/');await add(page,'甲');await add(page,'乙');await add(page,'丙');
+  await taskAction(page,'甲','delete');await expect(card(page,'甲')).toHaveCount(0);
+  await taskAction(page,'乙','complete');await expect(page.getByRole('button',{name:'已完成 1',exact:true})).toBeVisible();
+  await expect(page.locator('.undo-toast')).toHaveCount(2);await undo(page);await expect(card(page,'乙')).toBeVisible();
+  expect((await rows(page)).map(r=>r.text)).toEqual(['乙','丙']);
+  await taskAction(page,'乙','delete');await expect(card(page,'乙')).toHaveCount(0);await undo(page);await expect(card(page,'乙')).toBeVisible();
+  const ids=(await rows(page)).map(r=>r.id);expect(ids).toEqual([2,3]);
+  // Two overlapping gestures: operations persist in order and never share a target.
+  const b=card(page,'乙'),c=card(page,'丙');
+  await drag(page,b,-(await b.boundingBox())!.width*.65);
+  await drag(page,c,(await c.boundingBox())!.width*.65);
+  await expect(b).toHaveCount(0);await expect(page.getByRole('button',{name:'已完成 1',exact:true})).toBeVisible();
+  await undo(page);await expect(c).toBeVisible();
+  expect((await rows(page)).map(r=>[r.id,r.completed])).toEqual([[3,false]]);
+});
+import { writeFileSync } from 'node:fs';
+test.beforeEach(async({page})=>{await page.addInitScript(()=>{const win=window as unknown as {swipeHits:unknown[]};win.swipeHits=[];document.addEventListener('pointerdown',event=>{const target=event.target as Element;const rect=(selector:string)=>{const element=document.querySelector(selector);if(!element)return null;const r=element.getBoundingClientRect();return {x:r.x,y:r.y,width:r.width,height:r.height};};win.swipeHits.push({time:performance.now(),x:event.clientX,y:event.clientY,target:target.tagName+'.'+target.className,card:target.closest('[data-testid="todo-card"]')?.textContent,layout:Object.fromEntries(['.date-row','.date-navigation','.view-tabs','.task-area','.undo-toast'].map(s=>[s,rect(s)]))});},true);});});
+test.afterEach(async({page})=>{writeFileSync(process.env.CD_DIAGNOSTIC_OUT!,JSON.stringify(await page.evaluate(()=>(window as unknown as {swipeHits:unknown[]}).swipeHits),null,2));});

@@ -1,0 +1,13 @@
+{
+  "beforeHooksMs": 943030.653,
+  "source": "afc908261f20646e2307c119dc32e9c02f5eecbc",
+  "explicitTestSetTimeoutMs": 60000,
+  "preLastGotoMs": 52359.272,
+  "lastGotoEndedMs": 1003698.742,
+  "CLIOverrideCannotRaiseExplicit": true,
+  "test": "tests/todo.spec.ts:102",
+  "firstNavigateToNextActionApprox": "multiple dev-server document/module loads consumed about52s before last navigation; no business assertion failure",
+  "lastGotoMs": 995389.925,
+  "lastGotoWaitMs": 8308.817,
+  "result": "159 passed / 1 whole-test budget timeout"
+}

@@ -1,0 +1,47 @@
+[WebServer] (node:12156) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+
+Running 1 test using 1 worker
+
+
+(node:21240) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+[1/1] [chromium] › tests\v022-period-logic.spec.ts:87:1 › crossing local midnight rejects truncation before any persistence call
+  1) [chromium] › tests\v022-period-logic.spec.ts:87:1 › crossing local midnight rejects truncation before any persistence call 
+
+    Error: expect(locator).toContainText(expected) failed
+
+    Locator: getByRole('dialog').getByRole('alert')
+    Expected substring: "日期已变化"
+    Timeout: 6000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toContainText" getByRole('dialog').getByRole('alert') with timeout 6000ms
+      - waiting for getByRole('dialog').getByRole('alert')
+
+
+      92 |   await page.evaluate(()=>{(window as unknown as {periodWrites:number}).periodWrites=0;const put=IDBObjectStore.prototype.put;IDBObjectStore.prototype.put=function(...args:Parameters<IDBObjectStore['put']>){if(this.transaction.db.name==='cozy-days-period')(window as unknown as {periodWrites:number}).periodWrites++;return put.apply(this,args);};});
+      93 |   await page.clock.runFor(120_000);await dialog.getByRole('button',{name:'确认取消标记'}).click();
+    > 94 |   await expect(dialog.getByRole('alert')).toContainText('日期已变化');
+         |                                           ^
+      95 |   expect(await page.evaluate(()=>(window as unknown as {periodWrites:number}).periodWrites)).toBe(0);
+      96 |   expect((await read(page)).periods).toEqual(data.periods);
+      97 | });
+        at D:\cozy-days-v022-verification\tests\v022-period-logic.spec.ts:94:43
+
+    Error Context: test-results\v022-period-logic-crossing-9afb6-before-any-persistence-call-chromium\error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\v022-period-logic-crossing-9afb6-before-any-persistence-call-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\v022-period-logic-crossing-9afb6-before-any-persistence-call-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+  1 failed
+    [chromium] › tests\v022-period-logic.spec.ts:87:1 › crossing local midnight rejects truncation before any persistence call 

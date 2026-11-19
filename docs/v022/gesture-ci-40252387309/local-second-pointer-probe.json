@@ -1,0 +1,200 @@
+[
+  {
+    "time": 12588,
+    "x": 665.7100219726562,
+    "y": 454,
+    "pointerType": "mouse",
+    "isPrimary": true,
+    "target": "SPAN.",
+    "calendarHit": true,
+    "aria": null,
+    "calendar": {
+      "x": 457.5,
+      "y": 236,
+      "width": 235.3125,
+      "height": 310,
+      "bottom": 546
+    },
+    "scrollTop": 0
+  },
+  {
+    "time": 12632,
+    "x": 575.15625,
+    "y": 459.20001220703125,
+    "pointerType": "touch",
+    "isPrimary": true,
+    "target": "SPAN.",
+    "calendarHit": true,
+    "aria": null,
+    "calendar": {
+      "x": 457.5,
+      "y": 236,
+      "width": 235.3125,
+      "height": 310,
+      "bottom": 546
+    },
+    "scrollTop": 0
+  },
+  {
+    "time": 12780,
+    "x": 575.15625,
+    "y": 459.20001220703125,
+    "pointerType": "touch",
+    "isPrimary": true,
+    "target": "SPAN.",
+    "calendarHit": true,
+    "aria": null,
+    "calendar": {
+      "x": 457.5,
+      "y": 236,
+      "width": 235.3125,
+      "height": 310,
+      "bottom": 546
+    },
+    "scrollTop": 0
+  },
+  {
+    "time": 12947,
+    "x": 575.15625,
+    "y": 459.20001220703125,
+    "pointerType": "touch",
+    "isPrimary": true,
+    "target": "SPAN.",
+    "calendarHit": true,
+    "aria": null,
+    "calendar": {
+      "x": 457.5,
+      "y": 236,
+      "width": 235.3125,
+      "height": 310,
+      "bottom": 546
+    },
+    "scrollTop": 0
+  },
+  {
+    "time": 13119,
+    "x": 575.15625,
+    "y": 459.20001220703125,
+    "pointerType": "touch",
+    "isPrimary": true,
+    "target": "P.period-selected",
+    "calendarHit": true,
+    "aria": null,
+    "calendar": {
+      "x": 457.5,
+      "y": 176,
+      "width": 235.3125,
+      "height": 310,
+      "bottom": 486
+    },
+    "scrollTop": 60
+  },
+  {
+    "time": 13119,
+    "x": 583.15625,
+    "y": 467.20001220703125,
+    "pointerType": "touch",
+    "isPrimary": false,
+    "target": "P.period-selected",
+    "calendarHit": true,
+    "aria": null,
+    "calendar": {
+      "x": 457.5,
+      "y": 176,
+      "width": 235.3125,
+      "height": 310,
+      "bottom": 486
+    },
+    "scrollTop": 60
+  },
+  {
+    "time": 13247,
+    "x": 575.15625,
+    "y": 459.20001220703125,
+    "pointerType": "touch",
+    "isPrimary": true,
+    "target": "P.period-selected",
+    "calendarHit": true,
+    "aria": null,
+    "calendar": {
+      "x": 457.5,
+      "y": 176,
+      "width": 235.3125,
+      "height": 310,
+      "bottom": 486
+    },
+    "scrollTop": 60
+  },
+  {
+    "time": 13401,
+    "x": 626.9500122070312,
+    "y": 208,
+    "pointerType": "mouse",
+    "isPrimary": true,
+    "target": "svg.[object SVGAnimatedString]",
+    "calendarHit": true,
+    "aria": null,
+    "calendar": {
+      "x": 457.5,
+      "y": 176,
+      "width": 235.3125,
+      "height": 310,
+      "bottom": 486
+    },
+    "scrollTop": 60
+  },
+  {
+    "time": 13452,
+    "x": 590.9500122070312,
+    "y": 208,
+    "pointerType": "mouse",
+    "isPrimary": true,
+    "target": "svg.[object SVGAnimatedString]",
+    "calendarHit": true,
+    "aria": null,
+    "calendar": {
+      "x": 457.5,
+      "y": 176,
+      "width": 235.3125,
+      "height": 310,
+      "bottom": 486
+    },
+    "scrollTop": 60
+  },
+  {
+    "time": 13502,
+    "x": 662.9500122070312,
+    "y": 208,
+    "pointerType": "mouse",
+    "isPrimary": true,
+    "target": "BUTTON.period-today",
+    "calendarHit": true,
+    "aria": null,
+    "calendar": {
+      "x": 457.5,
+      "y": 176,
+      "width": 235.3125,
+      "height": 310,
+      "bottom": 486
+    },
+    "scrollTop": 60
+  },
+  {
+    "time": 13532,
+    "x": 484.59375,
+    "y": 394,
+    "pointerType": "touch",
+    "isPrimary": true,
+    "target": "SPAN.",
+    "calendarHit": true,
+    "aria": null,
+    "calendar": {
+      "x": 457.5,
+      "y": 176,
+      "width": 235.3125,
+      "height": 310,
+      "bottom": 486
+    },
+    "scrollTop": 60
+  }
+]

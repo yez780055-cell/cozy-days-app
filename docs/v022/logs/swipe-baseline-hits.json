@@ -1,0 +1,613 @@
+[
+  {
+    "time": 348.69999998807907,
+    "x": 752.6799926757812,
+    "y": 540,
+    "target": "path.[object SVGAnimatedString]",
+    "layout": {
+      ".date-row": {
+        "x": 461.5,
+        "y": 276,
+        "width": 357,
+        "height": 44
+      },
+      ".date-navigation": {
+        "x": 730.5,
+        "y": 320,
+        "width": 88,
+        "height": 44
+      },
+      ".view-tabs": {
+        "x": 461.5,
+        "y": 320,
+        "width": 263,
+        "height": 44
+      },
+      ".task-area": {
+        "x": 443.5,
+        "y": 412,
+        "width": 393,
+        "height": 179
+      },
+      ".undo-toast": null
+    }
+  },
+  {
+    "time": 727.3999999761581,
+    "x": 640,
+    "y": 600,
+    "target": "BUTTON.button button--primary todo-submit",
+    "layout": {
+      ".date-row": {
+        "x": 461.5,
+        "y": 276,
+        "width": 357,
+        "height": 44
+      },
+      ".date-navigation": {
+        "x": 730.5,
+        "y": 320,
+        "width": 88,
+        "height": 44
+      },
+      ".view-tabs": {
+        "x": 461.5,
+        "y": 320,
+        "width": 263,
+        "height": 44
+      },
+      ".task-area": {
+        "x": 443.5,
+        "y": 412,
+        "width": 393,
+        "height": 179
+      },
+      ".undo-toast": null
+    }
+  },
+  {
+    "time": 778.3999999761581,
+    "x": 752.6799926757812,
+    "y": 540,
+    "target": "path.[object SVGAnimatedString]",
+    "layout": {
+      ".date-row": {
+        "x": 461.5,
+        "y": 276,
+        "width": 357,
+        "height": 44
+      },
+      ".date-navigation": {
+        "x": 730.5,
+        "y": 320,
+        "width": 88,
+        "height": 44
+      },
+      ".view-tabs": {
+        "x": 461.5,
+        "y": 320,
+        "width": 263,
+        "height": 44
+      },
+      ".task-area": {
+        "x": 443.5,
+        "y": 412,
+        "width": 393,
+        "height": 97
+      },
+      ".undo-toast": null
+    }
+  },
+  {
+    "time": 1163.699999988079,
+    "x": 640,
+    "y": 600,
+    "target": "BUTTON.button button--primary todo-submit",
+    "layout": {
+      ".date-row": {
+        "x": 461.5,
+        "y": 276,
+        "width": 357,
+        "height": 44
+      },
+      ".date-navigation": {
+        "x": 730.5,
+        "y": 320,
+        "width": 88,
+        "height": 44
+      },
+      ".view-tabs": {
+        "x": 461.5,
+        "y": 320,
+        "width": 263,
+        "height": 44
+      },
+      ".task-area": {
+        "x": 443.5,
+        "y": 412,
+        "width": 393,
+        "height": 97
+      },
+      ".undo-toast": null
+    }
+  },
+  {
+    "time": 1230.300000011921,
+    "x": 752.6799926757812,
+    "y": 540,
+    "target": "path.[object SVGAnimatedString]",
+    "layout": {
+      ".date-row": {
+        "x": 461.5,
+        "y": 276,
+        "width": 357,
+        "height": 44
+      },
+      ".date-navigation": {
+        "x": 730.5,
+        "y": 320,
+        "width": 88,
+        "height": 44
+      },
+      ".view-tabs": {
+        "x": 461.5,
+        "y": 320,
+        "width": 263,
+        "height": 44
+      },
+      ".task-area": {
+        "x": 443.5,
+        "y": 412,
+        "width": 393,
+        "height": 97
+      },
+      ".undo-toast": null
+    }
+  },
+  {
+    "time": 1512.199999988079,
+    "x": 640,
+    "y": 600,
+    "target": "BUTTON.button button--primary todo-submit",
+    "layout": {
+      ".date-row": {
+        "x": 461.5,
+        "y": 276,
+        "width": 357,
+        "height": 44
+      },
+      ".date-navigation": {
+        "x": 730.5,
+        "y": 320,
+        "width": 88,
+        "height": 44
+      },
+      ".view-tabs": {
+        "x": 461.5,
+        "y": 320,
+        "width": 263,
+        "height": 44
+      },
+      ".task-area": {
+        "x": 443.5,
+        "y": 412,
+        "width": 393,
+        "height": 97
+      },
+      ".undo-toast": null
+    }
+  },
+  {
+    "time": 1580.699999988079,
+    "x": 787.5,
+    "y": 470,
+    "target": "circle.[object SVGAnimatedString]",
+    "card": "甲",
+    "layout": {
+      ".date-row": {
+        "x": 461.5,
+        "y": 276,
+        "width": 357,
+        "height": 44
+      },
+      ".date-navigation": {
+        "x": 730.5,
+        "y": 320,
+        "width": 88,
+        "height": 44
+      },
+      ".view-tabs": {
+        "x": 461.5,
+        "y": 320,
+        "width": 263,
+        "height": 44
+      },
+      ".task-area": {
+        "x": 443.5,
+        "y": 412,
+        "width": 393,
+        "height": 97
+      },
+      ".undo-toast": null
+    }
+  },
+  {
+    "time": 1979.5,
+    "x": 640,
+    "y": 625,
+    "target": "BUTTON.button button--danger ",
+    "layout": {
+      ".date-row": {
+        "x": 461.5,
+        "y": 276,
+        "width": 357,
+        "height": 44
+      },
+      ".date-navigation": {
+        "x": 730.5,
+        "y": 320,
+        "width": 88,
+        "height": 44
+      },
+      ".view-tabs": {
+        "x": 461.5,
+        "y": 320,
+        "width": 263,
+        "height": 44
+      },
+      ".task-area": {
+        "x": 443.5,
+        "y": 412,
+        "width": 393,
+        "height": 97
+      },
+      ".undo-toast": null
+    }
+  },
+  {
+    "time": 2346.599999964237,
+    "x": 787.5,
+    "y": 470,
+    "target": "circle.[object SVGAnimatedString]",
+    "card": "乙",
+    "layout": {
+      ".date-row": {
+        "x": 461.5,
+        "y": 276,
+        "width": 357,
+        "height": 44
+      },
+      ".date-navigation": {
+        "x": 730.5,
+        "y": 320,
+        "width": 88,
+        "height": 44
+      },
+      ".view-tabs": {
+        "x": 461.5,
+        "y": 320,
+        "width": 263,
+        "height": 44
+      },
+      ".task-area": {
+        "x": 443.5,
+        "y": 412,
+        "width": 393,
+        "height": 97
+      },
+      ".undo-toast": {
+        "x": 455.5,
+        "y": 541.513671875,
+        "width": 255.1875,
+        "height": 49
+      }
+    }
+  },
+  {
+    "time": 2729.399999976158,
+    "x": 640,
+    "y": 569,
+    "target": "BUTTON.button button--primary ",
+    "layout": {
+      ".date-row": {
+        "x": 461.5,
+        "y": 276,
+        "width": 357,
+        "height": 44
+      },
+      ".date-navigation": {
+        "x": 730.5,
+        "y": 320,
+        "width": 88,
+        "height": 44
+      },
+      ".view-tabs": {
+        "x": 461.5,
+        "y": 320,
+        "width": 263,
+        "height": 44
+      },
+      ".task-area": {
+        "x": 443.5,
+        "y": 412,
+        "width": 393,
+        "height": 97
+      },
+      ".undo-toast": {
+        "x": 455.5,
+        "y": 530,
+        "width": 255.1875,
+        "height": 49
+      }
+    }
+  },
+  {
+    "time": 3464.300000011921,
+    "x": 677.6799926757812,
+    "y": 553,
+    "target": "BUTTON.",
+    "layout": {
+      ".date-row": {
+        "x": 461.5,
+        "y": 276,
+        "width": 357,
+        "height": 44
+      },
+      ".date-navigation": {
+        "x": 730.5,
+        "y": 320,
+        "width": 88,
+        "height": 44
+      },
+      ".view-tabs": {
+        "x": 461.5,
+        "y": 320,
+        "width": 263,
+        "height": 44
+      },
+      ".task-area": {
+        "x": 443.5,
+        "y": 412,
+        "width": 393,
+        "height": 97
+      },
+      ".undo-toast": {
+        "x": 455.5,
+        "y": 476,
+        "width": 255.1875,
+        "height": 49
+      }
+    }
+  },
+  {
+    "time": 3547.399999976158,
+    "x": 787.5,
+    "y": 470,
+    "target": "circle.[object SVGAnimatedString]",
+    "card": "乙",
+    "layout": {
+      ".date-row": {
+        "x": 461.5,
+        "y": 276,
+        "width": 357,
+        "height": 44
+      },
+      ".date-navigation": {
+        "x": 730.5,
+        "y": 320,
+        "width": 88,
+        "height": 44
+      },
+      ".view-tabs": {
+        "x": 461.5,
+        "y": 320,
+        "width": 263,
+        "height": 44
+      },
+      ".task-area": {
+        "x": 443.5,
+        "y": 412,
+        "width": 393,
+        "height": 97
+      },
+      ".undo-toast": {
+        "x": 455.5,
+        "y": 530,
+        "width": 255.1875,
+        "height": 49
+      }
+    }
+  },
+  {
+    "time": 3928,
+    "x": 640,
+    "y": 625,
+    "target": "BUTTON.button button--danger ",
+    "layout": {
+      ".date-row": {
+        "x": 461.5,
+        "y": 276,
+        "width": 357,
+        "height": 44
+      },
+      ".date-navigation": {
+        "x": 730.5,
+        "y": 320,
+        "width": 88,
+        "height": 44
+      },
+      ".view-tabs": {
+        "x": 461.5,
+        "y": 320,
+        "width": 263,
+        "height": 44
+      },
+      ".task-area": {
+        "x": 443.5,
+        "y": 412,
+        "width": 393,
+        "height": 97
+      },
+      ".undo-toast": {
+        "x": 455.5,
+        "y": 530,
+        "width": 255.1875,
+        "height": 49
+      }
+    }
+  },
+  {
+    "time": 4645.300000011921,
+    "x": 677.6799926757812,
+    "y": 553,
+    "target": "BUTTON.",
+    "layout": {
+      ".date-row": {
+        "x": 461.5,
+        "y": 276,
+        "width": 357,
+        "height": 44
+      },
+      ".date-navigation": {
+        "x": 730.5,
+        "y": 320,
+        "width": 88,
+        "height": 44
+      },
+      ".view-tabs": {
+        "x": 461.5,
+        "y": 320,
+        "width": 263,
+        "height": 44
+      },
+      ".task-area": {
+        "x": 443.5,
+        "y": 412,
+        "width": 393,
+        "height": 97
+      },
+      ".undo-toast": {
+        "x": 455.5,
+        "y": 476,
+        "width": 255.1875,
+        "height": 49
+      }
+    }
+  },
+  {
+    "time": 4761.599999964237,
+    "x": 729.25,
+    "y": 470,
+    "target": "ARTICLE.task-card ",
+    "card": "乙",
+    "layout": {
+      ".date-row": {
+        "x": 461.5,
+        "y": 276,
+        "width": 357,
+        "height": 44
+      },
+      ".date-navigation": {
+        "x": 730.5,
+        "y": 320,
+        "width": 88,
+        "height": 44
+      },
+      ".view-tabs": {
+        "x": 461.5,
+        "y": 320,
+        "width": 263,
+        "height": 44
+      },
+      ".task-area": {
+        "x": 443.5,
+        "y": 412,
+        "width": 393,
+        "height": 97
+      },
+      ".undo-toast": {
+        "x": 455.5,
+        "y": 530,
+        "width": 255.1875,
+        "height": 49
+      }
+    }
+  },
+  {
+    "time": 5394.599999964237,
+    "x": 550.75,
+    "y": 470,
+    "target": "SPAN.",
+    "card": "丙",
+    "layout": {
+      ".date-row": {
+        "x": 461.5,
+        "y": 276,
+        "width": 357,
+        "height": 44
+      },
+      ".date-navigation": {
+        "x": 730.5,
+        "y": 320,
+        "width": 88,
+        "height": 44
+      },
+      ".view-tabs": {
+        "x": 461.5,
+        "y": 320,
+        "width": 263,
+        "height": 44
+      },
+      ".task-area": {
+        "x": 443.5,
+        "y": 412,
+        "width": 393,
+        "height": 97
+      },
+      ".undo-toast": {
+        "x": 455.5,
+        "y": 476,
+        "width": 255.1875,
+        "height": 49
+      }
+    }
+  },
+  {
+    "time": 6488.300000011921,
+    "x": 677.6799926757812,
+    "y": 553,
+    "target": "BUTTON.",
+    "layout": {
+      ".date-row": {
+        "x": 461.5,
+        "y": 276,
+        "width": 357,
+        "height": 44
+      },
+      ".date-navigation": {
+        "x": 730.5,
+        "y": 320,
+        "width": 88,
+        "height": 44
+      },
+      ".view-tabs": {
+        "x": 461.5,
+        "y": 320,
+        "width": 263,
+        "height": 44
+      },
+      ".task-area": {
+        "x": 443.5,
+        "y": 412,
+        "width": 393,
+        "height": 97
+      },
+      ".undo-toast": {
+        "x": 455.5,
+        "y": 422,
+        "width": 255.1875,
+        "height": 49
+      }
+    }
+  }
+]

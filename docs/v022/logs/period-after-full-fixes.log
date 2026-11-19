@@ -1,0 +1,51 @@
+
+[WebServer] (node:3132) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 37 tests using 1 worker
+
+(node:26684) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+[1/37] [chromium] › tests\period-assets.spec.ts:21:3 › period artwork is legible and contained at 360x740
+[2/37] [chromium] › tests\period-assets.spec.ts:21:3 › period artwork is legible and contained at 393x852
+[3/37] [chromium] › tests\period-assets.spec.ts:21:3 › period artwork is legible and contained at 430x932
+[4/37] [chromium] › tests\period-assets.spec.ts:77:1 › period asset source files match their declared dimensions, pixel alpha and canonical hashes
+[chromium] › tests\period-assets.spec.ts:77:1 › period asset source files match their declared dimensions, pixel alpha and canonical hashes
+M4 source audit: [{"name":"cats_header.png","width":1602,"height":884,"hash":"01c839801c4a78ce4c37433db0ee63e4a171fe3b19645c3b5756d37dde05e59a","clearFraction":0.4186014653628666,"opaqueFraction":0,"partialFraction":0.5813985346371334,"expectedWidth":1602,"expectedHeight":884,"expectedClear":0.4186,"expectedHash":"01c839801c4a78ce4c37433db0ee63e4a171fe3b19645c3b5756d37dde05e59a"},{"name":"cats_empty_state.png","width":1875,"height":811,"hash":"96e7ea984b170bbdb78af03b74e3b3bb7360569cc706f0fd1d139c38f3bff829","clearFraction":0.4454740649404028,"opaqueFraction":0.00006642005754212905,"partialFraction":0.554459515002055,"expectedWidth":1875,"expectedHeight":811,"expectedClear":0.44547,"expectedHash":"96e7ea984b170bbdb78af03b74e3b3bb7360569cc706f0fd1d139c38f3bff829"},{"name":"book_open_decor.png","width":394,"height":258,"hash":"22a71d58b0992a999c4ffa2808e80ee928fec6839cc4fff4139cee19420840b2","clearFraction":0.4676641876205092,"opaqueFraction":0,"partialFraction":0.5323358123794908,"expectedWidth":394,"expectedHeight":258,"expectedClear":0.46766,"expectedHash":"22a71d58b0992a999c4ffa2808e80ee928fec6839cc4fff4139cee19420840b2"},{"name":"washi_pink.png","width":302,"height":179,"hash":"67d472011ab6ed8e0df6876308fe9dbceb03e210246ecb7e5b03b01c12d7b3cb","clearFraction":0.4642421103259462,"opaqueFraction":0.5185171482481779,"partialFraction":0.01724074142587591,"expectedWidth":302,"expectedHeight":179,"expectedClear":0.46424,"expectedHash":"67d472011ab6ed8e0df6876308fe9dbceb03e210246ecb7e5b03b01c12d7b3cb"},{"name":"flower_pink.png","width":139,"height":138,"hash":"563d9fe84ad9482987dcad02852c3fa80326fb084f1a500cfb7a3c6231e6f5f5","clearFraction":0.4442185382129079,"opaqueFraction":0.528047127515379,"partialFraction":0.027734334271713065,"expectedWidth":139,"expectedHeight":138,"expectedClear":0.44422,"expectedHash":"563d9fe84ad9482987dcad02852c3fa80326fb084f1a500cfb7a3c6231e6f5f5"},{"name":"star_cream.svg","width":128,"height":128,"hash":"5d84edd7fbd1406e5cdc658c607c8a5c24607ef2aee4c52c8bfc31b79a84bd84","clearFraction":0.5589599609375,"opaqueFraction":0.41839599609375,"partialFraction":0.02264404296875,"expectedWidth":128,"expectedHeight":128,"expectedClear":0.55896,"expectedHash":"5d84edd7fbd1406e5cdc658c607c8a5c24607ef2aee4c52c8bfc31b79a84bd84"},{"name":"sparkle_gold.svg","width":128,"height":128,"hash":"3119e0e755612e7125ad32de61168ef55b5e6e2035c5f6129931749b044fec57","clearFraction":0.72198486328125,"opaqueFraction":0.2554931640625,"partialFraction":0.02252197265625,"expectedWidth":128,"expectedHeight":128,"expectedClear":0.721984,"expectedHash":"3119e0e755612e7125ad32de61168ef55b5e6e2035c5f6129931749b044fec57"},{"name":"heart_pink_outline.svg","width":128,"height":128,"hash":"6137cc47a35ee8c05200ec41efb747efb6edb173dcedee5fa734655fb2c64927","clearFraction":0.7938232421875,"opaqueFraction":0.1390380859375,"partialFraction":0.067138671875,"expectedWidth":128,"expectedHeight":128,"expectedClear":0.793823,"expectedHash":"6137cc47a35ee8c05200ec41efb747efb6edb173dcedee5fa734655fb2c64927"}]
+
+[5/37] [chromium] › tests\period-assets.spec.ts:125:1 › a failed illustration request falls back and the period view stays usable offline
+[6/37] [chromium] › tests\period.spec.ts:22:1 › empty state, historical cycles, calendar, diary persistence, settings and evidence
+[7/37] [chromium] › tests\period.spec.ts:57:1 › history edit, overlap rejection, deletion and setting fallback
+[8/37] [chromium] › tests\period.spec.ts:70:1 › month navigation, adjacent date, future diary lock and todo isolation
+[9/37] [chromium] › tests\period.spec.ts:82:95 › mobile fit 360x740
+[10/37] [chromium] › tests\period.spec.ts:82:95 › mobile fit 393x852
+[11/37] [chromium] › tests\period.spec.ts:82:95 › mobile fit 430x932
+[12/37] [chromium] › tests\period.spec.ts:99:1 › failed save stays visible and retry persists the latest diary; offline writing works
+[13/37] [chromium] › tests\v022-evidence.spec.ts:21:62 › matched baseline evidence 360x740
+[14/37] [chromium] › tests\v022-evidence.spec.ts:21:62 › matched baseline evidence 393x852
+[15/37] [chromium] › tests\v022-evidence.spec.ts:21:62 › matched baseline evidence 430x932
+[16/37] [chromium] › tests\v022-evidence.spec.ts:30:1 › empty summary plus top24 bottom24 safe area stays on one screen
+[17/37] [chromium] › tests\v022-evidence.spec.ts:39:31 › short screen 480 with 150 percent font scrolls safely
+[18/37] [chromium] › tests\v022-evidence.spec.ts:39:31 › short screen 640 with 150 percent font scrolls safely
+[19/37] [chromium] › tests\v022-evidence.spec.ts:55:30 › today and chosen backgrounds stay connected at width 393
+[20/37] [chromium] › tests\v022-evidence.spec.ts:55:30 › today and chosen backgrounds stay connected at width 900
+[21/37] [chromium] › tests\v022-evidence.spec.ts:60:1 › bands break at weeks and months, preserve palette and real status priority
+[22/37] [chromium] › tests\v022-interactions.spec.ts:72:1 › touch date gestures are scoped, click safe, and month dates clamp
+[23/37] [chromium] › tests\v022-interactions.spec.ts:156:3 › period controls fit 360x740
+[24/37] [chromium] › tests\v022-interactions.spec.ts:156:3 › period controls fit 393x852
+[25/37] [chromium] › tests\v022-interactions.spec.ts:156:3 › period controls fit 430x932
+[26/37] [chromium] › tests\v022-interactions.spec.ts:197:1 › six week calendar and 24px safe inset budget remain usable
+[27/37] [chromium] › tests\v022-interactions.spec.ts:223:3 › empty cycle summary stays inside its card at 360x740
+[28/37] [chromium] › tests\v022-interactions.spec.ts:223:3 › empty cycle summary stays inside its card at 393x852
+[29/37] [chromium] › tests\v022-interactions.spec.ts:223:3 › empty cycle summary stays inside its card at 430x932
+[30/37] [chromium] › tests\v022-period-logic.spec.ts:28:1 › today toggle persists intervals, hides flow, retains diary and unknown fields
+[31/37] [chromium] › tests\v022-period-logic.spec.ts:40:1 › historical removal confirms exact suffix, cancellation does not mutate, future is locked
+[32/37] [chromium] › tests\v022-period-logic.spec.ts:49:1 › historical insertion with later record immediately requires bounded end and protects later record
+[33/37] [chromium] › tests\v022-period-logic.spec.ts:58:1 › historical insertion without later record covers selected through today
+[34/37] [chromium] › tests\v022-period-logic.spec.ts:64:1 › failed toggle save keeps latest state and retry persists it without touching daily records
+[35/37] [chromium] › tests\v022-period-logic.spec.ts:78:1 › legacy unknown fields survive period editor, settings and daily edits
+[36/37] [chromium] › tests\v022-period-logic.spec.ts:87:1 › crossing local midnight rejects truncation before any persistence call
+[37/37] [chromium] › tests\v022-period-logic.spec.ts:98:1 › prior record within recent 90 days requires an end even when no later record exists
+  37 passed (1.6m)

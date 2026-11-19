@@ -1,0 +1,70 @@
+
+[WebServer] (node:9428) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 17 tests using 1 worker
+
+
+(node:19064) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+[1/17] [chromium] › tests\v022-evidence.spec.ts:21:62 › matched baseline evidence 360x740
+[2/17] [chromium] › tests\v022-evidence.spec.ts:21:62 › matched baseline evidence 393x852
+[3/17] [chromium] › tests\v022-evidence.spec.ts:21:62 › matched baseline evidence 430x932
+[4/17] [chromium] › tests\v022-evidence.spec.ts:30:1 › empty summary plus top24 bottom24 safe area stays on one screen
+[5/17] [chromium] › tests\v022-evidence.spec.ts:39:31 › short screen 480 with 150 percent font scrolls safely
+  1) [chromium] › tests\v022-evidence.spec.ts:39:31 › short screen 480 with 150 percent font scrolls safely 
+
+    Error: expect(locator).toBeInViewport() failed
+
+    Locator:  locator('.period-calendar button,.period-summary button').first()
+    Expected: in viewport
+    Received: viewport ratio 0.9984375238418579
+    Timeout:  6000ms
+
+    Call log:
+      - Expect "toBeInViewport" locator('.period-calendar button,.period-summary button').first() with timeout 6000ms
+      - waiting for locator('.period-calendar button,.period-summary button').first()
+        15 × locator resolved to <button aria-label="上个月">…</button>
+           - unexpected value "viewport ratio 0.9984375238418579"
+
+
+      46 |   const summary=await page.locator('.period-summary').boundingBox(),last=await page.locator('.period-averages button').last().boundingBox(),title=page.locator('.period-summary h2');expect(last!.y+last!.height).toBeLessThanOrEqual(summary!.y+summary!.height);expect(await title.evaluate(el=>el.scrollWidth-el.clientWidth)).toBeLessThanOrEqual(1);
+      47 |   expect(await page.locator('.period-page').evaluate(el=>el.scrollHeight>el.clientHeight)).toBe(true);
+    > 48 |   for(const control of [...await page.locator('.period-calendar button,.period-summary button').all(),...all.map(name=>page.getByRole('button',{name,exact:true}))]){await control.scrollIntoViewIfNeeded();await expect(control).toBeInViewport({ratio:1});}
+         |                                                                                                                                                                                                                                   ^
+      49 |   const nav=await page.locator('.bottom-nav').boundingBox(),mood=page.getByRole('button',{name:'易怒',exact:true});const moodBox=await mood.boundingBox(),label=await mood.locator(':scope >span').last().boundingBox();expect(label!.y+label!.height).toBeLessThanOrEqual(moodBox!.y+moodBox!.height);expect(label!.y+label!.height).toBeLessThanOrEqual(nav!.y);
+      50 |   expect(await page.evaluate(()=>document.body.scrollWidth)).toBe(360);
+      51 |   await shot(page,`period-360x${height}-font150-bottom`);await page.locator('.period-page').evaluate(el=>el.scrollTop=0);await shot(page,`period-360x${height}-font150-top`);
+        at D:\cozy-days-v022-verification\tests\v022-evidence.spec.ts:48:227
+
+    Error Context: test-results\v022-evidence-short-screen-533d9-percent-font-scrolls-safely-chromium\error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\v022-evidence-short-screen-533d9-percent-font-scrolls-safely-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\v022-evidence-short-screen-533d9-percent-font-scrolls-safely-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+(node:2288) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+[6/17] [chromium] › tests\v022-evidence.spec.ts:39:31 › short screen 640 with 150 percent font scrolls safely
+[7/17] [chromium] › tests\v022-evidence.spec.ts:53:30 › today and chosen backgrounds stay connected at width 393
+[8/17] [chromium] › tests\v022-evidence.spec.ts:53:30 › today and chosen backgrounds stay connected at width 900
+[9/17] [chromium] › tests\v022-evidence.spec.ts:58:1 › bands break at weeks and months, preserve palette and real status priority
+[10/17] [chromium] › tests\v022-interactions.spec.ts:72:1 › touch date gestures are scoped, click safe, and month dates clamp
+[11/17] [chromium] › tests\v022-interactions.spec.ts:149:3 › period controls fit 360x740
+[12/17] [chromium] › tests\v022-interactions.spec.ts:149:3 › period controls fit 393x852
+[13/17] [chromium] › tests\v022-interactions.spec.ts:149:3 › period controls fit 430x932
+[14/17] [chromium] › tests\v022-interactions.spec.ts:190:1 › six week calendar and 24px safe inset budget remain usable
+[15/17] [chromium] › tests\v022-interactions.spec.ts:216:3 › empty cycle summary stays inside its card at 360x740
+[16/17] [chromium] › tests\v022-interactions.spec.ts:216:3 › empty cycle summary stays inside its card at 393x852
+[17/17] [chromium] › tests\v022-interactions.spec.ts:216:3 › empty cycle summary stays inside its card at 430x932
+  1 failed
+    [chromium] › tests\v022-evidence.spec.ts:39:31 › short screen 480 with 150 percent font scrolls safely 
+  16 passed (55.7s)

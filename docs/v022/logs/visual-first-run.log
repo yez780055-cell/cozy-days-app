@@ -1,0 +1,87 @@
+
+[WebServer] (node:12552) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 7 tests using 1 worker
+
+(node:25240) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[1/7] [chromium] › tests\v022-evidence.spec.ts:21:62 › matched baseline evidence 360x740
+[2/7] [chromium] › tests\v022-evidence.spec.ts:21:62 › matched baseline evidence 393x852
+[3/7] [chromium] › tests\v022-evidence.spec.ts:21:62 › matched baseline evidence 430x932
+[4/7] [chromium] › tests\v022-evidence.spec.ts:30:1 › empty summary plus top24 bottom24 safe area stays on one screen
+  1) [chromium] › tests\v022-evidence.spec.ts:30:1 › empty summary plus top24 bottom24 safe area stays on one screen 
+
+    Error: expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 1
+    Received:    19
+
+      17 | }
+      18 | async function shot(page:Page,name:string) {await settle(page);await page.screenshot({path:`${out}/${name}.png`,animations:'disabled'});}
+    > 19 | async function noPageOverflow(page:Page) {expect(await page.locator('.period-page').evaluate(el=>el.scrollHeight-el.clientHeight)).toBeLessThanOrEqual(1);}
+         |                                                                                                                                    ^
+      20 | const all=['是','否','较多','适中','较少','点滴','无','腹痛','疲惫','头痛','胸部胀痛','其他','开心','平静','焦虑','低落','易怒'];
+      21 | for(const [width,height] of [[360,740],[393,852],[430,932]]) test(`matched baseline evidence ${width}x${height}`,async({page})=>{
+      22 |   await page.setViewportSize({width,height});await seed(page);
+        at noPageOverflow (D:\cozy-days-v022-verification\tests\v022-evidence.spec.ts:19:132)
+        at D:\cozy-days-v022-verification\tests\v022-evidence.spec.ts:35:3
+
+    Error Context: test-results\v022-evidence-empty-summar-c89c9-fe-area-stays-on-one-screen-chromium\error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\v022-evidence-empty-summar-c89c9-fe-area-stays-on-one-screen-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\v022-evidence-empty-summar-c89c9-fe-area-stays-on-one-screen-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+
+(node:31648) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+[5/7] [chromium] › tests\v022-evidence.spec.ts:38:31 › short screen 480 with 150 percent font scrolls safely
+[6/7] [chromium] › tests\v022-evidence.spec.ts:38:31 › short screen 640 with 150 percent font scrolls safely
+[7/7] [chromium] › tests\v022-evidence.spec.ts:47:1 › bands break at weeks and months, preserve palette and real status priority
+  2) [chromium] › tests\v022-evidence.spec.ts:47:1 › bands break at weeks and months, preserve palette and real status priority 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('.period-date.ovulation:not(.outside)').first()
+    Expected: visible
+    Timeout: 6000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" locator('.period-date.ovulation:not(.outside)').first() with timeout 6000ms
+      - waiting for locator('.period-date.ovulation:not(.outside)').first()
+
+
+      54 |   await page.getByRole('button',{name:'下个月',exact:true}).click();await settle(page);
+      55 |   for(const kind of ['predicted','fertile','ovulation']) {
+    > 56 |     const day=page.locator(`.period-date.${kind}:not(.outside)`).first();await expect(day).toBeVisible();
+         |                                                                                            ^
+      57 |     expect(await day.evaluate((el,k)=>getComputedStyle(el,k==='ovulation'?undefined:'::before').backgroundColor,kind)).toBe(await page.locator(`.period-legend i.${kind}`).evaluate(el=>getComputedStyle(el).backgroundColor));
+      58 |   }
+      59 |   await shot(page,'period-band-palette');
+        at D:\cozy-days-v022-verification\tests\v022-evidence.spec.ts:56:92
+
+    Error Context: test-results\v022-evidence-bands-break--598a4-te-and-real-status-priority-chromium\error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results\v022-evidence-bands-break--598a4-te-and-real-status-priority-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace test-results\v022-evidence-bands-break--598a4-te-and-real-status-priority-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+  2 failed
+    [chromium] › tests\v022-evidence.spec.ts:30:1 › empty summary plus top24 bottom24 safe area stays on one screen 
+    [chromium] › tests\v022-evidence.spec.ts:47:1 › bands break at weeks and months, preserve palette and real status priority 
+  5 passed (26.5s)

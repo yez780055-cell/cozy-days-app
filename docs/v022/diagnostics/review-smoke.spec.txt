@@ -1,0 +1,13 @@
+import { test, expect } from '@playwright/test';
+import { createHash } from 'node:crypto';
+test('v022 static review serves every hashed image and the final actual source',async({page,request,baseURL})=>{
+  const review=new URL('review/v022/',baseURL!).href;await page.goto(review);
+  await expect(page.getByRole('heading',{name:'小饱日常 · v0.2.2 验收',exact:true})).toBeVisible();
+  await expect(page.locator('script')).toHaveCount(0);
+  await page.locator('img').evaluateAll(images=>Promise.all(images.map(image=>(image as HTMLImageElement).decode())));
+  const response=await request.get(new URL('source.json',review).href);expect(response.ok()).toBe(true);const source=await response.json();
+  expect(source.actualTestSourceCommit).toBe('afc908261f20646e2307c119dc32e9c02f5eecbc');expect(source.integrationEquivalentSourceCommit).toBe('eda099dfc92d913562581bbc5a6b4e3138162ed2');
+  for(const artifact of source.artifacts){const resource=await request.get(new URL(artifact.path,review).href);expect(resource.ok(),artifact.path).toBe(true);expect(createHash('sha256').update(await resource.body()).digest('hex'),artifact.path).toBe(artifact.sha256);}
+  for(const href of await page.locator('a').evaluateAll(links=>links.map(link=>(link as HTMLAnchorElement).href)))expect((await request.get(href)).ok(),href).toBe(true);
+  expect(await page.locator('img[src$="-before.png"]').count()).toBe(3);expect(await page.locator('img[src$="-after.png"]').count()).toBe(3);
+});

@@ -1,0 +1,47 @@
+[WebServer] (node:24108) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 1 test using 1 worker
+
+(node:7740) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[1/1] [chromium] › tests\v022-swipe-diagnostic.spec.ts:29:1 › 快速连续操作支持独立撤销，同一任务删除后撤销不重复创建
+  1) [chromium] › tests\v022-swipe-diagnostic.spec.ts:29:1 › 快速连续操作支持独立撤销，同一任务删除后撤销不重复创建 ───────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('button', { name: '已完成 1', exact: true })
+    Expected: visible
+    Timeout: 6000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('button', { name: '已完成 1', exact: true }) with timeout 6000ms
+      - waiting for getByRole('button', { name: '已完成 1', exact: true })
+
+
+      39 |   await drag(page,b,-(await b.boundingBox())!.width*.65);
+      40 |   await drag(page,c,(await c.boundingBox())!.width*.65);
+    > 41 |   await expect(b).toHaveCount(0);await expect(page.getByRole('button',{name:'已完成 1',exact:true})).toBeVisible();
+         |                                                                                                   ^
+      42 |   await undo(page);await expect(c).toBeVisible();
+      43 |   expect((await rows(page)).map(r=>[r.id,r.completed])).toEqual([[3,false]]);
+      44 | });
+        at D:\cozy-days-v022-verification\tests\v022-swipe-diagnostic.spec.ts:41:99
+
+    Error Context: artifacts\v022-swipe-diagnostic\v022-swipe-diagnostic-快速连续操作支持独立撤销，同一任务删除后撤销不重复创建-chromium\error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    artifacts\v022-swipe-diagnostic\v022-swipe-diagnostic-快速连续操作支持独立撤销，同一任务删除后撤销不重复创建-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace artifacts\v022-swipe-diagnostic\v022-swipe-diagnostic-快速连续操作支持独立撤销，同一任务删除后撤销不重复创建-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+  1 failed
+    [chromium] › tests\v022-swipe-diagnostic.spec.ts:29:1 › 快速连续操作支持独立撤销，同一任务删除后撤销不重复创建 ────────────

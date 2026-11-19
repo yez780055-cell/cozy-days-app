@@ -1,0 +1,127 @@
+
+[WebServer] (node:29880) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 3 tests using 1 worker
+
+(node:13212) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[1/3] [chromium] › tests\swipe.spec.ts:128:1 › 快速连续操作支持独立撤销，同一任务删除后撤销不重复创建
+  1) [chromium] › tests\swipe.spec.ts:128:1 › 快速连续操作支持独立撤销，同一任务删除后撤销不重复创建 ──────────────────────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('button', { name: '已完成 1', exact: true })
+    Expected: visible
+    Timeout: 6000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('button', { name: '已完成 1', exact: true }) with timeout 6000ms
+      - waiting for getByRole('button', { name: '已完成 1', exact: true })
+
+
+      138 |   await drag(page,b,-(await b.boundingBox())!.width*.65);
+      139 |   await drag(page,c,(await c.boundingBox())!.width*.65);
+    > 140 |   await expect(b).toHaveCount(0);await expect(page.getByRole('button',{name:'已完成 1',exact:true})).toBeVisible();
+          |                                                                                                   ^
+      141 |   await undo(page);await expect(c).toBeVisible();
+      142 |   expect((await rows(page)).map(r=>[r.id,r.completed])).toEqual([[3,false]]);
+      143 | });
+        at D:\cozy-days-v022-verification\tests\swipe.spec.ts:140:99
+
+    Error Context: artifacts\v022-swipe-repeat\swipe-快速连续操作支持独立撤销，同一任务删除后撤销不重复创建-chromium\error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    artifacts\v022-swipe-repeat\swipe-快速连续操作支持独立撤销，同一任务删除后撤销不重复创建-chromium\trace.zip
+    Usage:
+
+        npx playwright show-trace artifacts\v022-swipe-repeat\swipe-快速连续操作支持独立撤销，同一任务删除后撤销不重复创建-chromium\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+(node:13228) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[2/3] [chromium] › tests\swipe.spec.ts:128:1 › 快速连续操作支持独立撤销，同一任务删除后撤销不重复创建
+  2) [chromium] › tests\swipe.spec.ts:128:1 › 快速连续操作支持独立撤销，同一任务删除后撤销不重复创建 ──────────────────────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('button', { name: '已完成 1', exact: true })
+    Expected: visible
+    Timeout: 6000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('button', { name: '已完成 1', exact: true }) with timeout 6000ms
+      - waiting for getByRole('button', { name: '已完成 1', exact: true })
+
+
+      138 |   await drag(page,b,-(await b.boundingBox())!.width*.65);
+      139 |   await drag(page,c,(await c.boundingBox())!.width*.65);
+    > 140 |   await expect(b).toHaveCount(0);await expect(page.getByRole('button',{name:'已完成 1',exact:true})).toBeVisible();
+          |                                                                                                   ^
+      141 |   await undo(page);await expect(c).toBeVisible();
+      142 |   expect((await rows(page)).map(r=>[r.id,r.completed])).toEqual([[3,false]]);
+      143 | });
+        at D:\cozy-days-v022-verification\tests\swipe.spec.ts:140:99
+
+    Error Context: artifacts\v022-swipe-repeat\swipe-快速连续操作支持独立撤销，同一任务删除后撤销不重复创建-chromium-repeat1\error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    artifacts\v022-swipe-repeat\swipe-快速连续操作支持独立撤销，同一任务删除后撤销不重复创建-chromium-repeat1\trace.zip
+    Usage:
+
+        npx playwright show-trace artifacts\v022-swipe-repeat\swipe-快速连续操作支持独立撤销，同一任务删除后撤销不重复创建-chromium-repeat1\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+
+(node:31612) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+[3/3] [chromium] › tests\swipe.spec.ts:128:1 › 快速连续操作支持独立撤销，同一任务删除后撤销不重复创建
+  3) [chromium] › tests\swipe.spec.ts:128:1 › 快速连续操作支持独立撤销，同一任务删除后撤销不重复创建 ──────────────────────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('button', { name: '已完成 1', exact: true })
+    Expected: visible
+    Timeout: 6000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('button', { name: '已完成 1', exact: true }) with timeout 6000ms
+      - waiting for getByRole('button', { name: '已完成 1', exact: true })
+
+
+      138 |   await drag(page,b,-(await b.boundingBox())!.width*.65);
+      139 |   await drag(page,c,(await c.boundingBox())!.width*.65);
+    > 140 |   await expect(b).toHaveCount(0);await expect(page.getByRole('button',{name:'已完成 1',exact:true})).toBeVisible();
+          |                                                                                                   ^
+      141 |   await undo(page);await expect(c).toBeVisible();
+      142 |   expect((await rows(page)).map(r=>[r.id,r.completed])).toEqual([[3,false]]);
+      143 | });
+        at D:\cozy-days-v022-verification\tests\swipe.spec.ts:140:99
+
+    Error Context: artifacts\v022-swipe-repeat\swipe-快速连续操作支持独立撤销，同一任务删除后撤销不重复创建-chromium-repeat2\error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    artifacts\v022-swipe-repeat\swipe-快速连续操作支持独立撤销，同一任务删除后撤销不重复创建-chromium-repeat2\trace.zip
+    Usage:
+
+        npx playwright show-trace artifacts\v022-swipe-repeat\swipe-快速连续操作支持独立撤销，同一任务删除后撤销不重复创建-chromium-repeat2\trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+  3 failed
+    [chromium] › tests\swipe.spec.ts:128:1 › 快速连续操作支持独立撤销，同一任务删除后撤销不重复创建 ───────────────────────────
+    [chromium] › tests\swipe.spec.ts:128:1 › 快速连续操作支持独立撤销，同一任务删除后撤销不重复创建 ───────────────────────────
+    [chromium] › tests\swipe.spec.ts:128:1 › 快速连续操作支持独立撤销，同一任务删除后撤销不重复创建 ───────────────────────────

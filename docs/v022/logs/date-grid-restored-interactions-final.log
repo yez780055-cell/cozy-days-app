@@ -1,0 +1,19 @@
+
+[WebServer] (node:7368) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+
+Running 8 tests using 1 worker
+
+(node:9068) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[1/8] [chromium] › tests\v022-interactions.spec.ts:72:1 › touch date gestures are scoped, click safe, and month dates clamp
+[2/8] [chromium] › tests\v022-interactions.spec.ts:162:3 › period controls fit 360x740
+[3/8] [chromium] › tests\v022-interactions.spec.ts:162:3 › period controls fit 393x852
+[4/8] [chromium] › tests\v022-interactions.spec.ts:162:3 › period controls fit 430x932
+[5/8] [chromium] › tests\v022-interactions.spec.ts:203:1 › six week calendar and 24px safe inset budget remain usable
+[6/8] [chromium] › tests\v022-interactions.spec.ts:229:3 › empty cycle summary stays inside its card at 360x740
+[7/8] [chromium] › tests\v022-interactions.spec.ts:229:3 › empty cycle summary stays inside its card at 393x852
+[8/8] [chromium] › tests\v022-interactions.spec.ts:229:3 › empty cycle summary stays inside its card at 430x932
+  8 passed (26.1s)

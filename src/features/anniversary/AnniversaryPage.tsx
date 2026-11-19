@@ -7,6 +7,7 @@ import { anniversaryRepository } from '../../data/database';
 import { dateKey, nextImportantDate, resolvedTimingMode, timing, timingModes, type Anniversary } from './model';
 import { PhotoEditor } from './PhotoEditor';
 import { AnniversaryArt } from './AnniversaryArt';
+import { useAndroidBack } from '../../native/back';
 import './anniversary.css';
 const filters = ['全部', '即将到来', '累计中', '已过去'] as const;
 const timingLabels = { countdown: '倒计时', cumulative: '累计天数' };
@@ -70,6 +71,8 @@ export default function AnniversaryPage({initialAdd=false}:{initialAdd?:boolean}
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState('');
   const [saveStatus, setSaveStatus] = useState('');
+  useAndroidBack('page', detailId !== undefined, () => setDetailId(undefined));
+  useAndroidBack('overlay', menuOpen && detailId === undefined, closeMenu);
   useLayoutEffect(() => {
     if (pageScroll.current) pageScroll.current.scrollTop = detailId === undefined ? libraryScroll.current : 0;
   }, [detailId]);

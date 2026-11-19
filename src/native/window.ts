@@ -1,13 +1,18 @@
 import { AndroidShell, type SafeArea } from './shell';
+import { bindAndroidBack } from './back';
+import { bindAndroidKeyboard } from './keyboard';
 import './window.css';
 
 export async function prepareAndroidWindow() {
   const root = document.documentElement;
   root.dataset.cozyAndroid = '';
+  bindAndroidBack();
+  const updateKeyboard = bindAndroidKeyboard(root);
   const apply = (area: SafeArea) => {
     for (const side of ['top', 'right', 'bottom', 'left'] as const) {
       root.style.setProperty(`--android-safe-${side}`, `${area[side]}px`);
     }
+    updateKeyboard(area);
   };
   window.addEventListener('cozy-safe-area', event => apply((event as CustomEvent<SafeArea>).detail));
   await AndroidShell.getSafeArea().then(apply).catch(error => console.error(error));

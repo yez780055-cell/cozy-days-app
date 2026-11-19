@@ -4,8 +4,8 @@
 
 [data-cozy-android] .app-shell {
   position: fixed;
-  inset: var(--visible-offset, 0px) 0 auto;
-  height: var(--visible-height, 100dvh);
+  inset: var(--android-visible-offset, 0px) 0 auto;
+  height: var(--android-visible-height, 100dvh);
   min-height: 0;
   padding-left: var(--android-safe-left, env(safe-area-inset-left, 0px));
   padding-right: var(--android-safe-right, env(safe-area-inset-right, 0px));
@@ -21,4 +21,34 @@
 
 [data-cozy-android] .modal {
   max-height: min(85%, calc(100% - var(--safe-top)));
+}
+
+[data-cozy-keyboard] .bottom-nav {
+  display: none;
+}
+
+[data-cozy-android][data-cozy-keyboard] .modal {
+  max-height: calc(100% - var(--safe-top));
+  padding-block: 0 8px;
+  scroll-padding-block: 52px 60px;
+  overflow-anchor: none;
+}
+
+[data-cozy-keyboard] .modal-header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  margin-bottom: 4px;
+  background: var(--surface);
+}
+
+[data-cozy-keyboard] .modal-actions {
+  padding-block: 4px;
+}
+
+[data-cozy-keyboard] .category-form {
+  position: sticky;
+  top: var(--touch);
+  z-index: 1;
+  background: var(--surface);
 }

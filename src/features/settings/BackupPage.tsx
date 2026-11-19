@@ -6,6 +6,7 @@ import { SettingsHeader } from './SettingsHeader';
 import { exportBackup, exportPreviousBackup, restoreBackup } from '../../data/backup';
 import { decodeBackup, maxBackupBytes, type Backup, type RestoreMode } from '../../data/backupModel';
 import { canRestore } from '../../data/storageAccess';
+import { useAndroidBack } from '../../native/back';
 
 const backupFile = registerPlugin<{ save(options: { filename: string; json: string }): Promise<{ saved: boolean }> }>('BackupFile');
 
@@ -37,6 +38,11 @@ export function BackupPage({ onBack }: { onBack: () => void }) {
   const [busy, setBusy] = useState(false);
   const inFlight = useRef(false);
   const supported = canRestore();
+  function cancelSelection() {
+    setSelection(null);
+    setError('');
+  }
+  useAndroidBack('overlay', !!candidate, () => { if (!inFlight.current) cancelSelection(); });
 
   useEffect(() => {
     let mounted = true;
@@ -80,7 +86,7 @@ export function BackupPage({ onBack }: { onBack: () => void }) {
   }
 
   return <section className="settings-page backup-page" aria-label="数据备份与恢复">
-    <SettingsHeader title="数据备份与恢复" disabled={busy} onBack={finished ? () => location.reload() : onBack}/>
+    <SettingsHeader title="数据备份与恢复" disabled={busy} onBack={finished ? () => location.reload() : onBack} onAndroidBack={onBack}/>
     <p className="settings-intro">备份包含已保存的待办、分类、经期记录和纪念日。JSON 只在本机处理，请妥善保管文件。</p>
     {busy && <p className="settings-notice" role="status">正在处理本地数据…</p>}
     {message && <p className="settings-notice" role="status">{message}</p>}
@@ -122,7 +128,7 @@ export function BackupPage({ onBack }: { onBack: () => void }) {
             : '本机三个模块的已保存数据将被替换。应用会先保存一份本机备份。'}</p>
           <p>继续前请关闭其他已打开的旧版应用页面。</p>
           <div className="backup-confirm">
-            <Button variant="soft" disabled={busy} onClick={() => { setSelection(null); setError(''); }}>取消</Button>
+            <Button variant="soft" disabled={busy} onClick={cancelSelection}>取消</Button>
             <Button variant={mode === 'replace' ? 'danger' : 'primary'} disabled={busy} onClick={() => confirm(candidate)}>
               {mode === 'merge' ? '确认合并' : '确认替换'}
             </Button>

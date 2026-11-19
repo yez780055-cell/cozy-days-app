@@ -1,10 +1,13 @@
 package com.littledays.app;
 
 import android.graphics.Color;
+import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Toast;
+import androidx.activity.OnBackPressedCallback;
 import androidx.core.graphics.Insets;
 import androidx.core.splashscreen.SplashScreen;
 import androidx.core.splashscreen.SplashScreenViewProvider;
@@ -45,6 +48,17 @@ public class MainActivity extends BridgeActivity {
         configureWindow();
 
         var webView = bridge.getWebView();
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                var insets = ViewCompat.getRootWindowInsets(webView);
+                if (insets != null && insets.isVisible(WindowInsetsCompat.Type.ime())) {
+                    WindowCompat.getInsetsController(getWindow(), webView).hide(WindowInsetsCompat.Type.ime());
+                    return;
+                }
+                webView.evaluateJavascript("dispatchEvent(new Event('cozy-android-back'))", null);
+            }
+        });
         ViewCompat.setOnApplyWindowInsetsListener(webView, (view, insets) -> {
             var area = updateSafeArea(insets);
             webView.evaluateJavascript("dispatchEvent(new CustomEvent('cozy-safe-area',{detail:" + area + "}))", null);
@@ -77,20 +91,46 @@ public class MainActivity extends BridgeActivity {
     JSObject getSafeArea() {
         var insets = ViewCompat.getRootWindowInsets(bridge.getWebView());
         if (insets != null) return updateSafeArea(insets);
-        return safeArea == null ? new JSObject().put("top", 0).put("right", 0).put("bottom", 0).put("left", 0) : safeArea;
+        return safeArea == null ? new JSObject().put("top", 0).put("right", 0).put("bottom", 0)
+            .put("left", 0).put("keyboardVisible", false).put("keyboardViewportHeight", 0) : safeArea;
     }
 
     private JSObject updateSafeArea(WindowInsetsCompat insets) {
         Insets bars = insets.getInsets(WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.displayCutout());
         Insets gestures = insets.getInsets(WindowInsetsCompat.Type.mandatorySystemGestures());
         float density = getResources().getDisplayMetrics().density;
-        int bottom = insets.isVisible(WindowInsetsCompat.Type.ime()) ? 0 : Math.max(bars.bottom, gestures.bottom);
+        boolean keyboardVisible = insets.isVisible(WindowInsetsCompat.Type.ime());
+        int imeBottom = insets.getInsets(WindowInsetsCompat.Type.ime()).bottom;
+        int bottom = keyboardVisible && imeBottom > 0 ? 0 : Math.max(bars.bottom, gestures.bottom);
+        int keyboardViewportHeight = keyboardVisible && imeBottom > 0 ? keyboardViewportHeight(imeBottom) : 0;
         safeArea = new JSObject()
             .put("top", Math.ceil(bars.top / density))
             .put("right", Math.ceil(bars.right / density))
             .put("bottom", Math.ceil(bottom / density))
-            .put("left", Math.ceil(bars.left / density));
+            .put("left", Math.ceil(bars.left / density))
+            .put("keyboardVisible", keyboardVisible)
+            .put("keyboardViewportHeight", Math.floor(keyboardViewportHeight / density));
         return safeArea;
+    }
+
+    private int keyboardViewportHeight(int imeInset) {
+        var webView = bridge.getWebView();
+        int[] location = new int[2];
+        webView.getLocationOnScreen(location);
+        int visibleBottom;
+        if (Build.VERSION.SDK_INT >= 30) {
+            visibleBottom = getWindowManager().getCurrentWindowMetrics().getBounds().bottom - imeInset;
+        } else {
+            Rect visible = new Rect();
+            webView.getWindowVisibleDisplayFrame(visible);
+            visibleBottom = visible.bottom;
+        }
+        return Math.max(0, visibleBottom - location[1]);
+    }
+
+    void homeBack(boolean exit) {
+        if (exit) finish();
+        else Toast.makeText(this, R.string.back_to_exit, Toast.LENGTH_SHORT).show();
     }
 
     private void setBarIcons(boolean darkStatus, boolean darkNavigation) {

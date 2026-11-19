@@ -18,7 +18,7 @@ Android 构建使用独立入口。它由原生窗口传入系统栏、屏幕缺
 
 ## 构建
 
-使用 Node、JDK 21 和 Android SDK 35。为实验单独生成 RSA 2048 或更高强度的 PKCS#12 密钥，设置 `COZY_EXPERIMENT_KEYSTORE`、`COZY_EXPERIMENT_STORE_PASSWORD`、`COZY_EXPERIMENT_KEY_ALIAS`、`COZY_EXPERIMENT_KEY_PASSWORD`。同一个实验签名用于后续 APK 和网页包。版本号默认 1，可用 `COZY_EXPERIMENT_VERSION_CODE` 提升。
+使用 Node、JDK 21 和 Android SDK 35。为实验单独生成 RSA 2048 或更高强度的 PKCS#12 密钥，设置 `COZY_EXPERIMENT_KEYSTORE`、`COZY_EXPERIMENT_STORE_PASSWORD`、`COZY_EXPERIMENT_KEY_ALIAS`、`COZY_EXPERIMENT_KEY_PASSWORD`。同一个实验签名用于后续 APK 和网页包。版本号默认 3，可用 `COZY_EXPERIMENT_VERSION_CODE` 提升。
 
 ```powershell
 npm ci
@@ -33,5 +33,9 @@ Windows 工作目录路径含中文时，构建命令可加 `-Pandroid.overrideP
 
 ```powershell
 npm run build:android
-java scripts/PackAndroidWeb.java dist-android 1 2 artifacts/Cozy-Days-Web-Update-2.cozyupdate
+java scripts/PackAndroidWeb.java dist-android 3 2 artifacts/Cozy-Days-Web-Update-2.cozyupdate
 ```
+
+## Android 交互回归
+
+先运行 `npm run build:android`，再运行 `npx playwright test --config playwright.android.config.ts`，检查键盘下的可视区域、滚动、草稿保护和逐层返回。实际系统键盘与返回键可在独立模拟器上验证。启动签名调试包并用 ADB 转发其 WebView 调试套接字后，运行 `node tests-android/device-qa.mjs <本地端口> <模拟器序列号>`。

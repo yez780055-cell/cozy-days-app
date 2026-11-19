@@ -2,10 +2,11 @@ import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import { X } from 'lucide-react';
 import { Button } from './Button';
 import { animateElement, motion } from '../styles/motion';
+import { useAndroidBack } from '../native/back';
 
-export function Modal({ title, onClose, children, className = '', headerAction, canClose, dirty = false, closeText, layout = 'sheet' }: {
+export function Modal({ title, onClose, children, className = '', headerAction, canClose, dirty = false, closeText, layout = 'sheet', onAndroidBack }: {
   title: string; onClose: () => void; children: ReactNode | ((requestClose: () => void) => ReactNode); className?: string; headerAction?: ReactNode; canClose?: () => boolean; dirty?: boolean;
-  closeText?: string; layout?: 'sheet' | 'confirm';
+  closeText?: string; layout?: 'sheet' | 'confirm'; onAndroidBack?: () => boolean;
 }) {
   const [confirmClose, setConfirmClose] = useState(false);
   const warning = useRef<HTMLDivElement>(null);
@@ -35,6 +36,15 @@ export function Modal({ title, onClose, children, className = '', headerAction, 
     }
     closeRef.current();
   }, [layout]);
+  useAndroidBack('overlay', true, () => {
+    if (closing.current || canCloseRef.current?.() === false) return;
+    if (confirmClose) {
+      setConfirmClose(false);
+      panel.current?.focus({ preventScroll: true });
+      return;
+    }
+    if (!onAndroidBack?.()) void close();
+  });
   useEffect(() => {
     const previous = document.activeElement as HTMLElement | null;
     const element = panel.current!;

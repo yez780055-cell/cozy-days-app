@@ -9,6 +9,11 @@ export function CategoryManager({categories,onSave,onRemove,onClose}:{
 }) {
   const [name,setName]=useState(''),[editing,setEditing]=useState<string>(),[deleting,setDeleting]=useState<Category>();
   const [error,setError]=useState(''),[busy,setBusy]=useState(false);
+  function cancelEdit() {
+    setEditing(undefined);
+    setName('');
+    setError('');
+  }
   async function submit(event:FormEvent) {
     event.preventDefault();if(busy)return;
     try{
@@ -21,6 +26,7 @@ export function CategoryManager({categories,onSave,onRemove,onClose}:{
     finally{setBusy(false);}
   }
   return <Modal title={deleting ? '删除分类？' : '管理分类'} layout={deleting ? 'confirm' : 'sheet'} canClose={() => !busy}
+    onAndroidBack={() => { if (deleting || !editing) return false; cancelEdit(); return true; }}
     onClose={() => deleting ? setDeleting(undefined) : onClose()}>
     {deleting ? <section className="category-delete">
       <p>删除「{deleting.name}」分类？</p><p>{categories.some(c=>c.id!==deleting.id&&c.key===categoryKey('生活')) ? '其中的任务都会移入「生活」，不会删除任务。' : categories.some(c=>c.id!==deleting.id) ? '其中的任务都会移入「'+categories.find(c=>c.id!==deleting.id)!.name+'」，不会删除任务。' : '将建立新的「生活」分类接收任务，不会删除任务。'}</p>
@@ -30,7 +36,7 @@ export function CategoryManager({categories,onSave,onRemove,onClose}:{
       <form className="category-form" onSubmit={submit}><label className="field-label" htmlFor="category-name">{editing?'修改分类名称':'新增分类'}</label>
         <div><input id="category-name" aria-label="分类名称" data-autofocus value={name} maxLength={16} placeholder="例如：运动、灵感" onChange={event=>setName(event.target.value)}/>
           <Button type="submit" disabled={busy||!name.trim()}>{editing?'保存分类':'添加分类'}</Button></div>
-        {editing && <button className="button button--ghost category-cancel" type="button" onClick={()=>{setEditing(undefined);setName('');setError('');}}>取消修改</button>}
+        {editing && <button className="button button--ghost category-cancel" type="button" onClick={cancelEdit}>取消修改</button>}
       </form>
       <p className="category-note">所有分类都可以改名或删除。没有生活时，任务移入最早的剩余分类；删除最后一个分类时建立新的生活分类。</p>
       <ul className="category-manager-list">{categories.map(category=><li key={category.id}><span>{category.name}</span>{<div>

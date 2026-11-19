@@ -14,6 +14,15 @@ import java.io.File;
 @CapacitorPlugin(name = "CozyAndroidShell")
 public class AndroidShellPlugin extends Plugin {
     @PluginMethod
+    public void homeBack(PluginCall call) {
+        var activity = (MainActivity) getActivity();
+        activity.runOnUiThread(() -> {
+            activity.homeBack(call.getBoolean("exit", false));
+            call.resolve();
+        });
+    }
+
+    @PluginMethod
     public void getSafeArea(PluginCall call) {
         var activity = (MainActivity) getActivity();
         activity.runOnUiThread(() -> call.resolve(activity.getSafeArea()));

@@ -18,12 +18,12 @@ export function SettingsPage({ fontId, pendingFontId, onSelect, onBack }: {
     <header className="settings-header">
       <button type="button" className="settings-back icon-button" aria-label="返回上一页" onClick={onBack}><ArrowLeft size={19}/></button>
       <span className="settings-icon"><Type size={20}/></span>
-      <div><span className="eyebrow">MAKE IT YOURS</span><h1>字体设置</h1></div>
+      <div><span className="eyebrow">MAKE IT YOURS</span><h1>设置</h1></div>
     </header>
-    <button type="button" className="backup-entry" onClick={() => setShowBackup(true)}>
+    <h2>数据</h2><p>记录仅保存在本机，不会自动同步；换设备前请导出备份。</p><button type="button" className="backup-entry" onClick={() => setShowBackup(true)}>
       <DatabaseBackup size={20}/><span>数据备份与恢复</span><ChevronRight size={18}/>
     </button>
-    <p className="settings-intro">选一种喜欢的字，让每个小日子都更像你。</p>
+    <h2>外观</h2><p className="settings-intro">选一种喜欢的字，让每个小日子都更像你。</p>
     <section className="font-preview-card" aria-label="当前字体预览">
       <span>实时预览 · {selected.name}</span>
       <p data-testid="font-preview" style={{ fontFamily: selected.familyStack }}>今天也辛苦啦，一件一件来就好。</p>

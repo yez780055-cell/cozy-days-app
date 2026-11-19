@@ -7,6 +7,7 @@ export function useTodos() {
   const [categories,setCategories]=useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [saveStatus, setSaveStatus] = useState('');
   const queue = useRef(Promise.resolve());
   const alive = useRef(true);
   const refresh = useCallback(async () => {
@@ -17,14 +18,15 @@ export function useTodos() {
   useEffect(() => { alive.current = true; void refresh(); return () => { alive.current = false; }; }, [refresh]);
   const mutate = useCallback((action: () => Promise<unknown>) => {
     const result = queue.current.then(async () => {
-      try { await action(); await refresh(); return true; }
-      catch (error) { if (alive.current) setError(error instanceof CategoryError ? error.message : '保存失败，请重试。当前更改尚未保存。'); return false; }
+      if (alive.current) setSaveStatus('正在保存…');
+      try { await action(); await refresh(); if (alive.current) setSaveStatus('已保存'); return true; }
+      catch (error) { if (alive.current) { setSaveStatus(''); setError(error instanceof CategoryError ? error.message : '保存失败，请重试。当前更改尚未保存。'); } return false; }
     });
     queue.current = result.then(() => {});
     return result;
   }, [refresh]);
   return {
-    todos, categories, loading, error,
+    todos, categories, loading, error, saveStatus,
     save: (text: string, date: string, id?: number, decoration?: TaskDecoration, favorite?: boolean, categoryId?:string, time?:string) => mutate(() => id === undefined
       ? todoRepository.add({ text, date, completed: false, createdAt: Date.now(), decoration, favorite: favorite ?? false,categoryId:categoryId??DEFAULT_CATEGORY,time })
       : todoRepository.update(id, { text, date, decoration, ...(favorite === undefined ? {} : {favorite}), ...(categoryId===undefined?{}:{categoryId}),...(time===undefined?{}:{time:canonicalTime(time)||undefined}) })),

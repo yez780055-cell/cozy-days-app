@@ -45,6 +45,10 @@
 .ann-week i,.ann-month-grid i { height: 11px; color: #e56d95; font-size: 10px; font-style: normal; line-height: 11px; }
 .ann-week button[aria-pressed=true] { background: #ed8eaa; color: #fff; }
 .ann-week button[aria-pressed=true] small,.ann-week button[aria-pressed=true] i { color: #fff; }
+.ann-selected-events { display: grid; gap: 4px; margin-top: 8px; }
+.ann-selected-events button { display:flex; justify-content:space-between; align-items:center; gap:8px; min-height:44px; padding:8px 10px; border:1px solid #ecd3cc; border-radius:10px; background:#fffaf5; color:#684b43; text-align:left; }
+.ann-selected-events button span { flex:none; font-size:12px; }
+.ann-list-label { margin:12px 2px 4px; font-size:12px; color:#705b50; }
 .ann-month-note { position: relative; display: flex; min-height: 76px; flex-direction: column; align-items: center; justify-content: center; gap: 3px; padding: 7px 2px; border: 1px dashed #e5d3ba; border-radius: 15px; background: #fff8e8; color: #5c4a3e; font-size: 10px; line-height: 1.4; text-align: center; }
 .ann-month-note .asset { position: absolute; top: -11px; right: 3px; width: 23px; height: 23px; object-fit: contain; }
 .ann-month-note b { color: #da8a43; font-size: 15px; }
@@ -143,4 +147,24 @@
   .ann-card-icon,.ann-card-icon>svg,.ann-doodle { width: 68px; }
   .ann-card h2 { font-size: 18px; }
   .ann-card p { font-size: 12px; }
+}
+@media(max-width:700px){
+.ann-card,.ann-card:nth-child(n){grid-template-columns:minmax(0,1fr) 91px;gap:8px}
+.ann-card-icon{display:none}
+.ann-card-copy{grid-column:1;padding:4px 0}
+.ann-card-side{grid-column:2}
+.ann-card-tape,.ann-card-flower{display:none}
+.ann-card p,.ann-meta,.ann-next{font-size:12px;line-height:1.5}
+.ann-card time{font-size:13px}
+.ann-week small,.ann-week-top,.ann-day-summary,.ann-day-summary button{font-size:12px}
+.ann-next{color:#654d43;margin-top:3px}
+.ann-week-layout>div:first-child{grid-template-rows:44px 1fr}
+.ann-week-top{height:44px}.ann-week-top button{min-height:44px}
+}
+@container phone (max-width:700px){
+.ann-card,.ann-card:nth-child(n){grid-template-columns:minmax(0,1fr) 91px;gap:8px}
+.ann-card-icon{display:none}.ann-card-copy{grid-column:1;padding:4px 0}.ann-card-side{grid-column:2}
+.ann-card-tape,.ann-card-flower{display:none}
+.ann-card p,.ann-meta,.ann-next{font-size:12px;line-height:1.5}.ann-card time{font-size:13px}
+.ann-week-layout>div:first-child{grid-template-rows:44px 1fr}.ann-week-top{height:44px}.ann-week-top button{min-height:44px}
 }

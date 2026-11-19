@@ -22,7 +22,7 @@ function PreviewStage({ scenario }: { scenario: Scenario }) {
   const [todos, setTodos] = useState(() => fixtures(scenario));
   const [categories,setCategories]=useState<Category[]>(defaultCategories);
   const store: TodoStore = {
-    todos, categories, error: '', loading: false,
+    todos, categories, error: '', saveStatus: '', loading: false,
     save: async (text, date, id, decoration, favorite, categoryId=DEFAULT_CATEGORY, time) => {
       setTodos(items => id === undefined ? [...items, {id: Date.now(), text, date, completed:false, createdAt:Date.now(), favorite,categoryId,time, decoration: reviseDecoration(text, decoration)}] : items.map(item => item.id === id ? {...item,text,date,favorite,categoryId,time, decoration: reviseDecoration(text, decoration ?? resolveDecoration(item.text, item.decoration))} : item)); return true;
     },

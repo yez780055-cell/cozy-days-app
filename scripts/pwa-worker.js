@@ -15,13 +15,14 @@ self.addEventListener('install', event => {
 });
 
 self.addEventListener('activate', event => {
-  // Updates wait for the previous version's windows to close before replacing its cache.
   event.waitUntil((async () => {
-    const keys = await caches.keys();
-    await Promise.all(keys.filter(key => key.startsWith(cachePrefix) && key !== cacheName)
-      .map(key => caches.delete(key)));
     await self.clients.claim();
+    await pruneShells().catch(() => {});
   })());
+});
+
+self.addEventListener('message', event => {
+  if (event.data?.type === 'SKIP_WAITING') event.waitUntil(self.skipWaiting());
 });
 
 self.addEventListener('fetch', event => {
@@ -32,13 +33,36 @@ self.addEventListener('fetch', event => {
     const url = new URL(request.url);
     if (`${url.origin}${url.pathname}` === scope || `${url.origin}${url.pathname}` === index) {
       event.respondWith(cachedShell(index, request));
+      if (event.resultingClientId) event.waitUntil(pruneShells(event.resultingClientId).catch(() => {}));
     }
   } else if (shell.has(request.url)) {
     event.respondWith(cachedShell(request.url, request));
   } else if (fonts.has(request.url)) {
     event.respondWith(cachedFont(request));
+  } else if (request.url.startsWith(new URL('assets/', scope).href)) {
+    // Older open tabs can still request their version's hashed assets offline.
+    event.respondWith((async () => {
+      const keys = await caches.keys();
+      for (const cacheName of keys.filter(key => key.startsWith(cachePrefix)).reverse()) {
+        const cached = await caches.match(request, { cacheName });
+        if (cached) return cached;
+      }
+      return fetch(request);
+    })());
   }
 });
+
+async function pruneShells(incomingClientId) {
+  const keys = (await caches.keys()).filter(key => key.startsWith(cachePrefix));
+  const current = keys.indexOf(cacheName);
+  if (current < 2) return;
+  // A claimed client may still be running any earlier build. Only a fresh
+  // navigation (or an activation with no open pages) can prove those are gone.
+  const windows = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+  if (windows.some(client => client.id !== incomingClientId && client.url.startsWith(scope))) return;
+  // Retain one previous shell and leave newer installing/waiting caches alone.
+  await Promise.all(keys.slice(0, current - 1).map(key => caches.delete(key)));
+}
 
 async function cachedShell(key, request) {
   const cache = await caches.open(cacheName);

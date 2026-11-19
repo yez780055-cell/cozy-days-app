@@ -83,7 +83,7 @@ export function TodoCard({ todo, showDate, onToggle, onEdit, onDelete }: {
     }
   }
   function down(event: ReactPointerEvent<HTMLElement>) {
-    if (busy.current || event.button!==0 || !event.isPrimary || (event.target as HTMLElement).closest('.card-more')) return;
+    if (busy.current || event.button!==0 || !event.isPrimary || (event.target as HTMLElement).closest('.card-more, .task-toggle')) return;
     window.dispatchEvent(new CustomEvent(OPEN_EVENT,{detail:todo.id}));
     gesture.current={id:event.pointerId,x:event.clientX,y:event.clientY,base:offset.current,axis:'pending'};
   }
@@ -111,7 +111,7 @@ export function TodoCard({ todo, showDate, onToggle, onEdit, onDelete }: {
     suppressClickUntil.current=performance.now()+400;
     if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
     const x=offset.current,width=event.currentTarget.getBoundingClientRect().width;
-    if (Math.abs(x)>width*.5) void perform(x<0?'delete':'toggle');
+    if (x>width*.5) void perform('toggle');
     else paint(Math.abs(x)>=REVEAL ? Math.sign(x)*REVEAL : 0,true);
   }
   return <div ref={shell} className="swipe-shell" data-offset="0" data-phase="idle">
@@ -125,6 +125,7 @@ export function TodoCard({ todo, showDate, onToggle, onEdit, onDelete }: {
       onPointerDown={down} onPointerMove={move} onPointerUp={up}
       onPointerCancel={()=>{gesture.current=null; if(!busy.current) paint(0,true);}}
       onClickCapture={event=>{if(performance.now()<suppressClickUntil.current){event.preventDefault();event.stopPropagation();}}}>
+      <button type="button" className="task-toggle" aria-label={`${todo.completed?'标记未完成':'标记完成'}：${todo.text}`} onClick={()=>void perform('toggle')}><span aria-hidden="true">{todo.completed && <Check size={16}/>}</span></button>
       <button className="task-content" aria-label={`编辑：${todo.text}`} onClick={()=>{paint(0,true);onEdit(todo);}}>
         <span>{todo.text}</span>{(showDate || canonicalTime(todo.time)) && <small className="task-meta">{showDate&&<span>{formatDate(todo.date)}</span>}{canonicalTime(todo.time)&&<time dateTime={`${todo.date}T${canonicalTime(todo.time)}`}>{canonicalTime(todo.time)}</time>}</small>}
       </button>
@@ -136,7 +137,7 @@ export function TodoCard({ todo, showDate, onToggle, onEdit, onDelete }: {
         onClick={()=>{window.dispatchEvent(new CustomEvent(OPEN_EVENT,{detail:null}));setMenu(true);}}><Ellipsis size={20}/></button></div>
     </article>
     {menu && createPortal(<Modal title="这件小事" onClose={()=>setMenu(false)}>
-      <p className="card-menu-copy">左滑删除，右滑{todo.completed?'恢复':'完成'}。也可以在这里轻点操作。</p>
+      <p className="card-menu-copy">左滑显示删除，右滑{todo.completed?'恢复':'完成'}。也可以在这里轻点操作。</p>
       <div className="card-menu-actions">
         <Button variant="soft" onClick={()=>{setMenu(false);onEdit(todo);}}>编辑待办与收藏</Button>
         <Button aria-label={`${todo.completed?'恢复':'完成'}：${todo.text}`} onClick={()=>void perform('toggle')}>{todo.completed?'恢复未完成':'完成这件小事'}</Button>

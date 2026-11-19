@@ -53,7 +53,8 @@ for(const [width,height] of [[360,740],[393,852],[430,932]]) {
     await expect(page.locator('.undo-toast')).toContainText('哎呀点错了');
     await undo(page);await expect(first).toBeVisible();expect(await rows(page)).toEqual(original);
     await drag(page,first,-w*.62);
-    await expect(first).toHaveCount(0);await undo(page);await expect(first).toBeVisible();
+    await expect(shell).toHaveAttribute('data-offset','-80');
+    expect((await rows(page)).length).toBe(2);
     // 50% exactly must not directly delete.
     await drag(page,first,-w*.5);
     await expect(shell).toHaveAttribute('data-offset','-80');
@@ -87,6 +88,7 @@ test('退场时数据仍在，300ms 收缩与下方补位完成后才移除',asy
   const first=card(page,'先删除的卡片'),second=card(page,'向上补位的卡片');
   const before=(await second.boundingBox())!.y,w=(await first.boundingBox())!.width;
   await drag(page,first,-w*.65);
+  await page.getByRole('button',{name:'滑动删除：先删除的卡片'}).click();
   await expect(first.locator('..')).toHaveAttribute('data-phase','exiting');
   expect(await page.getByTestId('todo-card').count()).toBe(2);
   expect((await rows(page)).length).toBe(2);
@@ -136,17 +138,18 @@ test('快速连续操作支持独立撤销，同一任务删除后撤销不重�
   // Two overlapping gestures: operations persist in order and never share a target.
   const b=card(page,'乙'),c=card(page,'丙');
   await drag(page,b,-(await b.boundingBox())!.width*.65);
+  await page.getByRole('button',{name:'滑动删除：乙'}).click();
   await drag(page,c,(await c.boundingBox())!.width*.65);
   await expect(b).toHaveCount(0);await expect(page.getByRole('button',{name:'已完成 1',exact:true})).toBeVisible();
   await undo(page);await expect(c).toBeVisible();
   expect((await rows(page)).map(r=>[r.id,r.completed])).toEqual([[3,false]]);
 });
 
-test('5秒读条、超时消失及导航卸载清理',async({page})=>{
+test('10秒读条、超时消失及导航卸载清理',async({page})=>{
   await page.clock.install();await page.goto('/');await add(page,'计时任务');
   await taskAction(page,'计时任务','delete');await expect(card(page,'计时任务')).toHaveCount(0);
-  await expect(page.locator('.undo-progress i')).toHaveCSS('animation-duration','5s');
-  await page.clock.fastForward(4000);await expect(page.getByRole('button',{name:'撤销',exact:true})).toBeEnabled();
+  await expect(page.locator('.undo-progress i')).toHaveCSS('animation-duration','10s');
+  await page.clock.fastForward(9000);await expect(page.getByRole('button',{name:'撤销',exact:true})).toBeEnabled();
   await page.clock.fastForward(1600);await expect(page.locator('.undo-toast')).toHaveCount(0);
   await add(page,'导航前的小事');await taskAction(page,'导航前的小事','complete');
   await expect(page.locator('.undo-toast')).toHaveCount(1);

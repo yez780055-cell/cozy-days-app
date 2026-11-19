@@ -36,7 +36,7 @@ export default function PeriodPage() {
         const days={...d.days}; if(!value.flow&&!value.mood&&!value.symptoms.length) delete days[selected]; else days[selected]=value;
         return {...d,days};
       })}/>
-      <p className="period-storage" role="status">{saving?'正在保存…':error?(durable?'尚未保存到记录库 · '+notice:'尚未保存 · 仅内存保留，刷新或关闭页面会丢失，请重试'):'♡ 记录仅保存在这台设备 · 清除站点数据会丢失记录'}</p>
+      <p className="period-storage" role="status">{saving?'正在保存…':error?(durable?'保存失败，尚未保存到记录库 · '+notice:'保存失败，仅内存保留，刷新或关闭页面会丢失，请重试'):'已保存 · 记录仅保存在这台设备，不会自动同步 · 清除站点数据会丢失记录'}</p>
     </div>}
     {ready&&dialog==='editor'&&<PeriodEditor entry={editing} selected={selected} data={data} today={today} onClose={close} onSave={async entry=>{const ok=await update(d=>({...d,periods:[...d.periods.filter(p=>p.id!==entry.id),entry]}));if(ok&&viewRef.current===view) close();return ok;}}/>}
     {ready&&dialog==='history'&&<PeriodHistory data={data} error={error} saving={saving} onRetry={()=>void retry()} onClose={close} onAdd={add} onEdit={entry=>setView({editing:entry,dialog:'editor'})} onRemove={id=>update(d=>({...d,periods:d.periods.filter(p=>p.id!==id)}))}/>}

@@ -53,7 +53,7 @@ export function TodoView({ store, initialDialog }: { store: TodoStore; initialDi
   useEffect(()=>{window.dispatchEvent(new CustomEvent('cozy-card-open',{detail:null}));if(categoryId!=='all'&&!store.loading&&!store.categories.some(c=>c.id===categoryId))setCategoryId('all');},[categoryId,store.categories,store.loading]);
   function remember(snapshot: Todo, label: string, kind: UndoRecord['kind']) {
     if (!alive.current) return;
-    const record={token:++sequence.current,snapshot,label,kind,expiresAt:Date.now()+5000};
+    const record={token:++sequence.current,snapshot,label,kind,expiresAt:Date.now()+10000};
     history.current.push(record);
     undoRef.current=[...undoRef.current,record]; setUndos(undoRef.current);
   }
@@ -130,13 +130,14 @@ export function TodoView({ store, initialDialog }: { store: TodoStore; initialDi
     <div className={`task-list-viewport ${pending.length||completed.length?'task-list-viewport--populated':''} ${listScrolled?'is-scrolled':''}`}>
     <section className={`task-area ${pending.length || completed.length ? 'task-area--populated' : ''}`} aria-label="待办列表" onScroll={event=>setListScrolled(event.currentTarget.scrollTop>8)}>
       {store.error && <p className="error-message" role="alert">{store.error}</p>}
+      {store.saveStatus && !store.error && <p className="save-status" role="status">{store.saveStatus}</p>}
       {store.loading ? <p className="loading-message" role="status">正在翻开你的小日子…</p> : <>
         <div className="list-heading"><h2><Asset name="tape"/>{view === 'all' ? '每一件小事' : date === todayKey() ? '今天的小计划' : '这天的小计划'}</h2><span>{pending.length ? `${pending.length} 件待办` : '慢慢来，也很好'}</span></div>
         {pending.length > 0 ? <div className="task-list">{pending.map(todo => <TodoCard key={todo.id} todo={todo} showDate={view === 'all'} onToggle={toggle} onEdit={openEdit} onDelete={remove}/>)}</div>
           : <div className="empty-state"><div className="empty-art"><Asset name="flower" className="empty-flower"/><Asset name="empty"/><Asset name="star" className="empty-star"/></div><h2>{completed.length ? '太棒了，都完成啦！' : view === 'all' ? '还没有未完成的待办' : '今天，轻轻开始'}</h2>
             <p>{completed.length ? '去做点喜欢的事吧，休息也很重要。' : '把心里的小计划，放到这里吧。'}</p></div>}
         {completed.length > 0 && <div className="completed-section"><button className="completed-heading" aria-expanded={completedOpen} onClick={() => setCompletedOpen(!completedOpen)}>
-          <ChevronDown size={16} className={completedOpen ? '' : 'is-collapsed'}/><span>已完成</span><span className="completed-count">{completed.length}</span>
+          <ChevronDown size={16} className={completedOpen ? '' : 'is-collapsed'}/><span>{view === 'all' ? '已完成（可恢复）' : '已完成'}</span><span className="completed-count">{completed.length}</span>
         </button>{completedOpen && completed.map(todo => <TodoCard key={todo.id} todo={todo} showDate={view === 'all'} onToggle={toggle} onEdit={openEdit} onDelete={remove}/>)}</div>}
         {totalForDate > 0 && view === 'date' && <div className="daily-progress" aria-label={`完成 ${completedForDate} / ${totalForDate}`}><span><Check size={13}/>已完成 {completedForDate} / {totalForDate}</span><div><i style={{ width: `${completedForDate / totalForDate * 100}%` }}/></div></div>}
       </>}

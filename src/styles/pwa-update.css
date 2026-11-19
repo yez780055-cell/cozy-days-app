@@ -1,0 +1,7 @@
+.pwa-update-backdrop { position:fixed; inset:0; z-index:1000; display:flex; align-items:center; justify-content:center; padding:20px; background:#51443d66; }
+.pwa-update { width:min(100%, 340px); padding:25px 24px 22px; border:1px solid #f0e3d9; border-radius:24px; background:var(--paper); box-shadow:0 18px 45px #4c383526; text-align:center; }
+.pwa-update-cat { display:block; width:88px; height:72px; object-fit:contain; margin:0 auto 12px; }
+.pwa-update h2 { margin:0; color:var(--ink); font-size:19px; line-height:1.5; }
+.pwa-update p { margin:10px 0 21px; color:#94847c; font-size:13px; line-height:1.8; }
+.pwa-update .pwa-update-error { color:#a85660; margin:0 0 15px; }
+.pwa-update .button { display:block; width:100%; min-height:46px; margin-top:10px; }

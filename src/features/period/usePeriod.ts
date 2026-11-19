@@ -68,7 +68,9 @@ export function usePeriod() {
   }, []);
   function update(change: (value: PeriodData) => PeriodData) {
     if (!state.ready) return Promise.resolve(false);
-    const data = change(state.data); revision++;
+    const data = change(state.data);
+    if (data === state.data) return Promise.resolve(false);
+    revision++;
     publish({ data, durable: setPending(data,baseline) });
     return save();
   }

@@ -1,53 +1,60 @@
 import { useState } from 'react';
-import { ArrowLeft, Check, ChevronRight, DatabaseBackup, Type } from 'lucide-react';
-import type { FontId } from '../../styles/fontRegistry';
-import { fontRegistry, getFontOption } from '../../styles/fontRegistry';
-
+import { CalendarDays, ChevronRight, DatabaseBackup, Type } from 'lucide-react';
+import { Button } from '../../components/Button';
+import { CycleInfoPage } from '../period/CycleInfoPage';
 import { BackupPage } from './BackupPage';
+import { SettingsHeader } from './SettingsHeader';
+import { fontRegistry, getFontOption, type FontId } from '../../styles/fontRegistry';
 
-export function SettingsPage({ fontId, pendingFontId, onSelect, onBack }: {
-  fontId: FontId;
-  pendingFontId: FontId | null;
-  onSelect: (id: FontId) => void;
-  onBack: () => void;
+export function SettingsPage({ fontId, pendingFontId, failedFontId, onSelect, onBack }: {
+  fontId: FontId; pendingFontId: FontId | null; failedFontId: FontId | null;
+  onSelect: (id: FontId) => void; onBack: () => void;
 }) {
-  const [showBackup, setShowBackup] = useState(false);
+  const [section, setSection] = useState<'appearance' | 'cycle' | 'backup'>();
+  const returnToSettings = () => setSection(undefined);
   const selected = getFontOption(fontId);
-  if (showBackup) return <BackupPage onBack={() => setShowBackup(false)}/>;
-  return <section className="settings-page" aria-label="应用设置">
-    <header className="settings-header">
-      <button type="button" className="settings-back icon-button" aria-label="返回上一页" onClick={onBack}><ArrowLeft size={19}/></button>
-      <span className="settings-icon"><Type size={20}/></span>
-      <div><span className="eyebrow">MAKE IT YOURS</span><h1>设置</h1></div>
-    </header>
-    <h2>数据</h2><p>记录仅保存在本机，不会自动同步；换设备前请导出备份。</p><button type="button" className="backup-entry" onClick={() => setShowBackup(true)}>
-      <DatabaseBackup size={20}/><span>数据备份与恢复</span><ChevronRight size={18}/>
-    </button>
-    <h2>外观</h2><p className="settings-intro">选一种喜欢的字，让每个小日子都更像你。</p>
-    <section className="font-preview-card" aria-label="当前字体预览">
+  if (section === 'cycle') return <CycleInfoPage onBack={returnToSettings}/>;
+  if (section === 'backup') return <BackupPage onBack={returnToSettings}/>;
+
+  if (section === 'appearance') return <section className="settings-page" aria-label="外观与字体">
+    <SettingsHeader title="外观与字体" onBack={returnToSettings}/>
+    <section className="font-preview-card settings-group" aria-label="当前字体预览">
       <span>实时预览 · {selected.name}</span>
-      <p data-testid="font-preview" style={{ fontFamily: selected.familyStack }}>今天也辛苦啦，一件一件来就好。</p>
-      <small>把平凡的小日子，过得柔软一点。</small>
+      <p data-testid="font-preview" style={{fontFamily:selected.familyStack}}>字体预览 Cozy Days 123</p>
     </section>
-    <h2 className="font-options-heading">选择字体</h2>
-    <div className="font-options" role="radiogroup" aria-label="全应用字体">
-      {fontRegistry.map(option => <button
-        className={`font-option ${fontId === option.id ? 'is-selected' : ''}`}
-        key={option.id}
-        type="button"
-        role="radio"
-        aria-checked={fontId === option.id}
-        aria-label={`选择${option.name}`}
-        aria-busy={pendingFontId === option.id}
-        disabled={pendingFontId !== null}
-        onClick={() => onSelect(option.id)}
-      >
-        <span className="font-option-copy"><strong>{option.name}</strong><small>{option.description}</small></span>
-        <span className="font-option-preview" style={{ fontFamily: fontId === option.id ? option.familyStack : undefined }}>小日子 Cozy 123</span>
-        <span className="font-option-check" aria-hidden="true">{fontId === option.id && (pendingFontId === option.id ? '…' : <Check size={16}/>)}</span>
-      </button>)}
+    <h2 className="settings-section-title">选择字体</h2>
+    <div className="settings-group font-options" role="radiogroup" aria-label="全应用字体" aria-busy={pendingFontId !== null}>
+      {fontRegistry.map(option => <label key={option.id} className="font-option">
+        <span><strong>{option.name}</strong><small>{option.description}</small></span>
+        <input type="radio" name="app-font" aria-label={`选择${option.name}`}
+          checked={fontId === option.id} disabled={pendingFontId !== null}
+          onChange={() => onSelect(option.id)}/>
+      </label>)}
     </div>
-    {pendingFontId && <p className="font-loading" role="status">正在准备{getFontOption(pendingFontId).name}…</p>}
-    <p className="font-settings-note">字体设置仅保存在这台设备上，离线也可以使用。</p>
+    {pendingFontId && <p className="settings-notice" role="status">正在准备{getFontOption(pendingFontId).name}…</p>}
+    {failedFontId && !pendingFontId && <div className="settings-notice settings-notice--error" role="alert">
+      <p>字体加载失败，当前字体选择没有更改。</p>
+      <Button variant="soft" onClick={() => onSelect(failedFontId)}>重试加载{getFontOption(failedFontId).name}</Button>
+    </div>}
+  </section>;
+
+  const groups = [
+    { id:'appearance', heading:'外观', label:'外观与字体', value:selected.name, Icon:Type },
+    { id:'cycle', heading:'记录', label:'周期信息', Icon:CalendarDays },
+    { id:'backup', heading:'数据', label:'数据备份与恢复', Icon:DatabaseBackup },
+  ] as const;
+  return <section className="settings-page" aria-label="应用设置">
+    <SettingsHeader title="设置" eyebrow="小饱日常" backLabel="返回上一页" onBack={onBack}/>
+    {groups.map(({id, heading, label, Icon, ...item}) => <section key={id} aria-labelledby={`settings-${id}`}>
+      <h2 id={`settings-${id}`} className="settings-section-title">{heading}</h2>
+      <div className="settings-group">
+        <button type="button" className="settings-row" onClick={() => setSection(id)}>
+          <Icon size={20} aria-hidden="true"/><span>{label}</span>
+          {'value' in item && <small>{item.value}</small>}
+          <ChevronRight size={18} aria-hidden="true"/>
+        </button>
+      </div>
+    </section>)}
+    <p className="settings-intro">记录保存在本机。换设备前请导出备份。</p>
   </section>;
 }

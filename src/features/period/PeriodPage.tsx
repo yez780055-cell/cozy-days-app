@@ -1,45 +1,128 @@
-import { useEffect, useRef, useState } from 'react';
-import { PeriodArt } from './PeriodArt';
+import { useEffect, useState } from 'react';
 import { PeriodCalendar } from './PeriodCalendar';
-import { CycleSummary } from './CycleSummary';
 import { DailyPeriodRecord } from './DailyPeriodRecord';
-import { PeriodEditor, PeriodHistory, PeriodSettings } from './PeriodForms';
-import { localToday, type PeriodEntry } from './model';
+import { Modal } from '../../components/Modal';
+import { Button } from '../../components/Button';
+import { localToday, shortDate, validatePeriod, type PeriodEntry } from './model';
+import { localId } from '../../data/localId';
 import { usePeriod } from './usePeriod';
-import { clearPeriodDraft, usePeriodDraft } from './recovery';
+import { usePeriodDraft } from './recovery';
 import { PeriodRecovery } from './PeriodRecovery';
+import { CycleOverview } from './CycleSummary';
 import './period.css';
 export default function PeriodPage() {
-  const mounted=useRef(true);
-  useEffect(()=>{mounted.current=true;return ()=>{mounted.current=false;};},[]);
   const {data,ready,error,saving,restoring,durable,conflict,conflictData,archives,restoreArchive,resolveConflict,notice,update,retry}=usePeriod();
   const [backups,setBackups]=useState(false),[confirmRestore,setConfirmRestore]=useState(false);
   const [today,setToday]=useState(localToday),[selected,setSelected]=useState(localToday),[month,setMonth]=useState(()=>localToday().slice(0,7));
-  const [view,setView]=usePeriodDraft<{dialog?:'editor'|'history'|'settings';editing?:PeriodEntry}>('view',()=>({}),(v):v is {dialog?:'editor'|'history'|'settings';editing?:PeriodEntry}=>{const x=v as {dialog?:unknown;editing?:PeriodEntry};return (!x.dialog||['editor','history','settings'].includes(String(x.dialog)))&&(!x.editing||(typeof x.editing.id==='string'&&typeof x.editing.start==='string'&&(x.editing.end===undefined||typeof x.editing.end==='string')));});
-  const {dialog,editing}=view;
-  const viewRef=useRef(view);viewRef.current=view;
-  const setDialog=(dialog?:'editor'|'history'|'settings')=>setView({...view,dialog});
-  const close=()=>{if(!mounted.current)return;clearPeriodDraft('editor-'+(editing?.id??'new'));clearPeriodDraft('settings');setView({});};
+  const [history, setHistory] = useState<{id:string; start:string; end?:string; month:string}>();
+  const [cancel, setCancel] = useState<PeriodEntry>();
+  const [toggleError, setToggleError] = useState('');
+  const [quickUndo, setQuickUndo] = usePeriodDraft<{id?:string}>('same-day-start', () => ({}));
   useEffect(()=>{ const refresh=()=>setToday(localToday()); const timer=setInterval(refresh,30_000); window.addEventListener('focus',refresh); return ()=>{clearInterval(timer);window.removeEventListener('focus',refresh);}; },[]);
-  function select(date:string) {setSelected(date);setMonth(date.slice(0,7));}
-  function add() {setView({dialog:'editor'});}
-  return <section className="period-page" aria-label="生理期页面" style={{'--period-paper-url':`url("${import.meta.env.BASE_URL}assets/cozy_days/raster/backgrounds/paper_texture.png")`,'--period-hero-url':`url("${import.meta.env.BASE_URL}assets/cozy_days/raster/backgrounds/bedroom_header.png")`} as React.CSSProperties}>
-    <header className="period-header"><div className="period-header-copy"><span>COZY DAYS · 小饱日常</span><h1 aria-label="生理期日历">生理期 <em>♡</em></h1><p>好好照顾自己，<br/>每个阶段的你都很可爱。</p></div><PeriodArt slot="header"/><span className="period-header-sticker" aria-hidden="true">也要温柔地<br/>对待自己呀 ♡</span></header>
-    {error&&<div className="period-error" role="alert">{error}<button onClick={retry}>重试</button></div>}
-    {(conflict||archives.length>0)&&<button disabled={saving||restoring} className="period-primary" onClick={()=>setBackups(true)}>查看恢复备份</button>}
-    {conflict&&<div className="period-error"><button onClick={()=>{setConfirmRestore(false);resolveConflict('database');}}>使用记录库版本</button><button onClick={()=>setConfirmRestore(true)}>恢复草稿版本</button><p>选择前双方均不覆盖；冲突副本暂留在恢复区。{notice}</p>{confirmRestore&&<div><p>草稿将替换当前记录库的全部生理期记录。双方副本必须先保存到设备本地恢复区；你也可以查看、导出备份后再决定。确认后还需点击重试保存。</p><button onClick={()=>setConfirmRestore(false)}>取消替换</button><button onClick={()=>{resolveConflict('draft');setConfirmRestore(false);}}>确认替换记录库</button></div>}</div>}
+  function select(date:string) {
+    setSelected(date);
+    setMonth(date.slice(0,7));
+    setToggleError('');
+  }
+  const closed = data.periods.find(p => p.end && p.start <= selected && selected <= p.end);
+  const current = data.periods.find(p => !p.end && p.start <= selected);
+  const active = closed ? closed.start === closed.end || selected !== closed.end : !!current;
+
+  function writePeriod(entry:PeriodEntry, action:'start'|'end'|'cancel') {
+    setToggleError('');
+    let validation = '';
+    void update(d => {
+      const previous = d.periods.find(p => p.id === entry.id);
+      if (action === 'start' && previous) {
+        validation = '这次经期记录已保存。';
+        return d;
+      }
+      if (action !== 'start' && (!previous || previous.end || previous.start !== entry.start)) {
+        validation = '这次经期记录已变更，请重新选择日期。';
+        return d;
+      }
+      if (action !== 'cancel') {
+        validation = validatePeriod(entry, d.periods) ?? '';
+        if (validation) return d;
+      }
+      const periods = d.periods.filter(p => p.id !== entry.id);
+      return {...d, periods:action === 'cancel' ? periods : [...periods, entry]};
+    });
+    if (validation) setToggleError(validation);
+    return !validation;
+  }
+
+  function togglePeriod() {
+    if (closed) return;
+    if (current) {
+      if (selected !== current.start) {
+        if (writePeriod({...current, end:selected}, 'end') && quickUndo.id === current.id) setQuickUndo({});
+      } else if (current.start === localToday() && quickUndo.id === current.id) {
+        if (writePeriod(current, 'cancel')) setQuickUndo({});
+      } else {
+        setCancel(current);
+      }
+      return;
+    }
+    const entry = {id:localId(), start:selected};
+    if (selected < localToday()) {
+      setToggleError('');
+      setHistory({...entry, month:selected.slice(0,7)});
+    } else if (writePeriod(entry, 'start') && selected === localToday()) {
+      setQuickUndo({id:entry.id});
+    }
+  }
+  return <section className="period-page" aria-label="生理期页面">
+    <header className="period-page-heading"><p>{today.slice(0,4)} · {today.slice(5,7)}</p><h1>生理期</h1></header>
+    {error && <div className="period-error" role="alert">
+      <p>{error}</p><Button variant="soft" disabled={restoring || saving} onClick={retry}>重试</Button>
+    </div>}
+    {conflict && <section className="period-warning" aria-label="恢复来源">
+      <p>选择前双方均不覆盖，冲突副本暂留在恢复区。{notice}</p>
+      <div className="period-recovery-actions">
+        <Button variant="soft" onClick={()=>{setConfirmRestore(false);resolveConflict('database');}}>使用记录库版本</Button>
+        <Button variant="soft" onClick={()=>setConfirmRestore(true)}>恢复草稿版本</Button>
+      </div>
+    </section>}
+    {(conflict || archives.length > 0) && <Button variant="soft" disabled={saving || restoring} onClick={()=>setBackups(true)}>查看恢复备份</Button>}
+    {conflict && confirmRestore && <Modal title="替换生理期记录？" layout="confirm" className="period-dialog" onClose={()=>setConfirmRestore(false)}>
+      <p>草稿将替换当前记录库的全部生理期记录。设备会先保留双方副本。也可以先关闭弹窗，查看或导出备份。确认后还需点击重试保存。</p>
+      <div className="confirm-actions">
+        <Button variant="soft" data-autofocus onClick={()=>setConfirmRestore(false)}>取消替换</Button>
+        <Button variant="danger" onClick={()=>{resolveConflict('draft');setConfirmRestore(false);}}>确认替换记录库</Button>
+      </div>
+    </Modal>}
     {backups&&<PeriodRecovery entries={[...archives,...(conflictData?[conflictData]:[])]} notice={notice} onClose={()=>setBackups(false)} onRestore={value=>{setBackups(false);setConfirmRestore(false);void restoreArchive(value);}}/>}
-    {!ready?<p className="loading-message">正在打开你的手账…</p>:<div className="period-content">
-      <div className="period-dashboard"><PeriodCalendar month={month} selected={selected} today={today} data={data} onMonth={setMonth} onSelect={select}/>
-      <CycleSummary data={data} today={today} onHistory={()=>setDialog('history')} onSettings={()=>setDialog('settings')} onAdd={add}/></div>
-      <DailyPeriodRecord date={selected} today={today} value={data.days[selected]} onChange={value=>update(d=>{
+    {ready ? <div className="period-content">
+      <CycleOverview data={data} today={today}/>
+      <PeriodCalendar month={month} selected={selected} today={today} data={data} onMonth={setMonth} onSelect={select}/>
+      <DailyPeriodRecord date={selected} today={today} value={data.days[selected]} active={active} locked={!!closed} onToggle={togglePeriod} onChange={value=>update(d=>{
         const days={...d.days}; if(!value.flow&&!value.mood&&!value.symptoms.length) delete days[selected]; else days[selected]=value;
         return {...d,days};
       })}/>
-      <p className="period-storage" role="status">{saving?'正在保存…':error?(durable?'保存失败，尚未保存到记录库 · '+notice:'保存失败，仅内存保留，刷新或关闭页面会丢失，请重试'):'已保存 · 记录仅保存在这台设备，不会自动同步 · 清除站点数据会丢失记录'}</p>
-    </div>}
-    {ready&&dialog==='editor'&&<PeriodEditor entry={editing} selected={selected} data={data} today={today} onClose={close} onSave={async entry=>{const ok=await update(d=>({...d,periods:[...d.periods.filter(p=>p.id!==entry.id),entry]}));if(ok&&viewRef.current===view) close();return ok;}}/>}
-    {ready&&dialog==='history'&&<PeriodHistory data={data} error={error} saving={saving} onRetry={()=>void retry()} onClose={close} onAdd={add} onEdit={entry=>setView({editing:entry,dialog:'editor'})} onRemove={id=>update(d=>({...d,periods:d.periods.filter(p=>p.id!==id)}))}/>}
-    {ready&&dialog==='settings'&&<PeriodSettings data={data} today={today} onClose={close} onSave={async settings=>{const ok=await update(d=>({...d,settings}));if(ok&&viewRef.current===view) close();return ok;}}/>}
+      {toggleError && !history && <p className="period-error" role="alert">{toggleError}</p>}
+      <p className="period-storage" role="status">{saving?'正在保存…':error?(durable?'保存失败，尚未保存到记录库 · '+notice:'保存失败，仅内存保留，刷新或关闭页面会丢失，请重试'):''}</p>
+    </div> : !error && <p className="loading-message" role="status">正在打开你的手账…</p>}
+    {ready && history && <Modal title="选择经期结束日期" className="period-dialog period-end-dialog" onClose={() => { setHistory(undefined); setToggleError(''); }}>
+      <p>开始日期 {shortDate(history.start)}。选择最后一天后保存。</p>
+      <PeriodCalendar month={history.month} selected={history.end ?? ''} today={today} data={data}
+        minDate={history.start} maxDate={today}
+        onMonth={month => setHistory({...history, month})}
+        onSelect={end => { setHistory({...history, end, month:end.slice(0,7)}); setToggleError(''); }}/>
+      {toggleError && <p className="error-message" role="alert">{toggleError}</p>}
+      <footer className="modal-actions"><Button disabled={!history.end} onClick={() => {
+        const {id,start,end} = history;
+        if (end && writePeriod({id,start,end}, 'start')) setHistory(undefined);
+      }}>保存经期记录</Button></footer>
+    </Modal>}
+    {ready && cancel && <Modal title="是否取消这次经期记录？" layout="confirm" className="period-dialog" onClose={() => setCancel(undefined)}>
+      <div className="confirm-actions">
+        <Button variant="soft" data-autofocus onClick={() => setCancel(undefined)}>暂不操作</Button>
+        <Button variant="danger" onClick={() => {
+          if (writePeriod(cancel, 'cancel') && quickUndo.id === cancel.id) setQuickUndo({});
+          setCancel(undefined);
+        }}>取消经期</Button>
+      </div>
+    </Modal>}
   </section>;
 }

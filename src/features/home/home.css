@@ -1,0 +1,112 @@
+.home-page {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  padding: 20px var(--page-gutter) 28px;
+  background: var(--canvas);
+}
+.home-header, .home-section-heading { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.home-header { margin-bottom: 16px; }
+.home-brand { color: var(--brand); font: italic 600 27px/1.2 var(--number-font-family); }
+.home-brand::after {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin-left: 5px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+.home-scene {
+  position: relative;
+  isolation: isolate;
+  min-height: 220px;
+  border: 2px solid var(--surface);
+  border-radius: 52px 14px 40px 14px;
+  overflow: hidden;
+  background: #f9ebd8;
+  color: #805239;
+}
+.home-scene-copy {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 19px 20px 10px 30px;
+}
+.home-scene-copy p { margin: 0; color: var(--muted); font-size: 13px; }
+.home-scene-copy h1 { margin: 4px 0 0; font: 600 29px/1.3 var(--heading-font-family); letter-spacing: .03em; }
+.home-stamp {
+  display: grid;
+  flex: 0 0 43px;
+  height: 43px;
+  place-content: center;
+  border: 1px solid #c4a575;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--surface) 65%, transparent);
+  text-align: center;
+  font: italic 21px/1 var(--number-font-family);
+}
+.home-stamp span { font: 9px/1.5 var(--number-font-family); letter-spacing: .12em; }
+.home-scene-art { position: absolute; z-index: -1; inset: 0; }
+.home-scene .home-room { position: absolute; inset: 0; width: 100%; height: 100%; }
+.home-scene-art::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, #f9ebd8 0%, #f9ebd8e6 21%, transparent 67%);
+}
+.home-scene .home-cats { position: absolute; z-index: 1; right: 9%; bottom: 0; height: 58%; width: auto; max-width: 80%; }
+.home-section-heading { min-height: 32px; margin: 17px 0 8px; }
+.home-section-heading h2 { margin: 0; font-size: 18px; line-height: 26px; }
+.home-section-heading .button { font-size: 13px; color: var(--muted); padding-inline: 8px; }
+.home-progress { display: flex; align-items: center; gap: 12px; }
+.home-progress > b { color: #825737; font: 42px/1 var(--number-font-family); }
+.home-progress > div { flex: 1; min-width: 0; }
+.home-progress small, .home-empty { color: var(--muted); font-size: 13px; }
+.home-empty { margin: 8px 0 12px; }
+.home-progress progress {
+  display: block;
+  width: 100%;
+  height: 4px;
+  margin: 6px 0 4px;
+  border: 0;
+  border-radius: 4px;
+  appearance: none;
+  background: var(--line);
+  accent-color: #825737;
+}
+.home-progress progress::-webkit-progress-bar { background: var(--line); border-radius: 4px; }
+.home-progress progress::-webkit-progress-value { background: #825737; border-radius: 4px; }
+.home-progress progress::-moz-progress-bar { background: #825737; border-radius: 4px; }
+.home-page .home-reminder { margin-top: 4px; padding-inline: 0; color: var(--warning); }
+.home-anniversary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 12px;
+  min-height: var(--touch);
+  padding: 14px;
+  border: 0;
+  border-left: 3px solid #c6a583;
+  border-radius: var(--control-radius);
+  background: #f0e5e8;
+  color: #76576c;
+  text-align: left;
+}
+.home-anniversary > span:first-child { flex: 1; min-width: 0; }
+.home-anniversary strong, .home-anniversary small { display: block; }
+.home-anniversary small { font-size: 13px; }
+.home-anniversary b { font: 34px/1 var(--number-font-family); }
+.home-actions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+.home-actions .button { min-width: 0; gap: 4px; padding: 4px; font-size: 13px; font-weight: 400; }
+.home-actions svg { flex: none; }
+@container phone (max-width: 370px) {
+  .home-scene { min-height: 195px; }
+  .home-scene-copy { padding: 14px 14px 10px 20px; }
+  .home-scene-copy h1 { font-size: 27px; }
+  .home-actions .button { font-size: 12px; }
+}

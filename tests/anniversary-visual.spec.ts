@@ -1,40 +1,57 @@
 import { test, expect } from '@playwright/test';
+import type { Anniversary } from '../src/features/anniversary/model';
 
-test('four scrapbook categories fit at phone widths and remain scrollable', async ({ browser }) => {
-  const sizes = [{width:360,height:800},{width:393,height:852},{width:430,height:900}];
-  for (const size of sizes) {
-    const page=await browser.newPage({viewport:size,timezoneId:'Asia/Shanghai'});
-    await page.clock.setFixedTime(new Date('2026-10-24T12:00:00+08:00'));
-    await page.addInitScript(()=>localStorage.setItem('cozy-days.settings-hint-seen','1'));
+test.use({timezoneId:'Asia/Shanghai'});
+const longName = '在一起的每一个普通日子'.repeat(5).slice(0,60);
+const longNote = '这一段备注用于检查长文换行与滚动。'.repeat(40).slice(0,500);
+const base: Anniversary = {
+  name:'今天的约定',date:'2026-11-19',theme:'生活',note:'',icon:'♡',yearly:false,color:'pink',createdAt:1,updatedAt:1,
+};
+const sample: Anniversary[] = [
+  base,
+  {...base,name:longName,note:longNote,date:'1970-01-01',theme:'恋爱',yearly:true,createdAt:2},
+  {...base,name:'下个月生日',date:'2001-12-06',theme:'生日',yearly:true,createdAt:3},
+  {...base,name:'更晚才开始',date:'2026-12-20',timingMode:'cumulative',createdAt:4},
+  {...base,name:'很早以前',date:'1970-11-19',createdAt:5},
+];
+
+for (const viewport of [{width:360,height:740},{width:393,height:852},{width:430,height:932}]) {
+  test(`date tickets, long titles and detail numbers fit at ${viewport.width}px`, async ({page}) => {
+    await page.setViewportSize(viewport);
+    await page.clock.setFixedTime(new Date('2026-11-19T12:00:00+08:00'));
     await page.goto('/');
+    await page.evaluate(async rows => {
+      const path = '/src/data/database.ts';
+      const { anniversaryRepository } = await import(path);
+      for (const row of rows) await anniversaryRepository.save(row);
+    },sample);
     await page.getByRole('navigation').getByRole('button',{name:'纪念日',exact:true}).click();
-    for (const [name,date,theme,color] of [['我们一起走过的第一个春天纪念日','2023-05-20','恋爱','粉色'],['妈妈生日','2000-11-08','生日','奶黄'],['养猫一周年','2024-01-15','宠物','淡紫'],['毕业纪念日','2022-06-30','成长','薄荷绿']]) {
-      await page.getByRole('button',{name:'新增纪念日',exact:true}).click();
-      const dialog=page.getByRole('dialog',{name:'新增纪念日',exact:true});
-      await dialog.getByLabel('纪念日名称').fill(name);
-      await dialog.getByLabel('日期',{exact:true}).fill(date);
-      await dialog.locator('select').first().selectOption({label:theme});
-      if (name==='毕业纪念日') await dialog.getByLabel('每年重复').uncheck();
-      await dialog.getByRole('button',{name:color,exact:true}).click();
-      await dialog.getByLabel('备注',{exact:true}).fill(name.startsWith('我们一起')?'谢谢你一直在我的生活里，和你一起的每一天都值得珍藏。那天的晚风、路边的小花和一路上的笑声，我一直记得。愿今后每一个普通的日子，也都能和你一起慢慢度过。':'谢谢你一直在我的生活里，和你一起的每一天都值得珍藏。');
-      await dialog.getByRole('button',{name:'保存纪念日',exact:true}).click();
-      await expect(dialog).not.toBeVisible();
-    }
-    await expect(page.getByTestId('anniversary-card')).toHaveCount(4);
-    await expect(page.getByTestId('anniversary-card').filter({hasText:'每年重复'})).toHaveCount(3);
-    await expect(page.getByTestId('anniversary-card').filter({hasText:'单次纪念'})).toHaveCount(1);
-    await page.evaluate(async()=>{await document.fonts.ready;await Promise.all([...document.images].map(image=>image.decode().catch(()=>{})));});
-    await page.screenshot({path:`artifacts/v021-g4/anniversary-${size.width}-top.png`,fullPage:false});
-    await page.locator('.ann-page').evaluate(el=>el.scrollTo(0,el.scrollHeight));
-    await page.waitForTimeout(150);
-    await page.screenshot({path:`artifacts/v021-g4/anniversary-${size.width}-scroll.png`,fullPage:false});
+    const cards = page.getByTestId('anniversary-card');
+    await expect(cards).toHaveCount(5);
+    await expect(page.locator('.ann-featured-count')).toHaveText('今天');
+    await expect(cards.locator('.ann-ticket--birthday')).toHaveText('DEC06');
+    await expect(cards.locator('.ann-ticket--yearly')).toHaveText('JAN01');
+    await expect(cards.filter({hasText:'更晚才开始'}).locator('.ann-count')).toHaveText('还有 31 天');
+    const search = page.getByRole('searchbox',{name:'搜索纪念日'});
+    await search.fill('没有匹配');
+    await expect(page.getByText('没有符合条件的纪念日')).toBeVisible();
+    await search.fill('长文换行');
+    await page.getByRole('button',{name:'网格视图'}).click();
+    await expect(cards).toHaveCount(1);
+    await cards.getByRole('button').click();
+    const detail = page.getByRole('region',{name:'纪念日详情'});
+    const art = detail.locator('.ann-art');
+    const box = (await art.boundingBox())!;
+    expect(box.width / box.height).toBeCloseTo(4 / 3, 2);
+    expect((await detail.getByRole('heading',{name:longName}).boundingBox())!.y).toBeGreaterThan(box.y+box.height);
+    await expect(detail.locator('.ann-numbers dd').first()).toHaveAttribute('aria-label', /^累计 \d{5} 天$/);
+    await expect(detail.locator('.ann-numbers dd').nth(1)).toContainText('周年');
+    await expect(detail.locator('.ann-detail-note')).toHaveText(longNote);
+    expect(await detail.evaluate(el=>el.scrollWidth<=el.clientWidth)).toBe(true);
+    await page.getByRole('button',{name:'返回纪念日列表'}).click();
+    await expect(search).toHaveValue('长文换行');
+    await expect(page.getByRole('button',{name:'网格视图'})).toHaveAttribute('aria-pressed','true');
+    await expect(cards).toHaveCount(1);
     expect(await page.locator('.ann-page').evaluate(el=>el.scrollWidth<=el.clientWidth)).toBe(true);
-    const lastCard = page.getByTestId('anniversary-card').last();
-    expect(await lastCard.evaluate(card=>card.scrollWidth<=card.clientWidth)).toBe(true);
-    await page.getByRole('button',{name:'月视图',exact:true}).click();
-    await expect(page.getByRole('dialog',{name:'月视图'})).toBeVisible();
-    await page.waitForTimeout(200);
-    await page.screenshot({path:`artifacts/v021-g4/anniversary-${size.width}-month.png`,fullPage:false,animations:'disabled'});
-    await page.close();
-  }
-});
+  });
+}

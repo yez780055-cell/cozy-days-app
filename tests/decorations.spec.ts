@@ -1,4 +1,4 @@
-import { taskAction } from './task-actions';
+import { openTodos, taskAction } from './task-actions';
 import { test, expect, type Page } from '@playwright/test';
 import fs from 'node:fs';
 import crypto from 'node:crypto';
@@ -42,13 +42,16 @@ test('素材注册表只包含 ready，文件真实存在且哈希一致', () =>
   expect(illustrationRules.map(r=>r.id)).not.toContain('task_laptop');
 });
 
-test('插画请求失败时使用包内 ready 星星兜底',async({page})=>{
-  await page.route('**/raster/tasks/task_book.png',route=>route.abort());
-  await page.goto('/');
+test('待办行不再请求装饰插画，装饰字段仍写入',async({page})=>{
+  const illustrationRequests: string[] = [];
+  page.on('request', request => {
+    if (/raster\/tasks\//.test(request.url())) illustrationRequests.push(request.url());
+  });
+  await page.goto('/'); await openTodos(page);
   await add(page,'阅读一本新书');
-  const image=page.locator('.task-art .task-illustration');
-  await expect(image).toHaveAttribute('src',/^data:image\/svg\+xml,/);
-  expect(await image.evaluate(img=>(img as HTMLImageElement).decode().then(()=>true))).toBe(true);
+  await expect(page.getByTestId('todo-card').locator('img')).toHaveCount(0);
+  expect(illustrationRequests).toEqual([]);
+  expect((await records(page))[0].decoration).toMatchObject({version:1,illustrationId:'taskBook'});
 });
 
 async function records(page: Page) {
@@ -67,11 +70,11 @@ async function add(page:Page,text:string) {
 
 test('新任务保存装饰，编辑重匹配，自动贴纸/配色持久化且不影响勾选删除', async({page})=>{
   await page.setViewportSize({width:360,height:740});
-  await page.goto('/');
+  await page.goto('/'); await openTodos(page);
   await add(page,'去见一位老朋友');
   const first=(await records(page))[0];
   expect(first.decoration).toMatchObject({version:1,seed:expect.any(Number),illustrationId:expect.any(String),stickerId:expect.any(String),theme:expect.any(String)});
-  await page.reload();
+  await page.reload(); await openTodos(page);
   await expect(page.getByTestId('todo-card')).toHaveCount(1);
   expect((await records(page))[0].decoration).toEqual(first.decoration);
   await page.getByRole('button',{name:'编辑：去见一位老朋友',exact:true}).click();
@@ -81,15 +84,15 @@ test('新任务保存装饰，编辑重匹配，自动贴纸/配色持久化且�
   await expect(page.getByRole('dialog')).not.toBeVisible();
   const changed=(await records(page))[0];
   expect(changed.decoration).toEqual({...first.decoration,illustrationId:'taskStretch'});
-  await page.reload();
+  await page.reload(); await openTodos(page);
   const card=page.getByTestId('todo-card');
-  await expect(card).toHaveAttribute('data-theme',first.decoration.theme);
-  await expect(card.locator('.task-art')).toHaveAttribute('data-sticker',first.decoration.stickerId);
+  await expect(card.locator('img')).toHaveCount(0);
   expect((await records(page))[0].decoration).toEqual(changed.decoration);
   // Cancel decoration edits without changing the saved appearance.
   await page.getByRole('button',{name:'编辑：晚上慢跑之后拉伸',exact:true}).click();
   await page.getByRole('button',{name:'收藏这件小事',exact:true}).click();
   await page.getByRole('button',{name:'关闭弹窗',exact:true}).click();
+  await page.getByRole('button',{name:'放弃修改'}).click();
   await expect(page.getByRole('dialog')).not.toBeVisible();
   expect((await records(page))[0].decoration).toEqual(changed.decoration);
   await taskAction(page, '晚上慢跑之后拉伸', 'complete');
@@ -113,13 +116,14 @@ test('v1 旧数据升级及当前版本部分/缺失装饰修复均写回，编�
       tx.oncomplete=()=>{db.close();resolve();};tx.onerror=()=>reject(tx.error);
     };
   }));
-  await page.goto('/');
+  await page.goto('/'); await openTodos(page);
   await page.getByRole('button',{name:/^全部未完成/}).click();
-  await expect(page.getByTestId('todo-card').first().locator('.task-art')).toHaveAttribute('data-illustration','study');
+  await expect(page.getByRole('button',{name:'编辑：复习英语'})).toBeVisible();
   const upgraded=await records(page);
   expect(upgraded[0]).toMatchObject({id:1,text:'复习英语',date:'2026-10-22',completed:false,createdAt:42});
   expect(upgraded.every(row=>row.decoration?.version===1)).toBe(true);
-  await page.reload();
+  expect(upgraded[0].decoration.illustrationId).toBe('study');
+  await page.reload(); await openTodos(page);
   await expect(page.locator('.loading-message')).toHaveCount(0);
   expect(await records(page)).toEqual(upgraded);
   await page.goto('/legacy-fixture');
@@ -130,9 +134,9 @@ test('v1 旧数据升级及当前版本部分/缺失装饰修复均写回，编�
       tx.oncomplete=()=>{db.close();resolve();};tx.onerror=()=>reject(tx.error);
     };
   }));
-  await page.goto('/');
+  await page.goto('/'); await openTodos(page);
   await page.getByRole('button',{name:/^全部未完成/}).click();
-  await expect(page.getByTestId('todo-card').first()).toHaveAttribute('data-theme','sage');
+  await expect(page.getByRole('button',{name:'编辑：复习英语'})).toBeVisible();
   const repaired=await records(page);
   expect(repaired[0].decoration).toMatchObject({seed:7,theme:'sage',illustrationId:'study',stickerId:expect.any(String)});
   expect(repaired[1].decoration).toEqual(upgraded[1].decoration);
@@ -143,22 +147,19 @@ test('v1 旧数据升级及当前版本部分/缺失装饰修复均写回，编�
   expect((await records(page))[0].decoration).toEqual({...repaired[0].decoration,illustrationId:'work'});
 });
 
-test('三视口装饰不覆盖文字/按钮/复选框，所有任务有可解码插画',async({page})=>{
+test('三视口长任务标题换行，完成与更多按钮保持独立命中',async({page})=>{
   test.setTimeout(60_000);
-  await page.goto('/');
+  await page.goto('/'); await openTodos(page);
   for(const text of ['读一本新书','下班运动拉伸','周末做家务洗衣','复习课程','准备工作报告','预约剪头发','长任务标题'.repeat(30)]) await add(page,text);
   for(const [width,height] of [[360,740],[393,852],[430,932]]){
-    await page.setViewportSize({width,height});await page.reload();
+    await page.setViewportSize({width,height});await page.reload(); await openTodos(page);
     await expect(page.getByTestId('todo-card')).toHaveCount(7);
-    await page.locator('.task-art img').evaluateAll(imgs=>Promise.all(imgs.map(i=>(i as HTMLImageElement).decode())));
-    const overlaps=await page.locator('.task-card').evaluateAll(cards=>cards.flatMap(card=>{
-      const art=card.querySelector('.task-art')!.getBoundingClientRect();
-      return [...card.querySelectorAll('.task-content,.task-actions,.checkbox')].filter(el=>{
-        const r=el.getBoundingClientRect();const padding=el.classList.contains('checkbox')?11:0;
-        return art.left<r.right+padding && art.right>r.left-padding && art.top<r.bottom+padding && art.bottom>r.top-padding;
-      }).map(el=>el.className);
-    }));
-    expect(overlaps).toEqual([]);
+    const row = page.getByTestId('todo-card').last();
+    await expect(row.locator('img')).toHaveCount(0);
+    expect(await row.evaluate(element => {
+      const [toggle, content, more] = [...element.querySelectorAll('button')].map(button => button.getBoundingClientRect());
+      return toggle.right <= content.left && content.right <= more.left && toggle.width >= 44 && more.width >= 44;
+    })).toBe(true);
     expect(await page.evaluate(()=>document.body.scrollWidth)).toBe(width);
     await page.screenshot({path:`artifacts/cozy-decorations-${width}x${height}.png`});
     await page.getByRole('button',{name:'编辑：预约剪头发',exact:true}).click();

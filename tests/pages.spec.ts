@@ -11,8 +11,10 @@ for (const [width, height] of [[360, 740], [393, 852], [430, 932]]) {
       if (response.status() >= 400) errors.push(`${response.status()} ${response.url()}`);
     });
     await page.setViewportSize({ width, height });
+    const todoNav = page.getByRole('navigation').getByRole('button', { name: '待办', exact: true });
     await page.goto('./');
-    await expect(page.locator('.empty-art')).toBeVisible();
+    await todoNav.click();
+    await expect(page.getByText('这一天的清单是空的。')).toBeVisible();
     await expect(page.locator('.preview-toolbar')).toHaveCount(0);
     for (const asset of catalog) {
       const response = await request.get(new URL(`assets/cozy_days/${asset.file}`, baseURL!).href);
@@ -26,6 +28,7 @@ for (const [width, height] of [[360, 740], [393, 852], [430, 932]]) {
     await expect(page.getByRole('dialog')).not.toBeVisible();
     await expect(page.getByTestId('todo-card')).toHaveCount(1);
     await page.reload();
+    await todoNav.click();
     await expect(page.getByTestId('todo-card')).toHaveCount(1);
     await page.getByRole('button', { name: '编辑：阅读一本新书', exact: true }).click();
     await page.getByRole('textbox', { name: '想做些什么？' }).fill('晚上做十分钟拉伸');
@@ -39,7 +42,7 @@ for (const [width, height] of [[360, 740], [393, 852], [430, 932]]) {
     expect(await page.locator('img').evaluateAll(imgs => imgs.every(img => !img.src.startsWith('data:') && img.naturalWidth > 0))).toBe(true);
     expect(await page.evaluate(() => document.body.scrollWidth)).toBe(width);
     const background = await page.locator('.phone').evaluate(el => getComputedStyle(el).backgroundImage);
-    expect(background).toContain(new URL('assets/',baseURL!).pathname);
+    expect(background).toBe('none');
     await expect(page.getByRole('button', { name: '新增待办', exact: true })).toBeInViewport();
     await expect(page.getByRole('button', { name: '纪念日', exact: true })).toBeInViewport();
     await page.screenshot({ path: `artifacts/pages-${width}x${height}.png` });

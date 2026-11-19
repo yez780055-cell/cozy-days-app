@@ -1,20 +1,19 @@
 import { useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react';
-import { Check, Ellipsis, RotateCcw, Trash2 } from 'lucide-react';
+import { Check, Ellipsis, RotateCcw, Star, Trash2 } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import type { Todo } from '../../data/database';
-import { Asset } from '../../components/Asset';
 import { Button } from '../../components/Button';
 import { Modal } from '../../components/Modal';
 import { motion, reducedMotion } from '../../styles/motion';
 import { formatDate } from './dates';
-import { decorationIdentity, resolveDecoration } from './decorations';
 import { canonicalTime } from '../../data/categories';
 
 const REVEAL = 80;
 const OPEN_EVENT = 'cozy-card-open';
-export function TodoCard({ todo, showDate, onToggle, onEdit, onDelete }: {
-  todo: Todo; showDate?: boolean; onToggle: (todo: Todo) => Promise<boolean>;
+export function TodoCard({ todo, category, showDate, onToggle, onEdit, onDelete, onRequestDelete }: {
+  todo: Todo; category: string; showDate?: boolean; onToggle: (todo: Todo) => Promise<boolean>;
   onEdit: (todo: Todo) => void; onDelete: (todo: Todo) => Promise<boolean>;
+  onRequestDelete: (todo: Todo, confirm: () => Promise<boolean>) => void;
 }) {
   const shell = useRef<HTMLDivElement>(null), surface = useRef<HTMLElement>(null);
   const leftAction = useRef<HTMLButtonElement>(null), rightAction = useRef<HTMLButtonElement>(null);
@@ -23,7 +22,7 @@ export function TodoCard({ todo, showDate, onToggle, onEdit, onDelete }: {
   const animations = useRef(new Set<Animation>());
   const gesture = useRef<{id:number; x:number; y:number; base:number; axis:'pending'|'x'|'y'} | null>(null);
   const [menu, setMenu] = useState(false);
-  const decoration = resolveDecoration(todo.text, todo.decoration, decorationIdentity(todo));
+  const time = canonicalTime(todo.time);
   function paint(x: number, settle = false) {
     offset.current = x;
     if (!surface.current || !shell.current) return;
@@ -59,8 +58,8 @@ export function TodoCard({ todo, showDate, onToggle, onEdit, onDelete }: {
     try { await animation.finished; return true; } catch { return false; }
     finally { animations.current.delete(animation); }
   }
-  async function perform(kind: 'delete'|'toggle') {
-    if (busy.current || !shell.current || !surface.current) return;
+  async function perform(kind: 'delete'|'toggle'): Promise<boolean> {
+    if (busy.current || !shell.current || !surface.current) return false;
     busy.current = true; gesture.current = null; setMenu(false);
     suppressClickUntil.current = performance.now()+600;
     const wrapper=shell.current, card=surface.current;
@@ -69,18 +68,19 @@ export function TodoCard({ todo, showDate, onToggle, onEdit, onDelete }: {
     wrapper.dataset.phase='exiting'; card.style.transition='none';
     const finished = await Promise.all([
       animate(card,[{transform:`translateX(${offset.current}px)`,opacity:1},{transform:`translateX(${direction*width*1.2}px)`,opacity:0}]),
-      animate(wrapper,[{height:`${height}px`,paddingBottom:getComputedStyle(wrapper).paddingBottom,opacity:1},{height:'0px',paddingBottom:'0px',opacity:0}]),
+      animate(wrapper,[{height:`${height}px`,opacity:1},{height:'0px',opacity:0}]),
     ]);
-    if (!alive.current || finished.some(value=>!value)) return;
+    if (!alive.current || finished.some(value=>!value)) return false;
     // Persist only after the card has slid out and the list has closed the gap.
     const success=await (kind==='delete' ? onDelete(todo) : onToggle(todo));
     if (alive.current) {
       // A failed write returns the card to its original state; no undo is offered.
       if (!success) {
         wrapper.getAnimations().forEach(a=>a.cancel()); card.getAnimations().forEach(a=>a.cancel());
-        busy.current=false; wrapper.style.height=''; wrapper.style.paddingBottom=''; paint(0,true);
+        busy.current=false; paint(0,true);
       }
     }
+    return success;
   }
   function down(event: ReactPointerEvent<HTMLElement>) {
     if (busy.current || event.button!==0 || !event.isPrimary || (event.target as HTMLElement).closest('.card-more, .task-toggle')) return;
@@ -121,27 +121,28 @@ export function TodoCard({ todo, showDate, onToggle, onEdit, onDelete }: {
     <div className="swipe-rail swipe-rail--delete"><button ref={rightAction} type="button" className="swipe-action" tabIndex={-1}
       aria-label={`滑动删除：${todo.text}`} onClick={()=>void perform('delete')}><Trash2 size={22}/><span>删除</span></button></div>
     <article ref={surface} className={`task-card ${todo.completed?'task-card--done':''}`} data-testid="todo-card"
-      data-theme={decoration.theme} data-layout={decoration.seed%3} data-seed={decoration.seed}
       onPointerDown={down} onPointerMove={move} onPointerUp={up}
       onPointerCancel={()=>{gesture.current=null; if(!busy.current) paint(0,true);}}
       onClickCapture={event=>{if(performance.now()<suppressClickUntil.current){event.preventDefault();event.stopPropagation();}}}>
       <button type="button" className="task-toggle" aria-label={`${todo.completed?'标记未完成':'标记完成'}：${todo.text}`} onClick={()=>void perform('toggle')}><span aria-hidden="true">{todo.completed && <Check size={16}/>}</span></button>
-      <button className="task-content" aria-label={`编辑：${todo.text}`} onClick={()=>{paint(0,true);onEdit(todo);}}>
-        <span>{todo.text}</span>{(showDate || canonicalTime(todo.time)) && <small className="task-meta">{showDate&&<span>{formatDate(todo.date)}</span>}{canonicalTime(todo.time)&&<time dateTime={`${todo.date}T${canonicalTime(todo.time)}`}>{canonicalTime(todo.time)}</time>}</small>}
+      <button type="button" className="task-content" aria-label={`编辑：${todo.text}`} onClick={()=>{paint(0,true);onEdit(todo);}}>
+        <strong>{todo.text}</strong>
+        <small className="task-meta">{showDate && <span>{formatDate(todo.date)} · </span>}{time ? <time dateTime={`${todo.date}T${time}`}>{time}</time> : '全天'} · {category}</small>
       </button>
-      <div className="task-art" aria-hidden="true" data-illustration={decoration.illustrationId} data-sticker={decoration.stickerId}>
-        <Asset name={decoration.illustrationId} className="task-illustration"/><Asset name={decoration.stickerId} className="task-sticker"/>
-      </div>
-      {todo.favorite===true && <Asset name="star" className="task-favorite"/>}
+      {todo.favorite === true && <Star className="task-favorite" size={16} aria-label="已收藏" role="img"/>}
       <div className="task-actions"><button type="button" className="icon-button card-more" aria-label={`更多操作：${todo.text}`}
         onClick={()=>{window.dispatchEvent(new CustomEvent(OPEN_EVENT,{detail:null}));setMenu(true);}}><Ellipsis size={20}/></button></div>
     </article>
     {menu && createPortal(<Modal title="这件小事" onClose={()=>setMenu(false)}>
-      <p className="card-menu-copy">左滑显示删除，右滑{todo.completed?'恢复':'完成'}。也可以在这里轻点操作。</p>
+      <p className="card-menu-copy">{todo.text}</p>
       <div className="card-menu-actions">
         <Button variant="soft" onClick={()=>{setMenu(false);onEdit(todo);}}>编辑待办与收藏</Button>
         <Button aria-label={`${todo.completed?'恢复':'完成'}：${todo.text}`} onClick={()=>void perform('toggle')}>{todo.completed?'恢复未完成':'完成这件小事'}</Button>
-        <Button variant="danger" aria-label={`删除：${todo.text}`} onClick={()=>void perform('delete')}>删除这件小事</Button>
+        <Button variant="ghost" className="card-menu-delete" aria-label={`删除：${todo.text}`}
+          onClick={() => {
+            setMenu(false);
+            onRequestDelete(todo, () => perform('delete'));
+          }}>删除待办</Button>
       </div>
     </Modal>,shell.current?.closest('.phone') ?? document.body)}
   </div>;

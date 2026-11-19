@@ -1,4 +1,4 @@
-import { colors, themes, validDate } from '../features/anniversary/model';
+import { colors, resolvedTimingMode, themes, timingModes, validDate } from '../features/anniversary/model';
 import { sortedPeriods, validPeriodData, type PeriodData } from '../features/period/model';
 import { isDateKey } from '../features/todo/dates';
 import { resolveDecoration } from '../features/todo/decorations';
@@ -72,7 +72,11 @@ function validRecords(value: unknown): value is BackupRecords {
       row.name.length <= 60 && text(row.date) && validDate(row.date) && themes.some(theme => theme === row.theme) &&
       colors.some(color => color === row.color) && text(row.note) && row.note.length <= 500 &&
       text(row.icon) && row.icon.length <= 16 && typeof row.yearly === 'boolean' &&
-      timestamp(row.createdAt) && timestamp(row.updatedAt)) || !unique(anniversaries, row => row.id)) return false;
+      optional(row.timingMode, value => timingModes.some(mode => mode === value)) &&
+      timestamp(row.createdAt) && timestamp(row.updatedAt) &&
+      optional(row.backgroundImage, value => text(value) && value.length <= 600000 && /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/]+=*$/.test(value)) &&
+      optional(row.backgroundX, value => typeof value === 'number' && value >= 0 && value <= 100) &&
+      optional(row.backgroundY, value => typeof value === 'number' && value >= 0 && value <= 100)) || !unique(anniversaries, row => row.id)) return false;
 
   if (value.period) {
     const intervals = sortedPeriods(value.period.periods);
@@ -114,14 +118,14 @@ function rowContent<T extends { id: string | number }>({ id: _id, ...row }: T): 
   return canonical(row);
 }
 
-function mergeRows<T extends { id: number }>(local: T[], incoming: T[]): T[] {
+function mergeRows<T extends { id: number }>(local: T[], incoming: T[], fingerprint: (row: T) => string = rowContent): T[] {
   const rows = [...local];
   const ids = new Set(local.map(row => row.id));
   const reserved = new Set(incoming.map(row => row.id));
-  const fingerprints = new Set(local.map(rowContent));
+  const fingerprints = new Set(local.map(fingerprint));
   let nextId = 1;
   for (const row of incoming) {
-    const content = rowContent(row);
+    const content = fingerprint(row);
     if (fingerprints.has(content)) continue;
     let id = row.id;
     if (ids.has(id)) {
@@ -183,7 +187,13 @@ export function mergeBackup(local: BackupRecords, incoming: BackupRecords) {
   const todos = incoming.todos.map(row => row.categoryId ? { ...row, categoryId: remapped.get(row.categoryId)! } : row);
   const { period, periodConflicts } = mergePeriod(local.period, incoming.period);
   return {
-    records: { categories, todos: mergeRows(local.todos, todos), anniversaries: mergeRows(local.anniversaries, incoming.anniversaries), period },
+    records: {
+      categories,
+      todos: mergeRows(local.todos, todos),
+      anniversaries: mergeRows(local.anniversaries, incoming.anniversaries, row =>
+        rowContent({ ...row, timingMode: resolvedTimingMode(row) })),
+      period,
+    },
     periodConflicts,
   };
 }

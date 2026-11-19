@@ -1,5 +1,5 @@
 import { expect, test, type Download, type Page } from '@playwright/test';
-import type { Backup, BackupRecords } from '../src/data/backupModel';
+import { makeBackup, type Backup, type BackupRecords } from '../src/data/backupModel';
 
 function fixture(label: string, month: string): BackupRecords {
   return {
@@ -61,8 +61,26 @@ async function downloaded(page: Page, name: string): Promise<string> {
 
 async function reopen(page: Page) {
   await page.getByRole('button', { name: '重新打开应用', exact: true }).click();
-  await expect(page.getByRole('heading', { name: '待办', exact: true })).toBeVisible();
+  await expect(page.getByRole('navigation').getByRole('button', { name: '首页', exact: true })).toHaveAttribute('aria-current', 'page');
 }
+
+test('a long backup filename wraps and cancel leaves stored records intact', async ({page}) => {
+  await page.setViewportSize({width:360,height:480});
+  await seed(page,fixture('已有', '03'));
+  const before = await snapshot(page);
+  const incoming = makeBackup(fixture('外部', '04'),before.appVersion);
+  await openBackup(page);
+  const name = '备份文件'.repeat(32) + '.json';
+  await page.getByLabel('选择备份文件').setInputFiles({name,mimeType:'application/json',buffer:Buffer.from(JSON.stringify(incoming))});
+  await expect(page.getByText(name,{exact:true})).toBeVisible();
+  await expect(page.locator('.backup-review dl')).toContainText('生理期日记');
+  expect(await page.locator('.backup-page').evaluate(element => element.scrollWidth <= element.clientWidth)).toBe(true);
+  await page.getByRole('radio',{name:'替换本机数据'}).check();
+  await expect(page.getByRole('button',{name:'确认替换',exact:true})).toBeEnabled();
+  await page.getByRole('button',{name:'取消',exact:true}).click();
+  await expect(page.getByRole('heading',{name:'确认导入'})).toHaveCount(0);
+  expect((await snapshot(page)).records).toEqual(before.records);
+});
 
 test('downloads all modules, merges without replacing, then restores and downloads the pre-replacement backup', async ({ page, browser }) => {
   await seed(page, fixture('来源', '02'));
@@ -184,6 +202,7 @@ test('rolls both databases back on a late failure and recovers a persisted inter
 test('deletes the final 生活 category and preserves its tasks in a fresh fallback', async ({ page }) => {
   const values = fixture('生活', '01');
   await seed(page, values);
+  await page.getByRole('navigation').getByRole('button', { name: '待办', exact: true }).click();
   await expect(page.getByRole('button', { name: '分类：生活' })).toBeVisible();
   await page.getByRole('button', { name: '添加或管理分类' }).click();
   await page.getByRole('button', { name: '删除分类：生活' }).click();
@@ -200,13 +219,12 @@ test('starts and saves an actual period when crypto.randomUUID is unavailable', 
     Object.defineProperty(Navigator.prototype, 'locks', { value: undefined });
   });
   await page.goto('/');
-  await expect(page.getByRole('heading', { name: '待办', exact: true })).toBeVisible();
+  await expect(page.getByRole('navigation').getByRole('button', { name: '首页', exact: true })).toHaveAttribute('aria-current', 'page');
   await page.getByRole('navigation').getByRole('button', { name: '生理期', exact: true }).click();
-  const firstPeriod = page.getByRole('button', { name: '记录第一次经期' });
+  const firstPeriod = page.getByRole('switch', { name: '经期中' });
   await expect(firstPeriod).toBeVisible();
   expect(await page.evaluate(() => Object.keys(localStorage).some(key => key.startsWith('cozy-days-period-recovery-v1')))).toBe(false);
   await firstPeriod.click();
-  await page.getByRole('button', { name: '保存经期记录' }).click();
-  await expect(page.getByRole('dialog', { name: '记录经期' })).toHaveCount(0);
-  expect((await snapshot(page)).records.period?.periods).toHaveLength(1);
+  await expect(firstPeriod).toHaveAttribute('aria-checked', 'true');
+  await expect.poll(async () => (await snapshot(page)).records.period?.periods).toHaveLength(1);
 });

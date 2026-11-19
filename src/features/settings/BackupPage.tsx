@@ -1,7 +1,8 @@
 import { Capacitor, registerPlugin } from '@capacitor/core';
 import { useEffect, useRef, useState, type ChangeEvent } from 'react';
-import { ArrowLeft, DatabaseBackup, Download, FileUp } from 'lucide-react';
+import { Download, FileUp } from 'lucide-react';
 import { Button } from '../../components/Button';
+import { SettingsHeader } from './SettingsHeader';
 import { exportBackup, exportPreviousBackup, restoreBackup } from '../../data/backup';
 import { decodeBackup, maxBackupBytes, type Backup, type RestoreMode } from '../../data/backupModel';
 import { canRestore } from '../../data/storageAccess';
@@ -26,7 +27,8 @@ async function download({ backup, json }: { backup: Backup; json: string }, pref
 }
 
 export function BackupPage({ onBack }: { onBack: () => void }) {
-  const [candidate, setCandidate] = useState<Backup | null>(null);
+  const [selection, setSelection] = useState<{backup: Backup; name: string} | null>(null);
+  const candidate = selection?.backup;
   const [mode, setMode] = useState<RestoreMode>('merge');
   const [previous, setPrevious] = useState(false);
   const [finished, setFinished] = useState(false);
@@ -58,17 +60,17 @@ export function BackupPage({ onBack }: { onBack: () => void }) {
     event.currentTarget.value = '';
     if (!file) return;
     void run(async () => {
-      setCandidate(null);
+      setSelection(null);
       setMode('merge');
       if (file.size > maxBackupBytes) throw new Error('备份文件超过 20 MB。');
-      setCandidate(decodeBackup(await file.text()));
+      setSelection({backup:decodeBackup(await file.text()), name:file.name});
     });
   }
 
   function confirm(backup: Backup) {
     void run(async () => {
       const result = await restoreBackup(backup, mode);
-      setCandidate(null);
+      setSelection(null);
       setFinished(true);
       const skipped = result.periodConflicts > 0 ? ` 已保留 ${result.periodConflicts} 项有冲突的本机生理期记录或设置。` : '';
       setMessage(mode === 'replace'
@@ -78,16 +80,14 @@ export function BackupPage({ onBack }: { onBack: () => void }) {
   }
 
   return <section className="settings-page backup-page" aria-label="数据备份与恢复">
-    <header className="settings-header">
-      <button type="button" className="settings-back icon-button" aria-label="返回设置" disabled={busy} onClick={finished ? () => location.reload() : onBack}><ArrowLeft size={19}/></button>
-      <span className="settings-icon"><DatabaseBackup size={20}/></span>
-      <h1>数据备份与恢复</h1>
-    </header>
+    <SettingsHeader title="数据备份与恢复" disabled={busy} onBack={finished ? () => location.reload() : onBack}/>
     <p className="settings-intro">备份包含已保存的待办、分类、经期记录和纪念日。JSON 只在本机处理，请妥善保管文件。</p>
-    {message && <p className="backup-feedback" role="status">{message}</p>}
+    {busy && <p className="settings-notice" role="status">正在处理本地数据…</p>}
+    {message && <p className="settings-notice" role="status">{message}</p>}
     {error && <p className="error-message" role="alert">{error}</p>}
     {finished ? <Button onClick={() => location.reload()}>重新打开应用</Button> : <>
-      <section className="font-preview-card backup-actions" aria-label="导出备份">
+      <section className="settings-group backup-actions" aria-labelledby="backup-export">
+        <h2 id="backup-export">导出备份</h2>
         <Button variant="soft" disabled={busy} onClick={() => void run(async () => {
           setMessage(await download(await exportBackup()));
         })}><Download size={16}/>导出完整 JSON</Button>
@@ -96,13 +96,15 @@ export function BackupPage({ onBack }: { onBack: () => void }) {
           if (backup) setMessage(await download(backup, 'cozy-days-before-restore'));
         })}><Download size={16}/>下载最近一次替换前的备份</Button>}
       </section>
-      <section className="font-preview-card backup-actions" aria-label="导入备份">
+      <section className="settings-group backup-actions" aria-labelledby="backup-import">
+        <h2 id="backup-import">导入备份</h2>
         <label className="backup-file"><FileUp size={16}/>选择备份文件
           <input type="file" accept=".json,application/json" disabled={busy || !supported} onChange={selectFile}/>
         </label>
         {!supported && <p>请在 HTTPS 或 localhost 页面使用支持 Web Locks 的浏览器恢复数据。</p>}
-        {candidate && <div className="backup-review">
+        {candidate && selection && <div className="backup-review">
           <h2>确认导入</h2>
+          <p className="backup-filename">{selection.name}</p>
           <p>备份自 {new Date(candidate.exportedAt).toLocaleString('zh-CN')} · v{candidate.appVersion}</p>
           <dl>
             <div><dt>待办</dt><dd>{candidate.records.todos.length}</dd></div>
@@ -116,18 +118,17 @@ export function BackupPage({ onBack }: { onBack: () => void }) {
             <label><input type="radio" name="restore-mode" checked={mode === 'merge'} onChange={() => setMode('merge')}/>合并并保留本机数据</label>
             <label><input type="radio" name="restore-mode" checked={mode === 'replace'} onChange={() => setMode('replace')}/>替换本机数据</label>
           </fieldset>
-          <p>{mode === 'merge' ? '跳过重复项；同日或重叠的生理期记录优先保留本机版本。'
+          <p className={mode === 'replace' ? 'settings-notice settings-notice--warning' : undefined}>{mode === 'merge' ? '跳过重复项；同日或重叠的生理期记录优先保留本机版本。'
             : '本机三个模块的已保存数据将被替换。应用会先保存一份本机备份。'}</p>
           <p>继续前请关闭其他已打开的旧版应用页面。</p>
           <div className="backup-confirm">
-            <Button variant="soft" disabled={busy} onClick={() => { setCandidate(null); setError(''); }}>取消</Button>
+            <Button variant="soft" disabled={busy} onClick={() => { setSelection(null); setError(''); }}>取消</Button>
             <Button variant={mode === 'replace' ? 'danger' : 'primary'} disabled={busy} onClick={() => confirm(candidate)}>
               {mode === 'merge' ? '确认合并' : '确认替换'}
             </Button>
           </div>
         </div>}
       </section>
-      {busy && <p role="status">正在处理本地数据…</p>}
     </>}
   </section>;
 }

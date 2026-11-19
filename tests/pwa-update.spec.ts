@@ -66,9 +66,11 @@ test.afterEach(async () => { await new Promise<void>(resolve => server.close(() 
 const dialog = (page: Page) => page.getByRole('dialog', { name: 'Cozy Days 有新版本啦！' });
 const addTodo = (page: Page) => page.getByRole('button', { name: '新增待办', exact: true });
 const releaseMarker = (page: Page) => page.locator('meta[name="test-release"]');
+const openTodos = (page: Page) => page.getByRole('navigation').getByRole('button', { name: '待办', exact: true }).click();
 
 async function openApp(page: Page) {
   await page.goto(url);
+  await openTodos(page);
   await expect(addTodo(page)).toBeVisible();
   await expect.poll(() => page.evaluate(() => navigator.serviceWorker.controller?.state)).toBe('activated');
 }
@@ -155,6 +157,7 @@ test('update preserves all six data types and can still reopen offline', async (
 
   await context.setOffline(true);
   await page.reload();
+  await openTodos(page);
   await expect(addTodo(page)).toBeVisible();
   await expect(dialog(page)).toHaveCount(0);
   expect(await persistentData(page)).toEqual(fixtures);
@@ -190,6 +193,7 @@ test('competing tabs activate once and retain old assets until the tabs close', 
     releaseActivation();
   }
   await expect(releaseMarker(page)).toHaveAttribute('content', '2');
+  await openTodos(page);
   await expect(savedTodo(page)).toBeVisible();
   await expect(savedTodo(other)).toBeVisible();
   await addTodo(other).click();
@@ -197,8 +201,10 @@ test('competing tabs activate once and retain old assets until the tabs close', 
   await draft.fill('未保存的草稿');
 
   await publish(page, 3);
+  await expect(dialog(other)).toHaveCount(0);
   await update(page);
   await expect(releaseMarker(page)).toHaveAttribute('content', '3');
+  await openTodos(page);
   await expect(savedTodo(page)).toBeVisible();
   await expect(draft).toHaveValue('未保存的草稿');
   await expect(releaseMarker(other)).toHaveAttribute('content', '1');
@@ -235,6 +241,7 @@ test('failed activation request leaves the old release usable and can be retried
   activationFailure = false;
   await update(page, '重试更新');
   await expect(releaseMarker(page)).toHaveAttribute('content', '2');
+  await openTodos(page);
   await expect(page.getByRole('button', { name: '编辑：更新失败后保存的待办' })).toBeVisible();
   expect(activationRequests).toBe(3);
 });

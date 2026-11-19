@@ -1,0 +1,96 @@
+import { test, expect } from '@playwright/test';
+import { makeBackup, encodeBackup, decodeBackup, mergeBackup } from '../src/data/backupModel';
+test('anniversary image fields survive backup and merge',()=>{
+ const record={id:1,name:'纪念日',date:'2020-02-29',theme:'恋爱' as const,note:'原有备注',icon:'♡',yearly:true,color:'pink' as const,createdAt:1,updatedAt:2,backgroundImage:'data:image/jpeg;base64,YWJj',backgroundX:25,backgroundY:75};
+ const records={categories:[],todos:[],anniversaries:[record],period:null};
+ const backup=decodeBackup(encodeBackup(makeBackup(records,'0.2.1')));
+ expect(backup.records.anniversaries[0]).toEqual(record);
+ const merged=mergeBackup({...records,anniversaries:[]},backup.records);
+ expect(merged.records.anniversaries[0]).toEqual(record);
+ const old={...record,backgroundImage:undefined,backgroundX:undefined,backgroundY:undefined};
+ expect(decodeBackup(encodeBackup(makeBackup({...records,anniversaries:[old]},'0.2.1'))).records.anniversaries).toHaveLength(1);
+});
+
+test('photo upload, pan, failed save, backup restore and removal use the same 4:3 crop', async ({page}) => {
+  await page.setViewportSize({width:360,height:740});
+  await page.goto('/');
+  const nav = page.getByRole('navigation').getByRole('button',{name:'纪念日',exact:true});
+  await nav.click();
+  await page.getByRole('button',{name:'新增纪念日',exact:true}).click();
+  const dialog = page.getByRole('dialog');
+  await dialog.getByLabel('纪念日名称').fill('照片裁切示例');
+  await dialog.getByRole('button',{name:'保存纪念日'}).click();
+  await expect(dialog).toHaveCount(0);
+  const card = page.getByRole('button',{name:'查看详情：照片裁切示例',exact:true});
+  await card.click();
+  await expect(page.locator('.ann-detail .ann-art img')).toHaveAttribute('src', /cats_empty_state/);
+  await page.getByRole('button',{name:'添加背景图片'}).click();
+  const png = await page.evaluate(() => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 480; canvas.height = 160;
+    const ctx = canvas.getContext('2d')!;
+    ctx.fillStyle = '#b77449'; ctx.fillRect(0,0,240,160);
+    ctx.fillStyle = '#624a65'; ctx.fillRect(240,0,240,160);
+    return canvas.toDataURL().split(',')[1];
+  });
+  await dialog.locator('input[type=file]').setInputFiles({name:'crop.png',mimeType:'image/png',buffer:Buffer.from(png,'base64')});
+  const preview = dialog.locator('.ann-art');
+  await preview.locator('img').evaluate(img => (img as HTMLImageElement).decode());
+  const box = (await preview.boundingBox())!;
+  expect(box.width / box.height).toBeCloseTo(4 / 3, 2);
+  const x = dialog.getByRole('slider',{name:'水平位置'});
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(box.x + box.width / 2 + 80, box.y + box.height / 2, {steps:8});
+  await page.mouse.up();
+  expect(Number(await x.inputValue())).toBeLessThan(50);
+  await x.fill('24');
+  await dialog.getByRole('slider',{name:'垂直位置'}).fill('73');
+  await expect(preview.locator('img')).toHaveCSS('object-position','24% 73%');
+  await dialog.getByRole('button',{name:'取消',exact:true}).click();
+  await expect(dialog.getByRole('alert')).toContainText('未保存');
+  await dialog.getByRole('button',{name:'继续编辑'}).click();
+  await page.evaluate(async () => {
+    const path = '/src/data/database.ts';
+    const { anniversaryRepository } = await import(path);
+    const save = anniversaryRepository.save;
+    anniversaryRepository.save = () => new Promise((_,reject) => {
+      anniversaryRepository.save = save;
+      window.addEventListener('test-fail-photo-write', () => reject(new Error('Synthetic photo save failure')), {once:true});
+    });
+  });
+  await dialog.getByRole('button',{name:'保存背景'}).click();
+  await expect(dialog.getByRole('button',{name:'正在保存…'})).toBeDisabled();
+  await dialog.getByRole('button',{name:'关闭弹窗'}).click();
+  await page.keyboard.press('Escape');
+  await expect(dialog).toBeVisible();
+  await page.evaluate(() => window.dispatchEvent(new Event('test-fail-photo-write')));
+  await expect(dialog.getByRole('alert')).toContainText('图片保存失败');
+  await expect(preview.locator('img')).toHaveCSS('object-position','24% 73%');
+  await dialog.getByRole('button',{name:'保存背景'}).click();
+  await expect(dialog).toHaveCount(0);
+  const photo = page.locator('.ann-detail .ann-art-photo');
+  await expect(photo).toHaveCSS('object-position','24% 73%');
+  await expect(photo).toHaveCSS('object-fit','cover');
+  const detailBox = (await page.locator('.ann-detail .ann-art').boundingBox())!;
+  expect(detailBox.width / detailBox.height).toBeCloseTo(4 / 3, 2);
+  const before = await photo.getAttribute('src');
+
+  await page.evaluate(async () => {
+    const models = '/src/data/backupModel.ts', storage = '/src/data/backup.ts';
+    const { decodeBackup } = await import(models);
+    const { exportBackup, restoreBackup } = await import(storage);
+    await restoreBackup(decodeBackup((await exportBackup()).json),'replace');
+  });
+  await page.reload();
+  await nav.click();
+  await card.click();
+  await expect(photo).toHaveAttribute('src',before!);
+  await expect(photo).toHaveCSS('object-position','24% 73%');
+  await page.getByRole('button',{name:'更换或调整背景'}).click();
+  await dialog.getByRole('button',{name:'移除图片'}).click();
+  await dialog.getByRole('button',{name:'保存背景'}).click();
+  await expect(dialog).toHaveCount(0);
+  await expect(photo).toHaveCount(0);
+  await expect(page.locator('.ann-detail .ann-art img')).toHaveAttribute('src', /cats_empty_state/);
+});

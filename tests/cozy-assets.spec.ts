@@ -1,69 +1,71 @@
-import { test, expect } from '@playwright/test';
-import fs from 'node:fs';
+import { expect, test, type Page } from '@playwright/test';
+import { openTodos, taskAction } from './task-actions';
 
-test('正式素材、三种安卓视口、长文本与安全区', async ({ page }) => {
-  test.setTimeout(90_000);
-  const measurements = [];
-  const errors: string[] = [];
-  page.on('pageerror', e => errors.push(e.message));
-  for (const [width, height] of [[360,740], [393,852], [430,932]]) {
-    await page.setViewportSize({width, height});
+async function addTodo(page: Page, text: string) {
+  await page.getByRole('button', { name: '新增待办', exact: true }).click();
+  const dialog = page.getByRole('dialog');
+  await dialog.getByRole('textbox', { name: '想做些什么？' }).fill(text);
+  await dialog.getByRole('button', { name: '保存', exact: true }).click();
+  await expect(dialog).toHaveCount(0);
+}
+
+for (const [width, height] of [[360, 740], [393, 852], [430, 932]]) {
+  test(`正式首页素材、长待办和模拟安全区 ${width}×${height}`, async ({ page }) => {
+    const errors: string[] = [];
+    page.on('pageerror', error => errors.push(error.message));
+    await page.setViewportSize({ width, height });
     await page.goto('/');
-    await expect(page.locator('.empty-art')).toBeVisible();
-    await page.locator('img').evaluateAll(imgs => Promise.all(imgs.map(img => (img as HTMLImageElement).decode())));
-    await page.screenshot({path:`artifacts/cozy-empty-${width}x${height}.png`});
-    for (const text of ['准备下周的设计稿', '整理一下房间', '看一本喜欢的书', '晚上做十分钟拉伸']) {
-      await page.getByRole('button',{name:'新增待办',exact:true}).click();
-      await page.getByRole('textbox',{name:'想做些什么？'}).fill(text);
-      await page.getByRole('button',{name:'保存',exact:true}).click();
-      await expect(page.getByRole('dialog')).not.toBeVisible();
-    }
+    await expect(page.getByText('今天还没有待办')).toBeVisible();
+    const scene = page.locator('.home-scene');
+    await expect(scene.locator('img')).toHaveCount(2);
+    await scene.locator('img').evaluateAll(images => Promise.all(
+      images.map(image => (image as HTMLImageElement).decode()),
+    ));
+    await expect(scene.locator('.home-room')).toHaveCSS('object-fit', 'cover');
+    const catRatio = await scene.locator<HTMLImageElement>('.home-cats').evaluate(image =>
+      Math.abs(image.width / image.height - image.naturalWidth / image.naturalHeight),
+    );
+    expect(catRatio).toBeLessThan(.08);
+
+    await openTodos(page);
+    await expect(page.getByText('这一天的清单是空的。')).toBeVisible();
+    const tasks = ['准备下周的设计稿', '整理一下房间', '看一本喜欢的书', '晚上做十分钟拉伸'];
+    for (const task of tasks) await addTodo(page, task);
     await page.reload();
-    await expect(page.getByTestId('todo-card')).toHaveCount(4);
-    await page.locator('img').evaluateAll(imgs => Promise.all(imgs.map(img => (img as HTMLImageElement).decode())));
-    await page.locator('.phone').evaluate(el => Promise.all(el.getAnimations({subtree:true}).map(a=>a.finished.catch(()=>{}))));
-    const measurement = await page.evaluate(() => ({
-      width: innerWidth, height: innerHeight, scrollWidth: document.body.scrollWidth,
-      images: [...document.images].map(i=>({src:i.getAttribute('src'), loaded:i.complete && i.naturalWidth>0, width:i.width,height:i.height,naturalWidth:i.naturalWidth,naturalHeight:i.naturalHeight})),
-      buttons: [...document.querySelectorAll('.task-actions button,.date-section button,.fab,.bottom-nav button')].map(b=>{const r=b.getBoundingClientRect();return {label:b.getAttribute('aria-label')||b.textContent,w:r.width,h:r.height};}),
-    }));
-    measurements.push(measurement);
-    expect(measurement.scrollWidth).toBe(width);
-    expect(measurement.images.every(i=>i.loaded && !i.src?.includes('placeholder'))).toBe(true);
-    for (const i of measurement.images.filter(i=>!i.src?.includes('bedroom_header'))) expect(Math.abs(i.width/i.height-i.naturalWidth/i.naturalHeight)).toBeLessThan(.08);
-    for (const b of measurement.buttons) { expect(b.w).toBeGreaterThanOrEqual(44); expect(b.h).toBeGreaterThanOrEqual(44); }
-    const fabBox = await page.locator('.fab').boundingBox();
-    const listBox = await page.locator('.task-area').boundingBox();
-    expect(listBox!.y + listBox!.height).toBeLessThanOrEqual(fabBox!.y);
-    await page.screenshot({path:`artifacts/cozy-todo-${width}x${height}.png`});
-    await page.locator('.task-area').evaluate(e=>{e.scrollTop=e.scrollHeight;});
-    await page.screenshot({path:`artifacts/cozy-scrolled-${width}x${height}.png`});
-    await page.getByRole('button',{name:'新增待办',exact:true}).click();
-    const longText = '这是需要正常换行的长待办内容'.repeat(8)+'\n'+'verylongunbrokentask'.repeat(12);
-    await page.getByRole('textbox',{name:'想做些什么？'}).fill(longText);
-    await page.getByRole('button',{name:'保存',exact:true}).click();
-    const content = page.locator('.task-content').last();
-    expect(await content.evaluate(e=>e.scrollWidth<=e.clientWidth)).toBe(true);
-    await page.getByRole('button',{name:`更多操作：${longText}`,exact:true}).click();
-    await page.getByRole('button',{name:`删除：${longText}`,exact:true}).click();
-    await expect(page.getByTestId('todo-card')).toHaveCount(4);
-    // Synthetic bottom inset checks CSS reservation; device bars still require a real Android device.
-    await page.addStyleTag({content:'.bottom-nav {height:calc(var(--nav-height) + 34px);padding-bottom:39px}.fab {bottom:calc(var(--nav-height) + 55px)}'});
-    await expect(page.getByRole('button',{name:'纪念日',exact:true})).toBeInViewport();
-    const nav = await page.locator('.bottom-nav').boundingBox();
-    expect(nav!.y+nav!.height).toBeLessThanOrEqual(height);
-    await page.screenshot({path:`artifacts/cozy-safe-area-${width}x${height}.png`});
-    // Reset injected safe-area styles before the next viewport.
-    await page.goto('about:blank');
-    await page.goto('/');
-    await expect(page.getByTestId('todo-card')).toHaveCount(4);
-    // Delete fixture todos through the UI to preserve the application's normal data path.
-    for (let remaining = 4; remaining > 0; remaining--) {
-      await page.locator('.task-actions button').last().click();
-      await page.getByRole('button',{name:/^删除：/}).click();
-      await expect(page.getByTestId('todo-card')).toHaveCount(remaining - 1);
+    await openTodos(page);
+    const cards = page.getByTestId('todo-card');
+    await expect(cards).toHaveCount(tasks.length);
+
+    const longText = '这是需要正常换行的长待办内容'.repeat(8) + '\n' + 'verylongunbrokentask'.repeat(12);
+    await addTodo(page, longText);
+    const content = page.getByRole('button', { name: `编辑：${longText}`, exact: true });
+    await expect(content).toHaveCount(1);
+    expect(await content.evaluate(element => element.scrollWidth)).toBeLessThanOrEqual(await content.evaluate(element => element.clientWidth));
+    await taskAction(page, longText, 'delete');
+    await expect(cards).toHaveCount(tasks.length);
+
+    await page.addStyleTag({ content: ':root { --safe-bottom: 34px; }' });
+    const nav = page.getByRole('navigation', { name: '应用模块' });
+    await expect(nav).toHaveCSS('height', '100px');
+    await expect(nav.getByRole('button', { name: '纪念日', exact: true })).toBeInViewport();
+    const list = page.locator('.task-area');
+    await list.evaluate(element => { element.scrollTop = element.scrollHeight; });
+    await expect(cards.last()).toBeInViewport();
+    const navBox = await nav.boundingBox();
+    const listBox = await list.boundingBox();
+    expect(navBox!.y + navBox!.height).toBe(height);
+    expect(listBox!.y + listBox!.height).toBeLessThanOrEqual(navBox!.y);
+    const controls = await page.locator('.todo-heading button, .todo-month button, .todo-week button, .task-actions button, .bottom-nav button').evaluateAll(
+      elements => elements.map(element => {
+        const { width, height } = element.getBoundingClientRect();
+        return { width, height };
+      }),
+    );
+    for (const control of controls) {
+      expect(control.width).toBeGreaterThanOrEqual(44);
+      expect(control.height).toBeGreaterThanOrEqual(44);
     }
-  }
-  expect(errors).toEqual([]);
-  fs.writeFileSync('artifacts/cozy-viewport-measurements.json', JSON.stringify(measurements,null,2));
-});
+    expect(await page.evaluate(() => document.body.scrollWidth)).toBe(width);
+    expect(errors).toEqual([]);
+  });
+}

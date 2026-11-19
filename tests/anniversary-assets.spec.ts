@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+test.use({timezoneId:'Asia/Shanghai'});
 
 const viewports = [
   { width:360, height:740 },
@@ -7,89 +8,31 @@ const viewports = [
 ];
 
 for (const viewport of viewports) {
-  test(`anniversary assets and full card framing at ${viewport.width}px`, async ({ page }) => {
+  test(`registered double-cat artwork and gold cover framing at ${viewport.width}px`, async ({ page }) => {
     await page.setViewportSize(viewport);
+    await page.clock.setFixedTime(new Date('2026-11-19T12:00:00+08:00'));
     await page.goto('/');
     await page.getByRole('navigation').getByRole('button', { name:'纪念日', exact:true }).click();
-    const hero = page.locator('.ann-hero');
-    await expect(hero.locator('.ann-cats')).toBeVisible();
-    await expect(hero.locator('.ann-title-heart')).toBeVisible();
-    await expect(hero.locator('.ann-sparkle')).toBeVisible();
-    await expect(hero.locator('.ann-hero-flower')).toBeVisible();
-    await expect(hero.locator('.ann-hero-star')).toBeVisible();
-    const images = await page.locator('.ann-hero img').evaluateAll(imgs => imgs.map(img => ({
-      name: img.getAttribute('src'), loaded: (img as HTMLImageElement).naturalWidth > 0,
-      width: (img as HTMLImageElement).naturalWidth,
-    })));
-    expect(images).toHaveLength(6);
-    expect(images.every(image => image.loaded)).toBe(true);
-    expect(images.map(image => image.name?.split('/').at(-1))).toEqual(expect.arrayContaining([
-      'bedroom_header.png', 'cats_header.png', 'heart_pink_outline.svg', 'sparkle_gold.svg', 'flower_pink.png', 'star_cream.svg',
-    ]));
-    await page.evaluate(() => document.fonts.ready);
-    await page.screenshot({ path:`artifacts/integration/m3/hero-empty-${viewport.width}.png` });
-
     await page.getByRole('button', { name:'新增纪念日', exact:true }).click();
-    const form = page.getByRole('dialog', { name:'新增纪念日', exact:true });
-    await form.getByLabel('纪念日名称').fill(`相遇纪念 ${viewport.width}`);
+    const form = page.getByRole('dialog');
+    await form.getByLabel('纪念日名称').fill('相遇纪念');
     await form.getByLabel('日期', { exact:true }).fill('2023-05-20');
     await form.getByRole('button', { name:'保存纪念日', exact:true }).click();
-    await expect(page.getByTestId('anniversary-card')).toHaveCount(1);
-    const card = page.getByTestId('anniversary-card').first();
-    await expect(card.locator('.ann-card-star')).toBeVisible();
-    await expect(card.locator('.ann-card-heart')).toBeVisible();
-    await expect(card.locator('.ann-card-flower')).toBeVisible();
-    await expect(card.locator('.ann-card-tape')).toBeVisible();
-    expect(await page.locator('.ann-page').evaluate(el => el.scrollWidth <= el.clientWidth)).toBe(true);
-    const audit = await page.evaluate(async () => {
-      const files = [
-        ['cats_header.png', '/assets/cozy_days/raster/characters/cats_header.png'],
-        ['bedroom_header.png', '/assets/cozy_days/raster/backgrounds/bedroom_header.png'],
-        ['flower_pink.png', '/assets/cozy_days/raster/decor/flower_pink.png'],
-        ['heart_pink_outline.svg', '/assets/cozy_days/vectors/symbols/heart_pink_outline.svg'],
-        ['star_cream.svg', '/assets/cozy_days/vectors/symbols/star_cream.svg'],
-        ['sparkle_gold.svg', '/assets/cozy_days/vectors/symbols/sparkle_gold.svg'],
-        ['washi_pink.png', '/assets/cozy_days/raster/decor/washi_pink.png'],
-      ];
-      const rows = [];
-      for (const [name, url] of files) {
-        const bytes = await (await fetch(url)).arrayBuffer();
-        const hash = [...new Uint8Array(await crypto.subtle.digest('SHA-256', bytes))].map(x => x.toString(16).padStart(2, '0')).join('');
-        const image = new Image(); image.src = url; await image.decode();
-        const canvas = document.createElement('canvas'); canvas.width = image.naturalWidth; canvas.height = image.naturalHeight;
-        const context = canvas.getContext('2d')!; context.drawImage(image, 0, 0);
-        const pixels = context.getImageData(0, 0, canvas.width, canvas.height).data;
-        let clear = 0, solid = 0;
-        for (let i = 3; i < pixels.length; i += 4) { if (pixels[i] === 0) clear++; if (pixels[i] === 255) solid++; }
-        rows.push({ name, hash, width: image.naturalWidth, height: image.naturalHeight, clearFraction: clear / (image.naturalWidth * image.naturalHeight), solidFraction: solid / (image.naturalWidth * image.naturalHeight) });
-      }
-      return rows;
-    });
-    console.log(`M3 asset audit ${viewport.width}: ${JSON.stringify(audit)}`);
-    expect(audit.every(item => /^[0-9a-f]{64}$/.test(item.hash))).toBe(true);
-    expect(audit.filter(item => ['cats_header.png','flower_pink.png','washi_pink.png'].includes(item.name)).every(item => item.clearFraction > 0)).toBe(true);
-    expect(audit.filter(item => ['flower_pink.png','washi_pink.png'].includes(item.name)).every(item => item.solidFraction > 0)).toBe(true);
-    await card.scrollIntoViewIfNeeded();
-    const cardBox = await card.boundingBox();
-    const tapeBox = await card.locator('.ann-card-tape').boundingBox();
-    const countBox = await card.locator('.ann-count').boundingBox();
-    const flowerBox = await card.locator('.ann-card-flower').boundingBox();
-    const controls = await card.locator('.ann-card-actions button').evaluateAll(buttons => buttons.map(button => { const r = button.getBoundingClientRect(); return { x:r.x, y:r.y, width:r.width, height:r.height }; }));
-    const overlaps = (a: {x:number;y:number;width:number;height:number}, b: {x:number;y:number;width:number;height:number}) => a.x < b.x+b.width && a.x+a.width > b.x && a.y < b.y+b.height && a.y+a.height > b.y;
-    expect(overlaps(tapeBox!, countBox!)).toBe(false);
-    expect(controls.every(control => !overlaps(flowerBox!, control))).toBe(true);
-    const viewportSize = page.viewportSize()!;
-    expect(cardBox!.y).toBeGreaterThanOrEqual(0);
-    expect(cardBox!.y + cardBox!.height).toBeLessThanOrEqual(viewportSize.height);
-    await page.screenshot({ path:`artifacts/integration/m3/card-${viewport.width}.png` });
-    await card.getByRole('button', { name:/编辑：/ }).click();
-    const editor = page.getByRole('dialog', { name:'编辑纪念日', exact:true });
-    await expect(editor).toBeVisible();
-    await editor.getByRole('button', { name:'关闭弹窗' }).click();
-    await card.getByRole('button', { name:/删除：/ }).click();
-    const confirm = page.getByRole('dialog', { name:'删除纪念日', exact:true });
-    await expect(confirm).toContainText('确定删除');
-    await confirm.getByRole('button', { name:'再想想' }).click();
+    await expect(form).toHaveCount(0);
+    const cover = page.locator('.ann-featured');
+    await expect(cover).toHaveCSS('background-color','rgb(235, 216, 198)');
+    await expect(cover).toHaveCSS('border-top-width','4px');
+    await expect(cover).toHaveCSS('border-radius','24px 6px');
+    await expect(cover.locator('.ann-featured-count strong')).toHaveCSS('font-size','64px');
+    await expect(page.locator('.ann-ticket')).toHaveCSS('height','59px');
+    const cats = cover.locator('img');
+    await expect(cats).toHaveAttribute('src',/cats_empty_state/);
+    await cats.evaluate(img => (img as HTMLImageElement).decode());
+    await page.getByRole('button',{name:'查看详情：相遇纪念'}).click();
+    const art = page.locator('.ann-detail .ann-art');
+    await expect(art.locator('img')).toHaveAttribute('src',/cats_empty_state/);
+    const size = (await art.boundingBox())!;
+    expect(size.width / size.height).toBeCloseTo(4 / 3, 2);
   });
 }
 

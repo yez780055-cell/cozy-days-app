@@ -1,4 +1,4 @@
-import { taskAction } from './task-actions';
+import { openTodos, taskAction } from './task-actions';
 import { test, expect, type Page } from '@playwright/test';
 
 async function addTodo(page: Page, text: string, date?: string) {
@@ -12,10 +12,10 @@ async function addTodo(page: Page, text: string, date?: string) {
 const card = (page: Page, text: string) => page.getByTestId('todo-card').filter({has:page.getByRole('button',{name:`编辑：${text}`,exact:true})});
 
 test('新增、刷新保留、完成与准确撤销', async ({page}) => {
-  await page.goto('/');
+  await page.goto('/'); await openTodos(page);
   await addTodo(page, '已经完成的第一件');
   await addTodo(page, '需要准确撤销的第二件');
-  await page.reload();
+  await page.reload(); await openTodos(page);
   await expect(card(page, '需要准确撤销的第二件')).toBeVisible();
   await taskAction(page, '已经完成的第一件', 'complete');
   await expect(page.getByRole('button', {name:'已完成 1',exact:true})).toBeVisible();
@@ -25,12 +25,12 @@ test('新增、刷新保留、完成与准确撤销', async ({page}) => {
   await expect(page.getByRole('button',{name:'编辑：需要准确撤销的第二件',exact:true})).toBeVisible();
   await page.getByRole('button', {name:'已完成 1',exact:true}).click();
   await expect(page.getByRole('button',{name:'编辑：已经完成的第一件',exact:true})).toBeVisible();
-  await page.reload();
+  await page.reload(); await openTodos(page);
   await expect(page.getByRole('button', {name:'已完成 1',exact:true})).toBeVisible();
 });
 
 test('编辑多行内容、修改日期、删除取消和确认', async ({page}) => {
-  await page.goto('/');
+  await page.goto('/'); await openTodos(page);
   await addTodo(page, '需要修改');
   await page.getByRole('button',{name:'编辑：需要修改',exact:true}).click();
   const editor=page.getByRole('dialog',{name:'编辑待办'});
@@ -42,13 +42,48 @@ test('编辑多行内容、修改日期、删除取消和确认', async ({page})
   await expect(page.getByRole('dialog')).not.toBeVisible();
   await page.getByRole('button',{name:/^更多操作：修改后的第一行/}).click();
   await page.getByRole('button',{name:/^删除：修改后的第一行/}).click();
+  const confirm = page.getByRole('dialog',{name:'删除这件待办？'});
+  await confirm.getByRole('button',{name:'取消',exact:true}).click();
+  await expect(page.getByTestId('todo-card')).toHaveCount(1);
+  await page.getByRole('button',{name:/^更多操作：修改后的第一行/}).click();
+  await page.getByRole('button',{name:/^删除：修改后的第一行/}).click();
+  await confirm.getByRole('button',{name:'确认删除',exact:true}).click();
   await expect(page.getByTestId('todo-card')).toHaveCount(0);
-  await page.reload();
+  await page.reload(); await openTodos(page);
   await expect(page.getByTestId('todo-card')).toHaveCount(0);
 });
 
-test('全部未完成包含过去与未来，日期日历与今天入口可操作', async ({page}) => {
+test('删除写入失败保留确认框和任务，重试成功后才能撤销', async ({page}) => {
   await page.goto('/');
+  await openTodos(page);
+  const title = '可重试的删除';
+  await addTodo(page, title);
+  await page.evaluate(async () => {
+    const path = '/src/data/database.ts';
+    const { todoRepository } = await import(path);
+    const remove = todoRepository.remove;
+    todoRepository.remove = async () => {
+      todoRepository.remove = remove;
+      throw new Error('Synthetic delete failure');
+    };
+  });
+  await page.getByRole('button', {name:`更多操作：${title}`}).click();
+  await page.getByRole('button', {name:`删除：${title}`, exact:true}).click();
+  const dialog = page.getByRole('dialog', {name:'删除这件待办？'});
+  const confirm = dialog.getByRole('button', {name:'确认删除'});
+  await confirm.click();
+  await expect(dialog.getByRole('alert')).toContainText('保存失败');
+  await expect(card(page, title)).toHaveCount(1);
+  await expect(page.locator('.undo-toast')).toHaveCount(0);
+  await confirm.click();
+  await expect(dialog).toHaveCount(0);
+  await expect(card(page, title)).toHaveCount(0);
+  await page.getByRole('button', {name:'撤销', exact:true}).click();
+  await expect(card(page, title)).toBeVisible();
+});
+
+test('全部未完成包含过去与未来，日期日历与今天入口可操作', async ({page}) => {
+  await page.goto('/'); await openTodos(page);
   await addTodo(page,'过去仍未完成','2020-01-01');
   await addTodo(page,'未来的小计划','2030-01-01');
   await page.getByRole('button',{name:/^全部未完成/}).click();
@@ -73,7 +108,7 @@ test('全部未完成包含过去与未来，日期日历与今天入口可操�
 });
 
 test('空内容不能保存，弹窗焦点与模块入口', async ({page}) => {
-  await page.goto('/');
+  await page.goto('/'); await openTodos(page);
   await page.getByRole('button',{name:'新增待办',exact:true}).click();
   await expect(page.getByRole('button',{name:'保存',exact:true})).toBeDisabled();
   await page.getByRole('textbox', {name:'想做些什么？'}).fill('   ');
@@ -82,7 +117,7 @@ test('空内容不能保存，弹窗焦点与模块入口', async ({page}) => {
   await page.getByRole('button',{name:'放弃修改'}).click();
   await expect(page.getByRole('dialog')).not.toBeVisible();
   await page.getByRole('button',{name:'生理期',exact:true}).click();
-  await expect(page.getByRole('region',{name:'生理期日历',exact:true})).toBeVisible();
+  await expect(page.locator('.period-calendar')).toBeVisible();
   await page.getByRole('button',{name:'纪念日',exact:true}).click();
   await expect(page.getByRole('heading',{name:'纪念日'})).toBeVisible();
   await page.getByRole('button',{name:'待办',exact:true}).click();
@@ -90,13 +125,13 @@ test('空内容不能保存，弹窗焦点与模块入口', async ({page}) => {
 });
 
 test('页面加载后断网仍可新增，恢复网络刷新后保留', async ({page,context}) => {
-  await page.goto('/');
+  await page.goto('/'); await openTodos(page);
   await expect(page.getByRole('button',{name:'新增待办',exact:true})).toBeVisible();
   await context.setOffline(true);
   await addTodo(page,'离线记下的一件小事');
   await expect(card(page,'离线记下的一件小事')).toBeVisible();
   await context.setOffline(false);
-  await page.reload();
+  await page.reload(); await openTodos(page);
   await expect(card(page,'离线记下的一件小事')).toBeVisible();
 });
 
@@ -104,17 +139,17 @@ test('两种手机尺寸：长列表滚动、导航与截图', async ({page}) =>
   test.setTimeout(60_000);
   const errors:string[]=[];
   page.on('pageerror', error=>errors.push(error.message));
-  await page.goto('/');
+  await page.goto('/'); await openTodos(page);
   for (const text of ['准备下周的设计稿','整理一下房间','看一本喜欢的书','晚上做十分钟拉伸']) await addTodo(page,text);
   for (const viewport of [{width:360,height:740},{width:430,height:932}]) {
     await page.setViewportSize(viewport);
-    await page.goto('/');
+    await page.goto('/'); await openTodos(page);
     await expect(page.getByTestId('todo-card')).toHaveCount(4);
     await page.locator('.phone').evaluate(element => Promise.all(element.getAnimations({subtree:true}).map(animation => animation.finished.catch(() => {}))));
     await page.screenshot({path:`artifacts/todo-${viewport.width}x${viewport.height}.png`});
     await page.goto('/?preview=1&scenario=normal');
     await page.getByLabel('开发状态',{exact:true}).selectOption('long');
-    const list=page.getByRole('region',{name:'待办列表',exact:true});
+    const list=page.locator('.task-area');
     await list.evaluate(element=>{element.scrollTop=element.scrollHeight;});
     await expect(page.getByRole('button',{name:'纪念日',exact:true})).toBeInViewport();
     await expect(page.getByRole('button',{name:'新增待办',exact:true})).toBeInViewport();
@@ -129,7 +164,7 @@ test('状态预览、模态框与键盘可视高度模拟', async ({page}) => {
   await page.screenshot({path:'artifacts/empty-390x844.png'});
   const select=page.getByLabel('开发状态',{exact:true});
   await select.selectOption('completed');
-  await expect(page.getByText('太棒了，都完成啦！')).toBeVisible();
+  await expect(page.getByRole('button',{name:'已完成 4',exact:true})).toBeVisible();
   await page.screenshot({path:'artifacts/completed-390x844.png'});
   await select.selectOption('add');
   await expect(page.getByRole('dialog',{name:'新建待办'})).toBeVisible();

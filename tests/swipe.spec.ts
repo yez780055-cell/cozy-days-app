@@ -1,5 +1,5 @@
 import { test, expect, type Page, type Locator } from '@playwright/test';
-import { taskAction } from './task-actions';
+import { openTodos, taskAction } from './task-actions';
 
 async function add(page: Page,text:string) {
   await page.getByRole('button',{name:'新增待办',exact:true}).click();
@@ -29,7 +29,7 @@ async function undo(page:Page) { const count=await page.locator('.undo-toast').c
 for(const [width,height] of [[360,740],[393,852],[430,932]]) {
   test(`滑动阈值、跟手与删除/完成/恢复撤销 ${width}x${height}`,async({page})=>{
     test.setTimeout(60_000);
-    await page.setViewportSize({width,height});await page.goto('/');
+    await page.setViewportSize({width,height});await page.goto('/'); await openTodos(page);
     await add(page,'读一本喜欢的书');await add(page,'第二件小事');
     const first=card(page,'读一本喜欢的书'),shell=first.locator('..');
     const original=await rows(page),w=(await first.boundingBox())!.width;
@@ -50,7 +50,7 @@ for(const [width,height] of [[360,740],[393,852],[430,932]]) {
     await page.screenshot({path:`artifacts/cozy-swipe-delete-reveal-${width}x${height}.png`});
     await page.getByRole('button',{name:'滑动删除：读一本喜欢的书',exact:true}).click();
     await expect(first).toHaveCount(0);
-    await expect(page.locator('.undo-toast')).toContainText('哎呀点错了');
+    await expect(page.locator('.undo-toast')).toContainText('已删除待办');
     await undo(page);await expect(first).toBeVisible();expect(await rows(page)).toEqual(original);
     await drag(page,first,-w*.62);
     await expect(shell).toHaveAttribute('data-offset','-80');
@@ -71,19 +71,19 @@ for(const [width,height] of [[360,740],[393,852],[430,932]]) {
     await expect(first).toHaveClass(/task-card--done/);
     await drag(page,first,w*.62);
     await expect(page.getByRole('button',{name:'已完成 1',exact:true})).toHaveCount(0);
-    await expect(page.locator('.undo-toast').last()).toContainText('又放回小计划啦');
+    await expect(page.locator('.undo-toast').last()).toContainText('已恢复待办');
     expect((await rows(page))[0].completed).toBe(false);
     await undo(page);
     await expect(page.getByRole('button',{name:'已完成 1',exact:true})).toBeVisible();
     expect((await rows(page))[0].completed).toBe(true);
-    await page.reload();await expect(page.getByRole('button',{name:'已完成 1',exact:true})).toBeVisible();
+    await page.reload(); await openTodos(page);await expect(page.getByRole('button',{name:'已完成 1',exact:true})).toBeVisible();
     expect((await rows(page)).map(r=>r.id)).toEqual(original.map(r=>r.id));
     expect(await page.evaluate(()=>document.body.scrollWidth)).toBe(width);
   });
 }
 
 test('退场时数据仍在，300ms 收缩与下方补位完成后才移除',async({page})=>{
-  await page.setViewportSize({width:393,height:852});await page.goto('/');
+  await page.setViewportSize({width:393,height:852});await page.goto('/'); await openTodos(page);
   await add(page,'先删除的卡片');await add(page,'向上补位的卡片');
   const first=card(page,'先删除的卡片'),second=card(page,'向上补位的卡片');
   const before=(await second.boundingBox())!.y,w=(await first.boundingBox())!.width;
@@ -98,7 +98,7 @@ test('退场时数据仍在，300ms 收缩与下方补位完成后才移除',asy
 });
 
 test('完整快照撤销保留 ID/分类/日期/时间/收藏/贴纸与原始排序',async({page})=>{
-  await page.goto('/');await add(page,'中间要保留所有字段');await add(page,'后面的小事');
+  await page.goto('/'); await openTodos(page);await add(page,'中间要保留所有字段');await add(page,'后面的小事');
   await page.getByRole('button',{name:'编辑：中间要保留所有字段',exact:true}).click();
   await page.getByRole('button',{name:'收藏这件小事',exact:true}).click();
   await page.getByRole('button',{name:'保存',exact:true}).click();await expect(page.getByRole('dialog')).not.toBeVisible();
@@ -110,25 +110,25 @@ test('完整快照撤销保留 ID/分类/日期/时间/收藏/贴纸与原始排
       get.onsuccess=()=>store.put({...get.result,category:'生活',time:'09:30',sortOrder:7});tx.oncomplete=()=>{db.close();resolve();};tx.onerror=()=>reject(tx.error);
     };
   }));
-  await page.reload();await expect(card(page,'中间要保留所有字段')).toBeVisible();
+  await page.reload(); await openTodos(page);await expect(card(page,'中间要保留所有字段')).toBeVisible();
   const original=await rows(page);
   await taskAction(page,'中间要保留所有字段','delete');await expect(card(page,'中间要保留所有字段')).toHaveCount(0);
   await undo(page);await expect(card(page,'中间要保留所有字段')).toBeVisible();
   expect(await rows(page)).toEqual(original);
-  expect(await page.locator('.task-list .task-content > span').allTextContents()).toEqual(['中间要保留所有字段','后面的小事']);
+  expect(await page.locator('.task-list .task-content > strong').allTextContents()).toEqual(['中间要保留所有字段','后面的小事']);
   await taskAction(page,'中间要保留所有字段','complete');
   await expect(page.getByRole('button',{name:'已完成 1',exact:true})).toBeVisible();
-  await page.reload();await page.getByRole('button',{name:'已完成 1',exact:true}).click();
+  await page.reload(); await openTodos(page);await page.getByRole('button',{name:'已完成 1',exact:true}).click();
   await expect(card(page,'中间要保留所有字段').locator('.task-favorite')).toHaveCount(1);
   expect((await rows(page))[0]).toMatchObject({...original[0],completed:true});
   await page.getByRole('button',{name:'编辑：中间要保留所有字段',exact:true}).click();
   await page.getByRole('button',{name:'已收藏这件小事',exact:true}).click();await page.getByRole('button',{name:'保存',exact:true}).click();
-  await expect(page.getByRole('dialog')).not.toBeVisible();await page.reload();
+  await expect(page.getByRole('dialog')).not.toBeVisible();await page.reload(); await openTodos(page);
   expect((await rows(page))[0].favorite).toBe(false);
 });
 
 test('快速连续操作支持独立撤销，同一任务删除后撤销不重复创建',async({page})=>{
-  await page.goto('/');await add(page,'甲');await add(page,'乙');await add(page,'丙');
+  await page.goto('/'); await openTodos(page);await add(page,'甲');await add(page,'乙');await add(page,'丙');
   await taskAction(page,'甲','delete');await expect(card(page,'甲')).toHaveCount(0);
   await taskAction(page,'乙','complete');await expect(page.getByRole('button',{name:'已完成 1',exact:true})).toBeVisible();
   await expect(page.locator('.undo-toast')).toHaveCount(2);await undo(page);await expect(card(page,'乙')).toBeVisible();
@@ -146,7 +146,7 @@ test('快速连续操作支持独立撤销，同一任务删除后撤销不重�
 });
 
 test('10秒读条、超时消失及导航卸载清理',async({page})=>{
-  await page.clock.install();await page.goto('/');await add(page,'计时任务');
+  await page.clock.install();await page.goto('/'); await openTodos(page);await add(page,'计时任务');
   await taskAction(page,'计时任务','delete');await expect(card(page,'计时任务')).toHaveCount(0);
   await expect(page.locator('.undo-progress i')).toHaveCSS('animation-duration','10s');
   await page.clock.fastForward(9000);await expect(page.getByRole('button',{name:'撤销',exact:true})).toBeEnabled();
@@ -159,7 +159,7 @@ test('10秒读条、超时消失及导航卸载清理',async({page})=>{
 });
 
 test('真实浏览器触控：纵向滚动不操作，横向拖动不误开编辑',async({page})=>{
-  test.setTimeout(60_000);await page.setViewportSize({width:393,height:852});await page.goto('/');
+  test.setTimeout(60_000);await page.setViewportSize({width:393,height:852});await page.goto('/'); await openTodos(page);
   for(let i=0;i<12;i++)await add(page,`滚动任务${i}`);
   const cdp=await page.context().newCDPSession(page);await cdp.send('Emulation.setTouchEmulationEnabled',{enabled:true,maxTouchPoints:1});
   const r=(await page.locator('.task-area').boundingBox())!,x=r.x+r.width*.45,y=r.y+r.height-25;
@@ -178,7 +178,7 @@ test('真实浏览器触控：纵向滚动不操作，横向拖动不误开编�
 });
 
 test('减少动态效果仍可删除/完成/撤销且没有常驻任务复选框',async({page})=>{
-  await page.emulateMedia({reducedMotion:'reduce'});await page.goto('/');await add(page,'安静的小事');
+  await page.emulateMedia({reducedMotion:'reduce'});await page.goto('/'); await openTodos(page);await add(page,'安静的小事');
   await expect(page.locator('.task-card .checkbox')).toHaveCount(0);
   const row=card(page,'安静的小事');await drag(page,row,(await row.boundingBox())!.width*.65);
   await expect(page.getByRole('button',{name:'已完成 1',exact:true})).toBeVisible();await undo(page);await expect(row).toBeVisible();

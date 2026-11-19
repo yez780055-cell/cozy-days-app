@@ -20,7 +20,8 @@ export function CalendarPanel({value,onSelect}:{value:string;onSelect:(date:stri
       {Array.from({ length: count }, (_, i) => {
         const key = toDateKey(new Date(month.getFullYear(), month.getMonth(), i + 1, 12));
         return <button type="button" key={key} className={`calendar-day ${key === value ? 'is-selected' : ''} ${key === todayKey() ? 'is-today' : ''}`}
-          aria-label={key} aria-pressed={key === value} onClick={() => onSelect(key)}>{i + 1}</button>;
+          aria-label={key} aria-pressed={key === value} aria-current={key === todayKey() ? 'date' : undefined}
+          onClick={() => onSelect(key)}><span>{i + 1}</span></button>;
       })}
     </div><Button variant="soft" onClick={() => onSelect(todayKey())}>回到今天</Button>
   </div>;

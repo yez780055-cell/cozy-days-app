@@ -4,7 +4,7 @@ export function Checkbox({ checked = false, disabled = false, onChange, label }:
 }) {
   return <button type="button" role="checkbox" aria-checked={checked} aria-label={label}
     disabled={disabled} onClick={onChange} className={`checkbox ${checked ? 'is-checked' : ''}`}>
-    <Check size={16} strokeWidth={2.7} aria-hidden="true" />
+    <span aria-hidden="true"><Check size={16} strokeWidth={1.7}/></span>
   </button>;
 }
 

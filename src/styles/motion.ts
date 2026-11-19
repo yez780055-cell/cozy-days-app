@@ -1,5 +1,5 @@
 export const motion = {
-  press: 160,
+  press: 120,
   checkbox: 220,
   modal: 240,
   list: 240,

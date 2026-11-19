@@ -18,59 +18,24 @@ const assets = [
 ] as const;
 
 for (const viewport of viewports) {
-  test(`period artwork is legible and contained at ${viewport.width}x${viewport.height}`, async ({ page }) => {
-    await page.clock.install({ time: new Date('2026-10-23T04:00:00Z') });
+  test(`period line icons and tap targets at ${viewport.width}x${viewport.height}`, async ({ page }) => {
     await page.setViewportSize(viewport);
-    await page.addInitScript(() => localStorage.setItem('cozy-days.settings-hint-seen', '1'));
     await page.goto('/');
-    await page.getByRole('navigation').getByRole('button', { name: '生理期', exact: true }).click();
-    const period = page.locator('.period-page');
-    await expect(period.locator('.period-art--header .period-art-main')).toBeVisible();
-    await expect(period.locator('.period-calendar-flower')).toBeVisible();
-    await expect(period.locator('.period-diary-tape')).toBeVisible();
-    await expect(period.locator('.period-art--note .period-art-main')).toBeVisible();
-    // Visibility alone does not wait for image bytes to finish loading.
-    await period.locator('img').evaluateAll(nodes => Promise.all(nodes.map(node => (node as HTMLImageElement).decode())));
-    const images = await period.locator('img').evaluateAll(nodes => nodes.map(node => {
-      const image = node as HTMLImageElement;
-      const style = getComputedStyle(image);
-      return { name: image.src.split('/').at(-1), loaded: image.complete && image.naturalWidth > 0, pointerEvents: style.pointerEvents };
-    }));
-    expect(images.length).toBe(7);
-    expect(images.every(image => image.loaded && image.pointerEvents === 'none')).toBe(true);
-    expect(new Set(images.map(image => image.name))).toEqual(new Set([
-      'cats_header.png', 'cats_empty_state.png', 'washi_pink.png', 'flower_pink.png',
-      'star_cream.svg', 'sparkle_gold.svg', 'heart_pink_outline.svg',
-    ]));
+    await page.getByRole('navigation').getByRole('button', { name:'生理期', exact:true }).click();
+    const period = page.getByRole('region', { name:'生理期页面' });
+    await expect(period.getByRole('heading', {name:'生理期', exact:true})).toBeVisible();
+    await expect(period.locator('img')).toHaveCount(0);
+    const choices = period.locator('.period-choices button');
+    await expect(choices).toHaveCount(23);
+    await expect(period.locator('.period-choice-icon')).toHaveCount(23);
+    const controls = period.locator('.period-calendar header button, .period-choices button');
+    expect(await controls.evaluateAll(buttons => buttons.every(button => {
+      const box = button.getBoundingClientRect();
+      return box.width >= 44 && box.height >= 44;
+    }))).toBe(true);
     expect(await period.evaluate(element => element.scrollWidth <= element.clientWidth)).toBe(true);
-    const heading = await period.locator('.period-header-copy').boundingBox();
-    const heroArt = await period.locator('.period-art--header').boundingBox();
-    const header = await period.locator('.period-header').boundingBox();
-    const copyLayer = await period.locator('.period-header-copy').evaluate(node => Number(getComputedStyle(node).zIndex));
-    expect(heading && header && heading.x >= header.x && heading.x + heading.width <= header.x + header.width).toBe(true);
-    expect(heroArt && header && heroArt.x >= header.x && heroArt.x + heroArt.width <= header.x + header.width).toBe(true);
-    expect(copyLayer).toBeGreaterThan(1);
-
-    await page.evaluate(() => document.fonts.ready);
-    await page.evaluate(async () => { await Promise.all([...document.images].map(image => image.decode().catch(() => {}))); });
-    await page.screenshot({ path: `artifacts/v021-g4/period-${viewport.width}-top.png`, animations: 'disabled' });
-    const overlaps = (a: { x:number; y:number; width:number; height:number }, b: { x:number; y:number; width:number; height:number }) => a.x < b.x + b.width && a.x + a.width > b.x && a.y < b.y + b.height && a.y + a.height > b.y;
-    const flower = await period.locator('.period-calendar-flower').boundingBox();
-    const calendarControls = await period.locator('.period-calendar header button').evaluateAll(buttons => buttons.map(button => { const rect = button.getBoundingClientRect(); return { x:rect.x, y:rect.y, width:rect.width, height:rect.height }; }));
-    expect(calendarControls.every(control => !overlaps(flower!, control))).toBe(true);
-    const diary = period.locator('.period-daily');
-    await diary.scrollIntoViewIfNeeded();
-    await expect(diary).toBeInViewport();
-    const tape = await diary.locator('.period-diary-tape').boundingBox();
-    const diaryHeading = await diary.locator('header h2').boundingBox();
-    const diaryDate = await diary.locator('header>span').boundingBox();
-    expect(overlaps(tape!, diaryHeading!)).toBe(false);
-    expect(overlaps(tape!, diaryDate!)).toBe(false);
-    await page.screenshot({ path: `artifacts/v021-g4/period-${viewport.width}-record.png`, animations: 'disabled' });
-    const moodFaces = await page.locator('.period-record-options fieldset').nth(2).locator('.period-cat-face').evaluateAll(faces => faces.map(face => face.innerHTML));
-    expect(moodFaces).toHaveLength(5);
-    expect(new Set(moodFaces).size).toBe(5);
-
+    const fills = await period.locator('clipPath').evaluateAll(paths => paths.map(path => path.id));
+    expect(new Set(fills).size).toBe(5);
   });
 }
 
@@ -122,17 +87,14 @@ test('period asset source files match their declared dimensions, pixel alpha and
   await page.screenshot({ path: 'artifacts/integration/m4/assets-dark.png', fullPage: true });
 });
 
-test('a failed illustration request falls back and the period view stays usable offline', async ({ page, context }) => {
+test('period controls work offline when legacy artwork is unavailable', async ({ page, context }) => {
   await page.route('**/assets/cozy_days/raster/characters/cats_header.png', route => route.abort());
-  await page.clock.install({ time: new Date('2026-10-23T04:00:00Z') });
   await page.goto('/');
-  await page.getByRole('navigation').getByRole('button', { name: '生理期', exact: true }).click();
-  const header = page.locator('.period-art--header .period-art-main');
-  await expect.poll(() => header.getAttribute('src')).toMatch(/^data:image\/svg\+xml,/);
-  await expect(header).toHaveJSProperty('naturalWidth', 128);
-  await context.setOffline(true);
+  await page.getByRole('navigation').getByRole('button', { name:'生理期', exact:true }).click();
   await expect(page.locator('.period-calendar')).toBeVisible();
-  await page.getByRole('button', { name: '周期设置', exact: true }).click();
-  await expect(page.getByRole('dialog', { name: '周期设置' })).toBeVisible();
-  await expect(page.locator('.period-art--header .period-art-main')).toHaveJSProperty('naturalWidth', 128);
+  await context.setOffline(true);
+  const choice = page.getByRole('button', { name:'平静', exact:true });
+  await choice.click();
+  await expect(choice).toHaveAttribute('aria-pressed','true');
+  await expect(page.locator('.period-storage')).toBeEmpty();
 });

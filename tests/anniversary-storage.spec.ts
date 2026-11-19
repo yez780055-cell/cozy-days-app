@@ -55,7 +55,8 @@ test('删除提交成功后刷新失败：明确已删除并提供只读重试',
   const dialog = await fill(page, '只删除一次');
   await dialog.getByRole('button', { name:'保存纪念日', exact:true }).click();
   await expect(dialog).not.toBeVisible();
-  await page.getByRole('button', { name:'删除：只删除一次', exact:true }).click();
+  await page.getByRole('button', { name:'查看详情：只删除一次', exact:true }).click();
+  await page.getByRole('button', { name:'删除纪念日', exact:true }).click();
   await failNextRead(page);
   await page.getByRole('button', { name:'确认删除', exact:true }).click();
   await expect(page.getByRole('alert')).toBeVisible();

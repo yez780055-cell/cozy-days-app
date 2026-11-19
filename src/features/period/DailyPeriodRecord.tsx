@@ -1,9 +1,9 @@
 import { shortDate, type DailyEntry } from './model';
-import { PeriodChoiceIcon } from './PeriodArt';
+import { moodFaces, PeriodChoiceIcon, symptomPaths } from './PeriodArt';
 
 export const flows = ['无', '点滴', '较少', '适中', '较多'];
-export const symptoms = ['腹痛', '腰痛', '疲惫', '头痛', '胸部胀痛', '腹胀', '恶心', '痘痘', '其他'];
-export const moods = ['开心', '平静', '放松', '疲倦', '焦虑', '低落', '易怒', '敏感', '难过'];
+export const symptoms = Object.keys(symptomPaths);
+export const moods = Object.keys(moodFaces);
 const groups = [
   { label: '流量', options: flows, field: 'flow' },
   { label: '身体状况', options: symptoms, field: 'symptoms' },
@@ -45,7 +45,7 @@ export function DailyPeriodRecord({ date, today, value, active, locked, onToggle
                     ? selected ? entry.symptoms.filter(symptom => symptom !== option) : [...entry.symptoms, option]
                     : selected ? undefined : option,
                 })}>
-                <PeriodChoiceIcon field={field} index={index}/>
+                <PeriodChoiceIcon field={field} option={option} index={index}/>
                 {option}
               </button>;
             })}

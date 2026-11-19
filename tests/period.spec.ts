@@ -83,7 +83,8 @@ for(const viewport of [{width:360,height:740},{width:393,height:852},{width:430,
   await expect(page.getByRole('button',{name:'今天',exact:true})).toBeVisible();
   const art=await page.locator('.period-art--header').boundingBox();expect(art?.width).toBeGreaterThan(viewport.width*.54);
   const dash=await page.locator('.period-dashboard').boundingBox();const cal=await page.locator('.period-calendar').boundingBox();const summary=await page.locator('.period-summary').boundingBox();
-  expect(cal!.width/(cal!.width+summary!.width)).toBeGreaterThan(.62);expect(cal!.width/(cal!.width+summary!.width)).toBeLessThan(.71);
+  expect(Math.abs(cal!.width-summary!.width)).toBeLessThan(2);expect(summary!.y).toBeGreaterThanOrEqual(cal!.y+cal!.height);
+  expect((await page.locator('.period-date').first().boundingBox())!.height).toBeGreaterThanOrEqual(44);
   mkdirSync('artifacts/v021-g2',{recursive:true});
   await page.screenshot({path:`artifacts/v021-g2/period-${viewport.width}x${viewport.height}-full.png`,fullPage:true,animations:'disabled'});
   await page.screenshot({path:`artifacts/v021-g2/period-${viewport.width}x${viewport.height}-top.png`,animations:'disabled'});

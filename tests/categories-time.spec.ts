@@ -71,7 +71,7 @@ test('可选时间、跨日期编辑和分类筛选组合即时更新，未设�
   await expect(card(page,'十点工作计划').locator('time')).toHaveCount(0);await page.reload();await page.getByRole('button',{name:/^全部未完成/}).click();await page.getByRole('button',{name:'分类：学习',exact:true}).click();
   await expect(card(page,'十点工作计划')).toBeVisible();await expect(card(page,'十点工作计划').locator('time')).toHaveCount(0);
   const saved=(await read(page)).todos.find(t=>t.text==='十点工作计划');expect(saved).toMatchObject({date:next,categoryId:'study'});expect(saved.time).toBeUndefined();
-  await taskAction(page,'十点工作计划','complete');await expect(page.getByRole('button',{name:'已完成 1',exact:true})).toBeVisible();
+  await taskAction(page,'十点工作计划','complete');await expect(page.getByRole('button',{name:'已完成（可恢复） 1',exact:true})).toBeVisible();
   await page.getByRole('button',{name:'撤销',exact:true}).click();await expect(card(page,'十点工作计划')).toBeVisible();expect((await read(page)).todos.find(t=>t.id===saved.id)).toEqual(saved);
 });
 

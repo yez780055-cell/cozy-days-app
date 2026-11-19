@@ -12,8 +12,9 @@ import './anniversary.css';
 const weekdays = ['一', '二', '三', '四', '五', '六', '日'];
 const eventsOn = (rows: Anniversary[], key: string) => rows.filter(row => inYear(row, localDate(key).getFullYear()) === key);
 
-function AnniversaryForm({ value, onSave, busy }: { value: Anniversary; onSave: (value: Anniversary) => Promise<void>; busy: boolean }) {
+function AnniversaryForm({ value, onSave, busy, onDirty }: { value: Anniversary; onSave: (value: Anniversary) => Promise<void>; busy: boolean; onDirty: (dirty: boolean) => void }) {
   const [draft, setDraft] = useState(value);
+  useEffect(() => { onDirty(JSON.stringify(draft) !== JSON.stringify(value)); }, [draft, value, onDirty]);
   function submit(event: FormEvent) { event.preventDefault(); void onSave(draft); }
   return <form className="ann-form" onSubmit={submit}>
     <label>纪念日名称<input data-autofocus required maxLength={60} value={draft.name} onChange={e => setDraft({ ...draft, name: e.target.value })} placeholder="给重要的日子起个名字"/></label>
@@ -35,12 +36,14 @@ export default function AnniversaryPage() {
   const [calendar, setCalendar] = useState(false);
   const [month, setMonth] = useState(() => localDate(dateKey()));
   const [editor, setEditor] = useState<Anniversary | null>(null);
+  const [editorDirty, setEditorDirty] = useState(false);
   const [deleting, setDeleting] = useState<Anniversary | null>(null);
   const [busy, setBusy] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const mutationPending = useRef(false);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState('');
+  const [saveStatus, setSaveStatus] = useState('');
   useEffect(() => {
     let mounted = true;
     void anniversaryRepository.all().then(data => { if (mounted) { setRows(data); setLoaded(true); } }).catch(() => { if (mounted) setError('暂时无法读取收藏，请重新读取或重新进入纪念日页面重试。'); });
@@ -58,15 +61,17 @@ export default function AnniversaryPage() {
   async function save(value: Anniversary) {
     if (mutationPending.current) return;
     mutationPending.current = true;
-    setBusy(true); setError('');
+    setBusy(true); setError(''); setSaveStatus('正在保存…');
     try {
       const saved = await anniversaryRepository.save(value);
       // A committed write remains successful even if the following read fails.
       setRows(current => [...current.filter(row => row.id !== saved.id), saved]);
       setEditor(null);
+      setEditorDirty(false);
+      setSaveStatus('已保存');
       await refresh('保存');
     }
-    catch { setError('保存失败，请检查名称和日期后重试。'); }
+    catch { setSaveStatus(''); setError('保存失败，请检查名称和日期后重试。'); }
     finally { mutationPending.current = false; setBusy(false); }
   }
   async function remove() {
@@ -97,26 +102,28 @@ export default function AnniversaryPage() {
     <section className="ann-page" aria-label="纪念日收藏">
       <header className="ann-hero"><Asset name={anniversaryArtwork.hero} className="ann-hero-scene"/><span className="eyebrow">COZY DAYS · 小饱日常</span><h1>纪念日 <Asset name={anniversaryArtwork.heart} className="ann-title-heart"/></h1><p>把重要的日子，<br/>认真收藏起来。</p><span className="ann-photo ann-photo--flower" aria-hidden="true">✿</span><span className="ann-photo ann-photo--heart" aria-hidden="true">♡</span><span className="ann-bow" aria-hidden="true"><i/><i/><b/></span><Asset name={anniversaryArtwork.headerCats} className="ann-cats"/><Asset name={anniversaryArtwork.sparkle} className="ann-sparkle"/><Asset name={anniversaryArtwork.flower} className="ann-hero-flower"/><Asset name={anniversaryArtwork.star} className="ann-hero-star"/></header>
       <div className="ann-content">
+        {saveStatus && !error && <p role="status">{saveStatus}</p>}
         <section className="ann-date-panel" aria-label="纪念日日历">
           <div className="ann-date-title"><div><strong>{date.getMonth() + 1}月{date.getDate()}日</strong><span>星期{weekdays[(date.getDay() + 6) % 7]}</span></div><button onClick={() => { setMonth(localDate(selected)); setCalendar(true); }}><CalendarDays size={17}/>月视图</button></div>
           <p className="ann-hint">{selected === today ? '今天也是值得被记住的一天 ♡' : `${date.getFullYear()} 年 · 把日子轻轻翻一页`}</p>
           <div className="ann-week-layout"><div><div className="ann-week-top"><button aria-label="上一周" onClick={() => { const d = new Date(date); d.setDate(d.getDate() - 7); select(dateKey(d)); }}><ChevronLeft size={16}/></button><span>{date.getFullYear()} 年 {date.getMonth() + 1} 月</span><button aria-label="下一周" onClick={() => { const d = new Date(date); d.setDate(d.getDate() + 7); select(dateKey(d)); }}><ChevronRight size={16}/></button></div>
           <div className="ann-week">{weekdays.map((day, i) => { const d = new Date(weekStart); d.setDate(d.getDate() + i); const key = dateKey(d); const count = eventsOn(rows, key).length; return <button key={day} aria-label={`${key}${count ? `，${count} 个纪念日` : ''}`} aria-pressed={key === selected} onClick={() => select(key)}><small>{day}</small><span>{d.getDate()}</span><i>{count ? '♡' : key === today ? '·' : ''}</i></button>; })}</div></div><aside className="ann-month-note"><Asset name={anniversaryArtwork.flower}/><span>本月有 <b>{monthEvents.length}</b> 个<br/>重要的日子</span><i>♡ ～</i></aside></div>
-          <div className="ann-day-summary"><span>{chosen.length ? chosen.map(row => row.name).join(' · ') : '这天还没有收藏的纪念日'}</span><button onClick={() => select(today)}>回到今天</button></div>
+          <div className="ann-day-summary"><span>所选日期：{chosen.length ? `${chosen.length} 个纪念日` : '没有纪念日'}</span><button onClick={() => select(today)}>回到今天</button></div>
+          {chosen.length > 0 && <div className="ann-selected-events" role="region" aria-label="所选日期的纪念日">{chosen.map(row => <button key={row.id} type="button" onClick={() => { setError(''); setEditor(row); }}>{row.name}<span>查看 / 编辑 ›</span></button>)}</div>}
         </section>
-        <div className="ann-filters" aria-label="纪念日筛选">{['全部', '即将到来', '已过去'].map((name, i) => <button key={name} aria-pressed={filter === name} onClick={() => setFilter(name)}>{name}<span>{[rows.length, upcoming, rows.length - upcoming][i]}</span></button>)}</div>
+        <p className="ann-list-label">全部收藏 · 按以下条件筛选</p><div className="ann-filters" aria-label="纪念日筛选">{['全部', '即将到来', '已过去'].map((name, i) => <button key={name} aria-pressed={filter === name} onClick={() => setFilter(name)}>{name}<span>{[rows.length, upcoming, rows.length - upcoming][i]}</span></button>)}</div>
         <div className="ann-list" aria-live="polite">
           {!loaded && !error && <p>正在打开日子收藏夹…</p>}
           {loaded && !visible.length && <div className="ann-empty"><Asset name={anniversaryArtwork.emptyCollection}/><h2>{rows.length ? '这里还没有这样的日子' : '重要的日子，从这里收藏'}</h2><p>{rows.length ? '切换分类，看看其他珍藏吧。' : '生日、相遇、或一个小小的开始。'}</p>{!rows.length && <Button variant="soft" onClick={create}>收藏第一个日子 ♡</Button>}</div>}
           {visible.map(row => { const status = timing(row, today); const counter = status.label.match(/^(还有|已过去) (\d+) 天$/); return <article key={row.id} data-testid="anniversary-card" className={`ann-card ann-${row.color}`}>
-            <div className="ann-card-icon" aria-hidden="true"><AnniversaryDoodle row={row}/><Asset name={anniversaryArtwork.star} className="ann-card-star"/><Asset name={anniversaryArtwork.heart} className="ann-card-heart"/></div><div className="ann-card-copy"><div className="ann-card-top"><h2>{row.name}</h2></div><time dateTime={row.date}>{row.date.replace(/-/g, '.')}</time><div className="ann-meta"><span aria-label="图标">{row.icon || '♡'}</span> {row.theme}{row.yearly ? ` · 每年重复${status.years ? ` · 已满 ${status.years} 周年` : ''}` : ' · 单次纪念'}</div>{row.note && <p>{row.note}</p>}<Asset name={anniversaryArtwork.flower} className="ann-card-flower"/><Asset name={anniversaryArtwork.tape} className="ann-card-tape"/></div><div className="ann-card-side ann-card-bottom"><span className="ann-count">{counter ? <><small>{counter[1]}</small><strong>{counter[2]}</strong><small>天</small></> : status.label}</span><div className="ann-card-actions"><button aria-label={`编辑：${row.name}`} onClick={() => { setError(''); setEditor(row); }}><Pencil size={18}/></button><button aria-label={`删除：${row.name}`} onClick={() => { setError(''); setDeleting(row); }}><Trash2 size={18}/></button></div></div>
+            <div className="ann-card-icon" aria-hidden="true"><AnniversaryDoodle row={row}/><Asset name={anniversaryArtwork.star} className="ann-card-star"/><Asset name={anniversaryArtwork.heart} className="ann-card-heart"/></div><div className="ann-card-copy"><div className="ann-card-top"><h2>{row.name}</h2></div><time dateTime={row.date}>{row.yearly ? '原始日期：' : '日期：'}{row.date.replace(/-/g, '.')}</time>{row.yearly && <div className="ann-next">下次：{status.occurrence.replace(/-/g, '.')}</div>}<div className="ann-meta"><span aria-label="图标">{row.icon || '♡'}</span> {row.theme}{row.yearly ? ` · 每年重复${status.years ? ` · 已满 ${status.years} 周年` : ''}` : ' · 单次纪念'}</div>{row.note && <p>{row.note}</p>}<Asset name={anniversaryArtwork.flower} className="ann-card-flower"/><Asset name={anniversaryArtwork.tape} className="ann-card-tape"/></div><div className="ann-card-side ann-card-bottom"><span className="ann-count">{counter ? <><small>{counter[1]}</small><strong>{counter[2]}</strong><small>天</small></> : status.label}</span><div className="ann-card-actions"><button aria-label={`编辑：${row.name}`} onClick={() => { setError(''); setEditor(row); }}><Pencil size={18}/></button><button aria-label={`删除：${row.name}`} onClick={() => { setError(''); setDeleting(row); }}><Trash2 size={18}/></button></div></div>
           </article>; })}
         </div><p className="ann-footer">♡ 每个小日子，都有被珍藏的理由</p>
       </div>
       {error && !editor && !deleting && <div><p role="alert" className="error-message">{error}</p><Button variant="soft" disabled={refreshing || busy} onClick={() => void refresh()}>{refreshing ? '正在读取…' : '重新读取收藏'}</Button></div>}
     </section>
     <button className="fab ann-fab" aria-label="新增纪念日" disabled={!loaded} onClick={create}><Plus size={32}/></button>
-    {editor && <Modal title={editor.id === undefined ? '新增纪念日' : '编辑纪念日'} className="ann-modal" canClose={() => !mutationPending.current} onClose={() => setEditor(null)}>{error && <p role="alert" className="error-message">{error}</p>}<AnniversaryForm value={editor} onSave={save} busy={busy}/></Modal>}
+    {editor && <Modal title={editor.id === undefined ? '新增纪念日' : '编辑纪念日'} className="ann-modal" dirty={editorDirty} canClose={() => !mutationPending.current} onClose={() => { setEditor(null); setEditorDirty(false); }}>{error && <p role="alert" className="error-message">{error}</p>}<AnniversaryForm value={editor} onSave={save} busy={busy} onDirty={setEditorDirty}/></Modal>}
     {deleting && <Modal title="删除纪念日" className="ann-modal" canClose={() => !mutationPending.current} onClose={() => setDeleting(null)}><p>确定删除「{deleting.name}」吗？删除后无法恢复。</p>{error && <p role="alert" className="error-message">{error}</p>}<div className="confirm-actions"><Button variant="soft" disabled={busy} onClick={() => setDeleting(null)}>再想想</Button><Button variant="danger" disabled={busy} onClick={() => void remove()}>确认删除</Button></div></Modal>}
     {calendar && <Modal title="月视图" className="ann-modal" onClose={() => setCalendar(false)}>
       <div className="ann-month-heading"><button aria-label="上个月" onClick={() => shiftMonth(-1)}><ChevronLeft/></button><strong>{year} 年 {monthIndex + 1} 月</strong><button aria-label="下个月" onClick={() => shiftMonth(1)}><ChevronRight/></button></div>

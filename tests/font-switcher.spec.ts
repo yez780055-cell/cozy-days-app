@@ -8,7 +8,7 @@ test('only the current font loads on startup and entering Settings does not prel
   await expect.poll(() => page.evaluate(() => document.fonts.check('16px "Yozai"'))).toBe(true);
   await page.locator('.bottom-nav button').nth(0).dispatchEvent('contextmenu');
   await page.getByRole('menuitem', { name: '设置' }).click();
-  await expect(page.getByRole('heading', { name: '字体设置' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: '设置' })).toBeVisible();
   expect(requested.some(url => /Xiaolai|GenSenRounded/i.test(url) && /\.(woff2|ttf|otf)(\?|$)/i.test(url)), requested.join('\n')).toBe(false);
 });
 
@@ -54,7 +54,7 @@ test('Settings opens from quick menu and returns to the previous module', async 
   await expect(page.getByRole('menu')).toBeVisible();
   await page.mouse.up();
   await page.getByRole('menuitem', { name: '设置' }).click();
-  await expect(page.getByRole('heading', { name: '字体设置' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: '设置' })).toBeVisible();
   await page.getByRole('button', { name: '返回上一页' }).click();
   await expect(page.getByRole('heading', { name: '生理期日历' })).toBeVisible();
   await expect(page.locator('.bottom-nav button')).toHaveCount(3);

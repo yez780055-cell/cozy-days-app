@@ -82,7 +82,7 @@ test('动态筛选、周标记、月视图与跨月选择', async ({ page }) => 
   await expect(month.locator('.ann-month-events')).toContainText('妈妈生日');
   await month.getByRole('button', { name:'查看收藏' }).click();
   await expect(page.locator('.ann-date-title')).toContainText('11月8日');
-  await expect(page.locator('.ann-day-summary')).toContainText('妈妈生日');
+  await expect(page.getByRole('region', { name:'所选日期的纪念日' })).toContainText('妈妈生日');
   await page.getByRole('button', { name:'回到今天', exact:true }).click();
   await expect(page.locator('.ann-date-title')).toContainText('10月23日');
 });

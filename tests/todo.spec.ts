@@ -79,6 +79,7 @@ test('空内容不能保存，弹窗焦点与模块入口', async ({page}) => {
   await page.getByRole('textbox', {name:'想做些什么？'}).fill('   ');
   await expect(page.getByRole('button',{name:'保存',exact:true})).toBeDisabled();
   await page.keyboard.press('Escape');
+  await page.getByRole('button',{name:'放弃修改'}).click();
   await expect(page.getByRole('dialog')).not.toBeVisible();
   await page.getByRole('button',{name:'生理期',exact:true}).click();
   await expect(page.getByRole('region',{name:'生理期日历',exact:true})).toBeVisible();
@@ -140,6 +141,7 @@ test('状态预览、模态框与键盘可视高度模拟', async ({page}) => {
   await expect(page.getByRole('button',{name:'保存',exact:true})).toBeInViewport();
   await page.screenshot({path:'artifacts/keyboard-height-simulation.png'});
   await page.getByRole('button',{name:'关闭弹窗',exact:true}).click();
+  await page.getByRole('button',{name:'放弃修改'}).click();
   await page.setViewportSize({width:390,height:844});
   for(const scenario of ['edit','delete','undo','components']) {
     await select.selectOption(scenario);

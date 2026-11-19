@@ -12,6 +12,11 @@
 [data-theme="sage"] { --card-accent: #cadbb7; }
 .swipe-shell { padding-bottom: 8px; }
 .swipe-shell .task-card { min-height: 64px; padding: 8px 8px 8px 15px; gap: 8px; border-radius: 17px 15px 18px 16px; }
+.task-toggle { flex: 0 0 44px; width: 44px; height: 44px; display: grid; place-items: center; border: 0; background: transparent; color: #a45168; }
+@media (max-width:700px) { .hero { height: 138px; } }
+@container phone (max-width:700px) { .hero { height: 138px; } }
+.task-toggle span { display:grid; place-items:center; width:23px; height:23px; border:1.5px solid #b76b7e; border-radius:50%; }
+.task-card--done .task-toggle span { background: #e8a6b8; color: #fff; }
 .swipe-rail { bottom: 8px; border-radius: 17px 15px 18px 16px; }
 .task-content { line-height: 1.5; gap: 3px; letter-spacing: .2px; }
 .task-content .task-meta { display: flex; align-items: center; flex-wrap: wrap; gap: 3px 10px; font-size: 11px; line-height: 1.35; color: #a28b74; }

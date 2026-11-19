@@ -11,7 +11,8 @@
     "test:pages": "playwright test --config playwright.pages.config.ts",
     "preview": "vite preview --host 0.0.0.0",
     "android:add": "cap add android",
-    "android:sync": "npm run build && cap sync android",
+    "build:android": "tsc -b && vite build --mode android --outDir dist-android",
+    "android:sync": "npm run build:android && cap sync android",
     "android:open": "cap open android",
     "test:e2e": "playwright test"
   },

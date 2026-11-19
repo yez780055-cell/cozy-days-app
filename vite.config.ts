@@ -1,6 +1,6 @@
-import { defineConfig } from 'vite';
+import { defineConfig, type Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { cpSync, mkdirSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { pwaBuild } from './scripts/pwa-build';
 
@@ -29,8 +29,37 @@ function reviewBuildInfo() {
   };
 }
 
-export default defineConfig({
-  plugins: [react(), reviewBuildInfo(), pwaBuild()],
+const androidEntry: Plugin = {
+  name: 'cozy-days-android',
+  transformIndexHtml: {
+    order: 'pre',
+    handler: html => html
+      .replace('src="/src/main.tsx"', 'src="/src/native/main.ts"')
+      .replace(/^\s*<link rel="manifest"[^>]+>$/m, ''),
+  },
+};
+
+function androidPublicAssets(): Plugin {
+  let root: string;
+  let outDir: string;
+  return {
+    name: 'cozy-days-android-assets',
+    apply: 'build',
+    configResolved(config) {
+      root = config.root;
+      outDir = resolve(root, config.build.outDir);
+    },
+    closeBundle() {
+      for (const folder of ['assets', 'icons']) {
+        cpSync(resolve(root, 'public', folder), resolve(outDir, folder), { recursive: true });
+      }
+    },
+  };
+}
+
+export default defineConfig(({ mode }) => ({
+  publicDir: mode === 'android' ? false : 'public',
+  plugins: [react(), ...(mode === 'android' ? [androidEntry, androidPublicAssets()] : [reviewBuildInfo(), pwaBuild()])],
   server: { host: '0.0.0.0' },
-});
+}));
 

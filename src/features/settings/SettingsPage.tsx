@@ -5,6 +5,7 @@ import { CycleInfoPage } from '../period/CycleInfoPage';
 import { BackupPage } from './BackupPage';
 import { SettingsHeader } from './SettingsHeader';
 import { fontRegistry, getFontOption, type FontId } from '../../styles/fontRegistry';
+import { AndroidWebUpdate } from '../../native/AndroidWebUpdate';
 
 export function SettingsPage({ fontId, pendingFontId, failedFontId, onSelect, onBack }: {
   fontId: FontId; pendingFontId: FontId | null; failedFontId: FontId | null;
@@ -55,6 +56,7 @@ export function SettingsPage({ fontId, pendingFontId, failedFontId, onSelect, on
         </button>
       </div>
     </section>)}
+    {import.meta.env.MODE === 'android' && <AndroidWebUpdate/>}
     <p className="settings-intro">记录保存在本机。换设备前请导出备份。</p>
   </section>;
 }

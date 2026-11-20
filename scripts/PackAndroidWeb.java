@@ -1,4 +1,5 @@
 import java.io.DataOutputStream;
+import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -13,7 +14,7 @@ import java.util.Objects;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-// Run with JDK 21 after npm run build:android. Signing credentials come from the experiment environment.
+// Run with JDK 21 after npm run build:android. Signing credentials use the same environment as the APK.
 class PackAndroidWeb {
     public static void main(String[] args) throws Exception {
         if (args.length < 4 || args.length > 5) {
@@ -40,11 +41,19 @@ class PackAndroidWeb {
             }
             byte[] data = Files.readAllBytes(archive);
             if (data.length > 64 * 1024 * 1024) throw new IllegalArgumentException("Web bundle exceeds 64 MiB");
-            var keys = KeyStore.getInstance("PKCS12");
-            try (var input = Files.newInputStream(Path.of(env("COZY_EXPERIMENT_KEYSTORE")))) {
-                keys.load(input, env("COZY_EXPERIMENT_STORE_PASSWORD").toCharArray());
+            boolean formal = System.getenv("ANDROID_KEYSTORE_PATH") != null;
+            var names = formal
+                ? List.of("ANDROID_KEYSTORE_PATH", "ANDROID_KEYSTORE_PASSWORD", "ANDROID_KEY_ALIAS", "ANDROID_KEY_PASSWORD")
+                : List.of("COZY_EXPERIMENT_KEYSTORE", "COZY_EXPERIMENT_STORE_PASSWORD", "COZY_EXPERIMENT_KEY_ALIAS", "COZY_EXPERIMENT_KEY_PASSWORD");
+            var keys = KeyStore.getInstance(new File(env(names.get(0))), env(names.get(1)).toCharArray());
+            String alias = env(names.get(2));
+            if (formal) {
+                var fingerprint = HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(keys.getCertificate(alias).getEncoded()));
+                if (!fingerprint.equals("c85fe70fff2425ad2b95d3dfa8f28ef7173027e744b03f57b721896fca40d3d8")) {
+                    throw new IllegalArgumentException("Incorrect formal Android signing certificate");
+                }
             }
-            var key = (PrivateKey) keys.getKey(env("COZY_EXPERIMENT_KEY_ALIAS"), env("COZY_EXPERIMENT_KEY_PASSWORD").toCharArray());
+            var key = (PrivateKey) keys.getKey(alias, env(names.get(3)).toCharArray());
             var signer = Signature.getInstance("SHA256withRSA");
             signer.initSign(key);
             signer.update(data);

@@ -13,6 +13,43 @@ permissions:
   contents: read
 
 jobs:
+  web-regression:
+    if: github.repository == 'yez780055-cell/cozy-days-app' && github.ref == 'refs/heads/release/android-formal-web-updates'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run build && npm run build:pages && npm run build:android
+      - name: Full Web E2E and Android UI tests
+        run: |
+          export PLAYWRIGHT_REVIEW_EVIDENCE_DIR=artifacts/review-evidence
+          PLAYWRIGHT_JSON_OUTPUT_FILE=artifacts/web-e2e.json npm run test:e2e -- --reporter=line,json
+          PLAYWRIGHT_JSON_OUTPUT_FILE=artifacts/android-web-e2e.json npx playwright test --config playwright.android.config.ts --reporter=line,json
+          PLAYWRIGHT_JSON_OUTPUT_FILE=artifacts/pages-e2e.json npm run test:pages -- --reporter=line,json
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        if: always()
+        with:
+          name: formal-web-regression
+          path: |
+            artifacts/*-e2e.json
+            artifacts/review-evidence/
+            test-results/
+          if-no-files-found: warn
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          name: formal-tested-web
+          path: dist-android/
+          if-no-files-found: error
+          retention-days: 1
+
   verify-signing:
     if: github.repository == 'yez780055-cell/cozy-days-app' && github.ref == 'refs/heads/release/android-formal-web-updates'
     runs-on: ubuntu-24.04
@@ -64,4 +101,75 @@ jobs:
           }
           JAVA
           java "$keydir/VerifySigner.java" "$keydir/signer.jks"
+
+  signed-apk:
+    if: github.repository == 'yez780055-cell/cozy-days-app' && github.ref == 'refs/heads/release/android-formal-web-updates'
+    needs: [web-regression, verify-signing]
+    runs-on: ubuntu-24.04
+    environment: android-release
+    timeout-minutes: 35
+    env:
+      ANDROID_VERSION_CODE: ${{ inputs.version_code }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version: '22'
+          cache: npm
+      - uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: android-actions/setup-android@be39fa834029ff78f1a44aa3bb0819b8fc2bd8fd
+      - run: sdkmanager 'platforms;android-35' 'build-tools;35.0.0'
+      - run: npm ci
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131
+        with:
+          name: formal-tested-web
+          path: dist-android
+      - run: npx cap sync android
+      - name: Build one release candidate and sign isolated test fixtures
+        shell: bash
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          umask 077
+          export ANDROID_KEYSTORE_PATH="$RUNNER_TEMP/little-days-release.jks"
+          trap 'rm -f -- "$ANDROID_KEYSTORE_PATH"' EXIT
+          printf '%s' "$ANDROID_KEYSTORE_BASE64" | base64 --decode > "$ANDROID_KEYSTORE_PATH"
+          unset ANDROID_KEYSTORE_BASE64 COZY_ANDROID_WEB_UPDATE_ROOT COZY_ANDROID_WEB_UPDATE_QA_CA
+          bash android/gradlew -p android --no-daemon --console=plain :app:assembleRelease
+          mkdir -p artifacts/formal-apk artifacts/formal-fixtures
+          cp android/app/build/outputs/apk/release/app-release.apk "artifacts/formal-apk/Cozy-Days-Android-0.2.2-${ANDROID_VERSION_CODE}.apk"
+          for revision in 2 3; do
+            java scripts/PackAndroidWeb.java dist-android "$ANDROID_VERSION_CODE" "$revision" \
+              "artifacts/formal-fixtures/Cozy-Days-Web-${ANDROID_VERSION_CODE}-${revision}.cozyupdate" artifacts/formal-fixtures/releases
+          done
+          mkdir -p "$RUNNER_TEMP/unready"/{assets,icons}
+          printf '<!doctype html><title>QA</title><p>Trial without a startup handshake</p>' > "$RUNNER_TEMP/unready/index.html"
+          java scripts/PackAndroidWeb.java "$RUNNER_TEMP/unready" "$ANDROID_VERSION_CODE" 4 artifacts/formal-fixtures/local-web-4.cozyupdate
+          java scripts/PackAndroidWeb.java dist-android "$ANDROID_VERSION_CODE" 5 artifacts/formal-fixtures/local-web-5.cozyupdate
+      - name: Verify formal certificate, offline bundle, package and checksum
+        run: |
+          python3 scripts/android-verify-apk.py "artifacts/formal-apk/Cozy-Days-Android-0.2.2-${ANDROID_VERSION_CODE}.apk" --output artifacts/formal-apk
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          name: formal-apk
+          path: artifacts/formal-apk/
+          if-no-files-found: error
+          retention-days: 30
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          name: formal-device-fixtures
+          path: |
+            artifacts/formal-fixtures/releases/shell-*/web-*/*.cozyupdate
+            artifacts/formal-fixtures/local-web-*.cozyupdate
+          if-no-files-found: error
+          retention-days: 1
 

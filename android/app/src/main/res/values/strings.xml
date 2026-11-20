@@ -1,8 +1,8 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">小饱日常 · 原生测试</string>
-    <string name="title_activity_main">小饱日常 · 原生测试</string>
-    <string name="package_name">com.littledays.capacitorexperiment</string>
-    <string name="custom_url_scheme">com.littledays.capacitorexperiment</string>
+    <string name="app_name">小饱日常</string>
+    <string name="title_activity_main">小饱日常</string>
+    <string name="package_name">com.littledays.app</string>
+    <string name="custom_url_scheme">com.littledays.app</string>
     <string name="back_to_exit">再按一次退出应用</string>
 </resources>

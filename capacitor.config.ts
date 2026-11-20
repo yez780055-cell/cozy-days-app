@@ -1,8 +1,8 @@
 import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.littledays.capacitorexperiment',
-  appName: '小饱日常 · 原生测试',
+  appId: 'com.littledays.app',
+  appName: '小饱日常',
   webDir: 'dist-android',
   backgroundColor: '#fbf6ec',
   android: { adjustMarginsForEdgeToEdge: 'disable', resolveServiceWorkerRequests: false },

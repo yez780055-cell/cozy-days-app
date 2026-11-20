@@ -1,11 +1,17 @@
 apply plugin: 'com.android.application'
 
-def releaseCodeText = System.getenv('COZY_EXPERIMENT_VERSION_CODE') ?: '3'
+def releaseCodeText = System.getenv('COZY_EXPERIMENT_VERSION_CODE') ?: '4'
 if (!(releaseCodeText ==~ /[1-9][0-9]*/) || new BigInteger(releaseCodeText) > 2100000000) {
     throw new GradleException('COZY_EXPERIMENT_VERSION_CODE must be a positive integer no greater than 2100000000')
 }
 def signingEnvironment = ['COZY_EXPERIMENT_KEYSTORE', 'COZY_EXPERIMENT_STORE_PASSWORD', 'COZY_EXPERIMENT_KEY_ALIAS', 'COZY_EXPERIMENT_KEY_PASSWORD']
 def hasReleaseSigning = signingEnvironment.every { System.getenv(it)?.trim() }
+def webUpdateRoot = System.getenv('COZY_ANDROID_WEB_UPDATE_ROOT')?.trim() ?: ''
+def qaCaPath = System.getenv('COZY_ANDROID_WEB_UPDATE_QA_CA')?.trim()
+if (qaCaPath && !(webUpdateRoot ==~ /https:\/\/127\.0\.0\.1:[0-9]+\/.*/)) {
+    throw new GradleException('The update test CA requires a loopback HTTPS update root')
+}
+def qaCa = qaCaPath ? file(qaCaPath).getText('UTF-8') : ''
 
 android {
     namespace "com.littledays.app"
@@ -18,6 +24,8 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode Integer.parseInt(releaseCodeText)
         versionName "0.2.1-experiment.${releaseCodeText}"
+        buildConfigField 'String', 'WEB_UPDATE_ROOT', groovy.json.JsonOutput.toJson(webUpdateRoot)
+        buildConfigField 'String', 'WEB_UPDATE_QA_CA', groovy.json.JsonOutput.toJson(qaCa)
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.

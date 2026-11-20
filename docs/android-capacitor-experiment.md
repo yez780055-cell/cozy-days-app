@@ -18,7 +18,7 @@ Android 构建使用独立入口。它由原生窗口传入系统栏、屏幕缺
 
 ## 构建
 
-使用 Node、JDK 21 和 Android SDK 35。为实验单独生成 RSA 2048 或更高强度的 PKCS#12 密钥，设置 `COZY_EXPERIMENT_KEYSTORE`、`COZY_EXPERIMENT_STORE_PASSWORD`、`COZY_EXPERIMENT_KEY_ALIAS`、`COZY_EXPERIMENT_KEY_PASSWORD`。同一个实验签名用于后续 APK 和网页包。版本号默认 3，可用 `COZY_EXPERIMENT_VERSION_CODE` 提升。
+使用 Node、JDK 21 和 Android SDK 35。为实验单独生成 RSA 2048 或更高强度的 PKCS#12 密钥，设置 `COZY_EXPERIMENT_KEYSTORE`、`COZY_EXPERIMENT_STORE_PASSWORD`、`COZY_EXPERIMENT_KEY_ALIAS`、`COZY_EXPERIMENT_KEY_PASSWORD`。同一个实验签名用于后续 APK 和网页包。版本号默认 4，可用 `COZY_EXPERIMENT_VERSION_CODE` 提升。
 
 ```powershell
 npm ci
@@ -33,7 +33,7 @@ Windows 工作目录路径含中文时，构建命令可加 `-Pandroid.overrideP
 
 ```powershell
 npm run build:android
-java scripts/PackAndroidWeb.java dist-android 3 2 artifacts/Cozy-Days-Web-Update-2.cozyupdate
+java scripts/PackAndroidWeb.java dist-android 4 2 artifacts/Cozy-Days-Web-Update-2.cozyupdate
 ```
 
 ## Android 交互回归

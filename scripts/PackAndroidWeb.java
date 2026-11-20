@@ -77,7 +77,8 @@ class PackAndroidWeb {
         Files.writeString(revisionRoot.resolve("download.html"), page);
         Path feed = Files.createTempFile(shellRoot, "latest-", ".tmp");
         try {
-            Files.writeString(feed, "{\"schema\":1,\"shell\":" + shell + ",\"web\":" + web + ",\"sha256\":\"" + sha256 + "\"}\n");
+            Files.writeString(feed, "{\"schema\":1,\"shell\":" + shell + ",\"web\":" + web + ",\"bytes\":" + Files.size(archive)
+                + ",\"sha256\":\"" + sha256 + "\"}\n");
             Files.move(feed, shellRoot.resolve("latest.json"), StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
         } finally {
             Files.deleteIfExists(feed);

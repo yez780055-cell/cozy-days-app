@@ -34,57 +34,88 @@ final class WebBundles {
     }
 
     int activeRevision() {
-        return state.getInt("shell", 0) == BuildConfig.VERSION_CODE
+        return isCurrentShell()
             ? state.getInt("web", BUNDLED_REVISION) : BUNDLED_REVISION;
     }
 
     File onStartup() {
         int revision = activeRevision();
-        File current = directory(revision);
-        if (revision == BUNDLED_REVISION || state.getBoolean("pending", false)
-                || !new File(current, "index.html").isFile()) {
-            try {
-                reset();
-            } catch (IllegalStateException error) {
-                android.util.Log.e("CozyDays", "Could not reset the web bundle on startup", error);
-            }
-            return null;
-        }
+        if (revision == BUNDLED_REVISION) return null;
         try {
-            writeState(revision, true);
-            return current;
+            if (!hasBundle(revision) || (isPending() && state.getBoolean("trialStarted", true))) {
+                return rollback();
+            }
+            beginTrial();
+            return directory(revision);
         } catch (IllegalStateException error) {
-            android.util.Log.e("CozyDays", "Could not mark the web bundle as pending", error);
+            android.util.Log.e("CozyDays", "Could not recover web bundle on startup", error);
             return null;
         }
+    }
+
+    boolean isPending() {
+        return isCurrentShell() && state.getBoolean("pending", false);
+    }
+
+    void beginTrial() {
+        if (isPending()) commit(state.edit().putBoolean("trialStarted", true));
     }
 
     void confirmStartup() {
-        if (state.getBoolean("pending", false)) writeState(activeRevision(), false);
+        if (!isPending()) return;
+        commit(state.edit().putBoolean("pending", false).remove("trialStarted")
+            .remove("priorPrevious").remove("failedWeb").putString("outcome", "installed"));
+    }
+
+    File rollback() {
+        int failed = activeRevision();
+        int previous = state.getInt("previous", BUNDLED_REVISION);
+        boolean usePrevious = previous > BUNDLED_REVISION && previous != failed && hasBundle(previous);
+        int restored = usePrevious ? previous : BUNDLED_REVISION;
+        int fallback = isPending() && usePrevious ? state.getInt("priorPrevious", BUNDLED_REVISION) : BUNDLED_REVISION;
+        commit(versionState(restored).putInt("previous", fallback).remove("priorPrevious").remove("trialStarted")
+            .putBoolean("pending", false).putInt("failedWeb", failed).putString("outcome", "rolledBack"));
+        return usePrevious ? directory(restored) : null;
+    }
+
+    int failedRevision() {
+        return isCurrentShell() ? state.getInt("failedWeb", 0) : 0;
+    }
+
+    String takeOutcome() {
+        if (!isCurrentShell()) return null;
+        String outcome = state.getString("outcome", null);
+        if (outcome != null) commit(state.edit().remove("outcome"));
+        return outcome;
     }
 
     void reset() {
-        if (activeRevision() != BUNDLED_REVISION || state.contains("web")) {
-            if (!state.edit().clear().commit()) throw new IllegalStateException("Could not reset web revision");
-        }
+        commit(state.edit().clear());
     }
 
-    File install(InputStream source) throws Exception {
+    File install(InputStream source, Integer expectedRevision, Runnable onVerified) throws Exception {
+        if (isPending()) throw new IOException("A web bundle is already starting");
         if (!root.isDirectory() && !root.mkdirs()) throw new IOException("Bundle directory unavailable");
-        File archive = File.createTempFile("cozy-update-", ".zip", context.getCacheDir());
+        File cache = context.getCacheDir();
+        File[] stale = cache.listFiles((directory, name) -> name.startsWith("cozy-update-") && name.endsWith(".zip"));
+        if (stale != null) for (File file : stale) file.delete();
+        File archive = File.createTempFile("cozy-update-", ".zip", cache);
         File staged = new File(root, "staging");
         try {
             verifyAndCopy(source, archive);
+            onVerified.run();
             remove(staged);
             if (!staged.mkdir()) throw new IOException("Staging directory unavailable");
-            int revision = extract(archive, staged);
+            int revision = extract(archive, staged, expectedRevision);
+            int current = activeRevision();
+            int previous = isCurrentShell() ? state.getInt("previous", BUNDLED_REVISION) : BUNDLED_REVISION;
             File destination = directory(revision);
+            // A retry after rollback may replace the failed candidate, never either stable directory.
             remove(destination);
             if (!staged.renameTo(destination)) throw new IOException("Could not activate web bundle");
-            writeState(revision, true);
-            for (File child : children(root)) {
-                if (!child.equals(destination)) remove(child);
-            }
+            commit(versionState(revision).putInt("previous", current).putBoolean("pending", true)
+                .putInt("priorPrevious", previous).putBoolean("trialStarted", false).remove("outcome"));
+            prune();
             return destination;
         } finally {
             archive.delete();
@@ -92,11 +123,32 @@ final class WebBundles {
         }
     }
 
-    private void writeState(int revision, boolean pending) {
-        if (!state.edit().putInt("shell", BuildConfig.VERSION_CODE)
-                .putInt("web", revision).putBoolean("pending", pending).commit()) {
+    void prune() {
+        if (!isCurrentShell()) return;
+        File current = directory(activeRevision());
+        File previous = directory(state.getInt("previous", BUNDLED_REVISION));
+        File prior = directory(state.getInt("priorPrevious", BUNDLED_REVISION));
+        for (File child : children(root)) {
+            if (!child.equals(current) && !child.equals(previous) && !child.equals(prior)) remove(child);
+        }
+    }
+
+    private SharedPreferences.Editor versionState(int revision) {
+        return state.edit().putInt("shell", BuildConfig.VERSION_CODE).putInt("web", revision);
+    }
+
+    private static void commit(SharedPreferences.Editor editor) {
+        if (!editor.commit()) {
             throw new IllegalStateException("Could not persist web revision");
         }
+    }
+
+    private boolean isCurrentShell() {
+        return state.getInt("shell", 0) == BuildConfig.VERSION_CODE;
+    }
+
+    private boolean hasBundle(int revision) {
+        return new File(directory(revision), "index.html").isFile();
     }
 
     private File directory(int revision) {
@@ -139,7 +191,7 @@ final class WebBundles {
         if (!verifier.verify(signature)) throw new SecurityException("Web bundle signature does not match the APK");
     }
 
-    private int extract(File archive, File staged) throws Exception {
+    private int extract(File archive, File staged, Integer expectedRevision) throws Exception {
         try (var zip = new ZipFile(archive)) {
             var metadata = zip.getEntry("cozy-update.json");
             if (metadata == null || metadata.getSize() < 1 || metadata.getSize() > 512) {
@@ -154,7 +206,8 @@ final class WebBundles {
             }
             var manifest = new JSONObject(new String(bytes.toByteArray(), StandardCharsets.UTF_8));
             int revision = manifest.getInt("web");
-            if (manifest.getInt("shell") != BuildConfig.VERSION_CODE || revision <= activeRevision()) {
+            if (manifest.getInt("shell") != BuildConfig.VERSION_CODE || revision <= activeRevision()
+                    || (expectedRevision != null && revision != expectedRevision)) {
                 throw new IOException("Incompatible shell or older web revision");
             }
             if (zip.size() > MAX_ENTRIES) throw new IOException("Too many web bundle entries");

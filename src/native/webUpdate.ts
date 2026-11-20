@@ -1,13 +1,13 @@
 import { useSyncExternalStore } from 'react';
-import { AndroidShell } from './shell';
+import { AndroidShell, androidPageReady, type WebUpdateProgress } from './shell';
 
 type Version = Awaited<ReturnType<typeof AndroidShell.updateInfo>>;
-type Release = { web: number; downloadPage: string };
-type Status = 'idle' | 'checking' | 'unconfigured' | 'current' | 'available' | 'browser'
-  | 'offline' | 'checkFailed' | 'importing' | 'restoring' | 'nativeFailed';
+type Release = NonNullable<Awaited<ReturnType<typeof AndroidShell.checkOnlineUpdate>>['release']>;
+type Status = 'idle' | 'checking' | 'unconfigured' | 'current' | 'available' | 'offline' | 'checkFailed'
+  | 'importing' | 'restoring' | 'nativeFailed' | 'installed' | 'rolledBack' | 'onlineFailed' | WebUpdateProgress['stage'];
 
-let state: { status: Status; version?: Version; release?: Release; prompt: boolean; error?: string } = {
-  status: 'idle', prompt: false,
+let state: { status: Status; version?: Version; release?: Release; prompt: boolean; error?: string; received: number } = {
+  status: 'idle', prompt: false, received: 0,
 };
 const listeners = new Set<() => void>();
 
@@ -23,76 +23,72 @@ function subscribe(listener: () => void) {
 
 export const useWebUpdate = () => useSyncExternalStore(subscribe, () => state);
 
-function updateRoot() {
-  const value = import.meta.env.VITE_ANDROID_WEB_UPDATE_ROOT?.trim();
-  if (!value) return;
-  const url = new URL(value);
-  if (url.protocol !== 'https:' || url.hostname === location.hostname || url.username || url.password
-    || url.search || url.hash) throw new Error('Invalid Android web release root');
-  if (!url.pathname.endsWith('/')) url.pathname += '/';
-  return url;
-}
-
-async function fetchRelease(root: URL, version: Version, signal: AbortSignal): Promise<Release | undefined> {
-  const feed = new URL(`shell-${version.shell}/latest.json`, root);
-  const response = await fetch(feed, { signal, credentials: 'omit', cache: 'no-store', redirect: 'error' });
-  if (response.status === 404) return;
-  if (!response.ok) throw new Error('Release catalog unavailable');
-  const manifest = await response.json();
-  if (manifest?.schema !== 1 || manifest.shell !== version.shell || !Number.isInteger(manifest.web)
-    || manifest.web < 2 || manifest.web > 2_147_483_647 || typeof manifest.sha256 !== 'string'
-    || !/^[a-f0-9]{64}$/.test(manifest.sha256)) throw new Error('Invalid release catalog');
-  if (manifest.web <= version.web) return;
-  const downloadPage = new URL(`web-${manifest.web}/download.html`, feed);
-  downloadPage.hash = manifest.sha256;
-  return { web: manifest.web, downloadPage: downloadPage.href };
+export function isOnlineUpdateBusy(status: Status) {
+  return status === 'downloading' || status === 'verifying' || status === 'installing';
 }
 
 export function isUpdateBusy(status: Status) {
-  return status === 'checking' || status === 'importing' || status === 'restoring';
+  return isOnlineUpdateBusy(status) || status === 'checking' || status === 'importing' || status === 'restoring';
+}
+
+function message(cause: unknown, fallback: string) {
+  return cause instanceof Error && cause.message ? cause.message : fallback;
 }
 
 export async function checkWebUpdate(startup = false) {
   if (isUpdateBusy(state.status) || (startup && state.status !== 'idle')) return;
-  setState({ status: 'checking', release: undefined, error: undefined, prompt: false });
-  const controller = new AbortController();
-  const timer = window.setTimeout(() => controller.abort(), 8_000);
+  setState({ status: 'checking', release: undefined, error: undefined, prompt: true });
   try {
+    await androidPageReady;
     const version = await AndroidShell.updateInfo();
     setState({ version });
-    const root = updateRoot();
-    if (!root) { setState({ status: 'unconfigured' }); return; }
-    if (!navigator.onLine) { setState({ status: 'offline' }); return; }
-    const release = await fetchRelease(root, version, controller.signal);
-    setState({ status: release ? 'available' : 'current', release, prompt: Boolean(release) });
-  } catch {
-    setState({ status: navigator.onLine ? 'checkFailed' : 'offline' });
-  } finally {
-    window.clearTimeout(timer);
+    if (version.outcome) { setState({ status: version.outcome }); return; }
+    if (!navigator.onLine) { setState({ status: 'offline', prompt: false }); return; }
+    const { configured, release } = await AndroidShell.checkOnlineUpdate({ retryFailed: !startup });
+    setState({ status: release ? 'available' : configured ? 'current' : 'unconfigured', release, prompt: Boolean(release) });
+  } catch (cause) {
+    setState({ status: navigator.onLine ? 'checkFailed' : 'offline', prompt: false,
+      error: message(cause, '暂时无法检查更新。可以继续使用本地网页。') });
   }
 }
 
 export function dismissWebUpdate() {
-  setState({ prompt: false });
+  if (!isUpdateBusy(state.status)) setState({ prompt: false });
 }
 
-export function openWebDownload() {
-  setState({ status: 'browser', prompt: true });
+export async function installOnlineWebUpdate() {
+  const release = state.release;
+  if (!release || isUpdateBusy(state.status)) return;
+  setState({ status: 'downloading', received: 0, error: undefined, prompt: true });
+  try {
+    const listener = await AndroidShell.addListener('webUpdateProgress', progress => {
+      setState({ status: progress.stage, received: progress.received });
+    });
+    try {
+      await AndroidShell.installOnlineUpdate({ web: release.web });
+      // The native shell reloads the document and reports the outcome after the new page is ready.
+      setState({ status: 'installing' });
+    } finally {
+      void listener.remove();
+    }
+  } catch (cause) {
+    setState({ status: 'onlineFailed', error: message(cause, '更新未完成，请重试。') });
+  }
 }
 
 export async function runNativeWebUpdate(action: 'importUpdate' | 'restoreBundled') {
   if (isUpdateBusy(state.status)) return;
   const previous = state.status;
-  const handoff = action === 'importUpdate' && state.prompt && (previous === 'browser' || previous === 'nativeFailed');
-  setState({ status: action === 'importUpdate' ? 'importing' : 'restoring', error: undefined, prompt: handoff });
+  setState({ status: action === 'importUpdate' ? 'importing' : 'restoring', error: undefined, prompt: false });
   try {
     await AndroidShell[action]();
     const version = await AndroidShell.updateInfo();
-    const release = state.release && state.release.web > version.web ? state.release : undefined;
-    const unchanged = version.web === state.version?.web;
-    const status = handoff ? 'browser' : previous === 'nativeFailed' ? 'idle' : previous;
-    setState({ version, release, status: unchanged ? status : 'idle', prompt: unchanged && handoff });
+    if (version.web === state.version?.web) {
+      setState({ version, status: previous === 'nativeFailed' ? 'idle' : previous });
+    } else {
+      setState({ version, release: undefined, status: 'idle' });
+    }
   } catch (cause) {
-    setState({ status: 'nativeFailed', error: cause instanceof Error ? cause.message : '暂时无法更新网页内容。' });
+    setState({ status: 'nativeFailed', error: message(cause, '暂时无法更新网页内容。') });
   }
 }

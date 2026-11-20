@@ -1,4 +1,4 @@
-import { AndroidShell, type SafeArea } from './shell';
+import { AndroidShell, signalAndroidPageReady, type SafeArea } from './shell';
 import { bindAndroidBack } from './back';
 import { bindAndroidKeyboard } from './keyboard';
 import './window.css';
@@ -15,7 +15,11 @@ export async function prepareAndroidWindow() {
     updateKeyboard(area);
   };
   window.addEventListener('cozy-safe-area', event => apply((event as CustomEvent<SafeArea>).detail));
-  await AndroidShell.getSafeArea().then(apply).catch(error => console.error(error));
+  let startupToken: number | undefined;
+  await AndroidShell.getSafeArea().then(area => {
+    startupToken = area.startupToken;
+    apply(area);
+  }).catch(error => console.error(error));
 
   const container = document.getElementById('root')!;
   const observer = new MutationObserver(() => {
@@ -35,10 +39,13 @@ export async function prepareAndroidWindow() {
       });
       return 0.2126 * r + 0.7152 * g + 0.0722 * b >= 0.179;
     };
-    void AndroidShell.ready({
-      darkStatusIcons: prefersDarkIcons(style.backgroundColor),
-      darkNavigationIcons: prefersDarkIcons(style.getPropertyValue('--surface')),
-    }).catch(error => console.error(error));
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      void AndroidShell.ready({
+        startupToken,
+        darkStatusIcons: prefersDarkIcons(style.backgroundColor),
+        darkNavigationIcons: prefersDarkIcons(style.getPropertyValue('--surface')),
+      }).catch(error => console.error(error)).finally(signalAndroidPageReady);
+    }));
   });
   observer.observe(container, { childList: true, subtree: true });
 }

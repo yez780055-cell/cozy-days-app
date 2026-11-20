@@ -25,6 +25,7 @@ public class MainActivity extends BridgeActivity {
     private SplashScreenViewProvider startupSplash;
     private boolean webReady;
     private WebBundles bundles;
+    private int startupToken;
     private final Runnable startupTimeout = this::recoverStartup;
 
     @Override
@@ -143,16 +144,34 @@ public class MainActivity extends BridgeActivity {
         return bundles;
     }
 
-    void pageReady(boolean darkStatus, boolean darkNavigation) {
+    int startupToken() { return startupToken; }
+
+    boolean pageReady(int token, boolean darkStatus, boolean darkNavigation) {
+        if (token != startupToken) return false;
         setBarIcons(darkStatus, darkNavigation);
-        bundles.confirmStartup();
+        try {
+            bundles.confirmStartup();
+        } catch (IllegalStateException error) {
+            android.util.Log.e("CozyDays", "Could not confirm the web bundle", error);
+            recoverStartup();
+            return false;
+        }
         bridge.getWebView().removeCallbacks(startupTimeout);
         dismissStartupSplash();
+        return true;
     }
 
     void reloadBundle(File directory) {
         var webView = bridge.getWebView();
+        startupToken++;
         webView.removeCallbacks(startupTimeout);
+        try {
+            bundles.beginTrial();
+        } catch (IllegalStateException error) {
+            android.util.Log.e("CozyDays", "Could not start the web bundle trial", error);
+            recoverStartup();
+            return;
+        }
         if (directory == null) bridge.setServerAssetPath("public");
         else bridge.setServerBasePath(directory.getAbsolutePath());
         webView.postDelayed(startupTimeout, STARTUP_TIMEOUT_MS);
@@ -161,8 +180,7 @@ public class MainActivity extends BridgeActivity {
     private void recoverStartup() {
         if (bundles.activeRevision() > 1) {
             try {
-                bundles.reset();
-                reloadBundle(null);
+                reloadBundle(bundles.rollback());
                 return;
             } catch (IllegalStateException error) {
                 android.util.Log.e("CozyDays", "Could not reset web bundle", error);

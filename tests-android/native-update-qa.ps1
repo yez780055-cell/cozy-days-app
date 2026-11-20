@@ -1,15 +1,16 @@
 param(
     [Parameter(Mandatory)][string]$Serial,
     [Parameter(Mandatory)][string]$QaDirectory,
-    [Parameter(Mandatory)][ValidateSet('Baseline', 'Upgrade', 'First', 'ResumeFirst', 'Second', 'Failures', 'Rollback', 'Offline', 'Manual', 'GitHubBaseline', 'GitHubUpgrade', 'GitHubFirst', 'GitHubInterrupt', 'GitHubSecond', 'GitHubRollback', 'GitHubOffline', 'GitHubManual')][string]$Step
+    [switch]$Formal,
+    [Parameter(Mandatory)][ValidateSet('FormalBaseline', 'Baseline', 'Upgrade', 'First', 'ResumeFirst', 'Second', 'Failures', 'Rollback', 'Offline', 'Manual', 'GitHubBaseline', 'GitHubUpgrade', 'GitHubFirst', 'GitHubInterrupt', 'GitHubSecond', 'GitHubRollback', 'GitHubOffline', 'GitHubManual')][string]$Step
 )
 $ErrorActionPreference = 'Stop'
 if ($Serial -notmatch '^emulator-\d+$') { throw 'Use a disposable emulator.' }
 $QaDirectory = (Resolve-Path -LiteralPath $QaDirectory).Path
-$app = 'com.littledays.capacitorexperiment'
+$app = if ($Formal) { 'com.littledays.app' } else { 'com.littledays.capacitorexperiment' }
 $activity = "$app/com.littledays.app.MainActivity"
 $downloads = '/sdcard/Download'
-$shell = if ($Step -like 'GitHub*') { 5 } else { 4 }
+$shell = if ($Formal) { 2 } elseif ($Step -like 'GitHub*') { 5 } else { 4 }
 
 function Invoke-Adb {
     & adb -s $Serial @args
@@ -166,7 +167,49 @@ function Go-Offline {
     throw 'Emulator has an active network'
 }
 
+function Capture-Screen([string]$name) {
+    Invoke-Adb shell screencap -p /sdcard/cozy-baseline.png | Out-Null
+    Invoke-Adb pull /sdcard/cozy-baseline.png "$QaDirectory/$name.png" | Out-Null
+}
+
+function Enter-SeedText([string]$value) {
+    Invoke-Adb shell input text $value
+    if ((Invoke-Adb shell dumpsys input_method) -match 'mInputShown=true') {
+        Invoke-Adb shell input keyevent 4
+    }
+}
+
 switch ($Step) {
+    'FormalBaseline' {
+        if (!$Formal) { throw 'FormalBaseline requires -Formal' }
+        if (!((Invoke-Adb shell dumpsys package $app) -match 'versionCode=1\b')) { throw 'Install the archived formal version 1 first' }
+        Touch '^新增待办$'
+        Enter-SeedText 'FormalUpgradeTodoQA'
+        Touch '^保存$'
+        Require-Element 'FormalUpgradeTodoQA' | Out-Null
+        Touch '^纪念日$'
+        Touch '^新增纪念日$'
+        Enter-SeedText 'FormalUpgradeAnniversaryQA'
+        Touch '^保存纪念日$'
+        Require-Element 'FormalUpgradeAnniversaryQA' | Out-Null
+        Touch '^生理期$'
+        Touch '^记录第一次经期$'
+        Touch '^保存经期记录$'
+        Require-Element '当前周期' | Out-Null
+        Touch '^适中$'
+        Invoke-Adb shell am force-stop $app
+        Invoke-Adb shell am start -W -n $activity | Out-Null
+        Require-Element 'FormalUpgradeTodoQA' | Out-Null
+        Capture-Screen 'formal-v1-todo'
+        Touch '^纪念日$'
+        Require-Element 'FormalUpgradeAnniversaryQA' | Out-Null
+        Capture-Screen 'formal-v1-anniversary'
+        Touch '^生理期$'
+        Require-Element '历史经期|当前周期' | Out-Null
+        if (Find-Element '^记录第一次经期$' 1) { throw 'Legacy period did not persist' }
+        Capture-Screen 'formal-v1-period'
+        Invoke-Adb shell date '+%F' | Set-Content "$QaDirectory/seed-date.txt"
+    }
     'Baseline' {
         Invoke-Adb install -r "$QaDirectory/baseline.apk"
         Cold-Start
@@ -189,10 +232,24 @@ switch ($Step) {
     }
     'Upgrade' {
         Set-Release 0
-        Invoke-Adb install -r "$QaDirectory/Cozy-Days-Android-Experiment-0.2.1-4.apk"
+        $apk = if ($Formal) { 'Cozy-Days-Android-0.2.2-2.apk' } else { 'Cozy-Days-Android-Experiment-0.2.1-4.apk' }
+        Invoke-Adb install -r "$QaDirectory/$apk"
         Cold-Start
         Require-Version 1
-        Compare-Records 'after-apk'
+        if ($Formal) {
+            Export-Records 'after-apk'
+            $records=(Get-Content "$QaDirectory/after-apk.json" -Raw | ConvertFrom-Json).records
+            $date=(Get-Content "$QaDirectory/seed-date.txt").Trim()
+            if ($records.todos.Count -ne 1 -or $records.todos[0].text -cne 'FormalUpgradeTodoQA' -or $records.todos[0].date -cne $date -or
+                $records.anniversaries.Count -ne 1 -or $records.anniversaries[0].name -cne 'FormalUpgradeAnniversaryQA' -or $records.anniversaries[0].date -cne $date -or
+                $records.period.periods.Count -ne 1 -or $records.period.periods[0].start -cne $date -or
+                $records.period.days.$date.flow -cne '适中') {
+                throw 'The records saved in the formal version 1 did not survive the APK update'
+            }
+            Copy-Item -LiteralPath "$QaDirectory/after-apk.json" -Destination "$QaDirectory/baseline.json"
+        } else {
+            Compare-Records 'after-apk'
+        }
     }
     'First' {
         Set-Release 2
@@ -218,7 +275,7 @@ switch ($Step) {
             Require-Element $test[1] | Out-Null
             Require-Element '^重试下载$' | Out-Null
             Touch '^关闭$'
-            Require-Element '当前网页版本 3 · 外壳 4' | Out-Null
+            Require-Element "当前网页版本 3 · 外壳 $shell" | Out-Null
             Touch '^返回上一页$'
         }
     }
@@ -277,6 +334,7 @@ switch ($Step) {
         Compare-Records 'after-web2'
     }
     'GitHubInterrupt' {
+        if ($Formal) { Set-Release 3 'cut' }
         Open-GitHubRelease 3
         Touch '^立即更新$'
         Go-Offline

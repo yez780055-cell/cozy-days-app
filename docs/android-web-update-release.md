@@ -1,5 +1,17 @@
 # 小饱日常 Android 网页更新发布流程
 
+## 正式外壳 2 验收
+
+正式候选包为 `com.littledays.app`，`versionName=0.2.2`，`versionCode=2`。正式签名沿用外壳 1 的证书 `c85fe70fff2425ad2b95d3dfa8f28ef7173027e744b03f57b721896fca40d3d8`。正式构建在现有 GitHub `android-release` 环境进行，沿用 `ANDROID_KEYSTORE_PATH`、`ANDROID_KEYSTORE_PASSWORD`、`ANDROID_KEY_ALIAS` 和 `ANDROID_KEY_PASSWORD`。构建前会签名随机数据并用固定证书验证。Gradle 同时核对待用密钥库的证书，正式构建使用默认 GitHub 更新源。
+
+覆盖验收使用归档的同签名外壳 1。先在旧包的界面录入合成待办、纪念日、经期和流量日记，再用 `adb install -r` 安装正式候选包。更新后的应用导出记录供后续网页安装、失败回滚和离线启动逐项对比。
+
+本轮正式候选包和正式签名测试网页包通过 Actions 制品交付。验证使用全新隔离模拟器。模拟器的本地代理模拟 GitHub Release API、资产地址和 CDN HTTPS 重定向，验收同一正式 APK 的默认网络路径。临时 TLS 信任仅存在于隔离模拟器。测试网页包的签名匹配正式 APK 证书，验收结束前没有新增 GitHub Release。
+
+正式外壳的第一个网页包使用 `shell=2`，修订号从 2 开始。将来得到发布许可后，正式版清单和包应同属 `android-web-shell-2-web-<修订号>`。制品生成命令由 `.github/workflows/android-apk.yml` 保存。
+
+## 实验外壳 5 历史流程
+
 外壳 `5` 使用公开 GitHub Releases 作为网页更新源。验收 APK 覆盖上一轮外壳 `4`，沿用 `com.littledays.capacitorexperiment` 和同一证书。应用默认检查普通 Release。需要验收 Pre-release 时，可在「设置 → Android 版本」打开「接收预发布网页更新」，然后点「检查更新」。同一 APK 可切换通道。通道偏好保存在本机。
 
 ## 生成和暂存

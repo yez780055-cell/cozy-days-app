@@ -23,7 +23,7 @@ function Find-Element([string]$pattern, [int]$attempts = 14) {
             Invoke-Adb pull /sdcard/cozy-surface.xml "$QaDirectory/surface.xml" | Out-Null
             $xml = [xml](Get-Content -LiteralPath "$QaDirectory/surface.xml" -Raw -Encoding utf8)
             $element = $xml.SelectNodes('//node') | Where-Object {
-                $_.text -match $pattern -or $_.'content-desc' -match $pattern
+                $_.class -notmatch 'EditText|AutoCompleteTextView' -and ($_.text -match $pattern -or $_.'content-desc' -match $pattern)
             } | Select-Object -First 1
             if ($element) { return $element }
             if ($xml.SelectSingleNode('//node[contains(@text,"isn''t responding")]')) {
@@ -70,6 +70,11 @@ function Pick-Download([string]$filename) {
         Touch '^Download$'
     }
     if (!(Find-Element $pattern 1) -and (Find-Element '^List view$' 1)) { Touch '^List view$' }
+    if (!(Find-Element $pattern 1) -and (Find-Element '^Search$' 1)) {
+        Touch '^Search$'
+        Invoke-Adb shell input text $filename
+        Invoke-Adb shell input keyevent 66
+    }
     Touch $pattern
 }
 
@@ -292,6 +297,7 @@ switch ($Step) {
         Compare-Records 'after-web3'
     }
     'GitHubRollback' {
+        Cold-Start
         Import-TestBundle 4
         Require-Element '新网页未能启动，已恢复稳定版本' | Out-Null
         Require-Element '^当前网页版本 3$' | Out-Null

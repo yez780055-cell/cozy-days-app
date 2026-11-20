@@ -2,10 +2,13 @@ import java.io.DataOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.security.KeyStore;
+import java.security.MessageDigest;
 import java.security.PrivateKey;
 import java.security.Signature;
 import java.util.List;
+import java.util.HexFormat;
 import java.util.Objects;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -13,8 +16,8 @@ import java.util.zip.ZipOutputStream;
 // Run with JDK 21 after npm run build:android. Signing credentials come from the experiment environment.
 class PackAndroidWeb {
     public static void main(String[] args) throws Exception {
-        if (args.length != 4) {
-            throw new IllegalArgumentException("Usage: java scripts/PackAndroidWeb.java <dist> <shell-code> <web-revision> <output.cozyupdate>");
+        if (args.length < 4 || args.length > 5) {
+            throw new IllegalArgumentException("Usage: java scripts/PackAndroidWeb.java <dist> <shell-code> <web-revision> <output.cozyupdate> [release-root]");
         }
         Path dist = Path.of(args[0]);
         int shell = Integer.parseInt(args[1]);
@@ -52,8 +55,32 @@ class PackAndroidWeb {
                 packaged.write(signature);
                 packaged.write(data);
             }
+            if (args.length == 5) writeRelease(Path.of(args[4]), output, shell, revision);
         } finally {
             Files.deleteIfExists(archive);
+        }
+    }
+
+    private static void writeRelease(Path root, Path output, int shell, int web) throws Exception {
+        Path shellRoot = root.resolve("shell-" + shell);
+        Files.createDirectories(shellRoot);
+        Path revisionRoot = shellRoot.resolve("web-" + web);
+        Files.createDirectory(revisionRoot);
+        String filename = "Cozy-Days-Web-" + shell + "-" + web + ".cozyupdate";
+        Path archive = Files.copy(output, revisionRoot.resolve(filename));
+        String sha256 = HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(Files.readAllBytes(archive)));
+        String page = Files.readString(Path.of("scripts/android-web-download.html"))
+            .replace("__WEB_REVISION__", Integer.toString(web))
+            .replace("__PACKAGE_NAME__", filename)
+            .replace("__SHA256__", sha256)
+            .replace("__PACKAGE_SIZE__", Long.toString(Files.size(archive)));
+        Files.writeString(revisionRoot.resolve("download.html"), page);
+        Path feed = Files.createTempFile(shellRoot, "latest-", ".tmp");
+        try {
+            Files.writeString(feed, "{\"schema\":1,\"shell\":" + shell + ",\"web\":" + web + ",\"sha256\":\"" + sha256 + "\"}\n");
+            Files.move(feed, shellRoot.resolve("latest.json"), StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
+        } finally {
+            Files.deleteIfExists(feed);
         }
     }
 

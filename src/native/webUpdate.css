@@ -1,0 +1,18 @@
+.android-update-prompt {
+  position: fixed;
+  z-index: var(--layer-update);
+  top: calc(var(--android-safe-top, 0px) + 12px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(calc(100% - 24px), 360px);
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+.android-update-prompt h2 { margin: 0; color: var(--ink); font-size: 17px; }
+.android-update-prompt p { margin: 6px 0 10px; color: var(--muted); font-size: 13px; }
+.android-update-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.android-update-actions a, .android-update-link { text-decoration: none; }
+body:has([role="dialog"]) .android-update-prompt { display: none; }

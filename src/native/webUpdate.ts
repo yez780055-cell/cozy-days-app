@@ -6,8 +6,14 @@ type Release = NonNullable<Awaited<ReturnType<typeof AndroidShell.checkOnlineUpd
 type Status = 'idle' | 'checking' | 'unconfigured' | 'current' | 'available' | 'offline' | 'checkFailed'
   | 'importing' | 'restoring' | 'nativeFailed' | 'installed' | 'rolledBack' | 'onlineFailed' | WebUpdateProgress['stage'];
 
-let state: { status: Status; version?: Version; release?: Release; prompt: boolean; error?: string; received: number } = {
-  status: 'idle', prompt: false, received: 0,
+const releasePreference = 'cozy-days.android-prerelease-updates';
+
+function prefersPrerelease() {
+  try { return localStorage.getItem(releasePreference) === '1'; } catch { return false; }
+}
+
+let state: { prerelease: boolean; status: Status; version?: Version; release?: Release; prompt: boolean; error?: string; received: number } = {
+  prerelease: prefersPrerelease(), status: 'idle', prompt: false, received: 0,
 };
 const listeners = new Set<() => void>();
 
@@ -44,12 +50,21 @@ export async function checkWebUpdate(startup = false) {
     setState({ version });
     if (version.outcome) { setState({ status: version.outcome }); return; }
     if (!navigator.onLine) { setState({ status: 'offline', prompt: false }); return; }
-    const { configured, release } = await AndroidShell.checkOnlineUpdate({ retryFailed: !startup });
+    const { configured, release } = await AndroidShell.checkOnlineUpdate({ retryFailed: !startup, prerelease: state.prerelease });
     setState({ status: release ? 'available' : configured ? 'current' : 'unconfigured', release, prompt: Boolean(release) });
   } catch (cause) {
     setState({ status: navigator.onLine ? 'checkFailed' : 'offline', prompt: false,
       error: message(cause, '暂时无法检查更新。可以继续使用本地网页。') });
   }
+}
+
+export function setPrereleaseUpdates(prerelease: boolean) {
+  if (isUpdateBusy(state.status) || state.prerelease === prerelease) return;
+  try {
+    if (prerelease) localStorage.setItem(releasePreference, '1');
+    else localStorage.removeItem(releasePreference);
+  } catch { /* In-memory opt-in lasts only until the app reloads. */ }
+  setState({ prerelease, status: 'idle', release: undefined, error: undefined, prompt: false });
 }
 
 export function dismissWebUpdate() {

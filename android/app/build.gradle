@@ -1,6 +1,6 @@
 apply plugin: 'com.android.application'
 
-def releaseCodeText = System.getenv('COZY_EXPERIMENT_VERSION_CODE') ?: '4'
+def releaseCodeText = System.getenv('COZY_EXPERIMENT_VERSION_CODE') ?: '5'
 if (!(releaseCodeText ==~ /[1-9][0-9]*/) || new BigInteger(releaseCodeText) > 2100000000) {
     throw new GradleException('COZY_EXPERIMENT_VERSION_CODE must be a positive integer no greater than 2100000000')
 }

@@ -1,7 +1,7 @@
 param(
     [Parameter(Mandatory)][string]$Serial,
     [Parameter(Mandatory)][string]$QaDirectory,
-    [Parameter(Mandatory)][ValidateSet('Baseline', 'Upgrade', 'First', 'ResumeFirst', 'Second', 'Failures', 'Rollback', 'Offline', 'Manual')][string]$Step
+    [Parameter(Mandatory)][ValidateSet('Baseline', 'Upgrade', 'First', 'ResumeFirst', 'Second', 'Failures', 'Rollback', 'Offline', 'Manual', 'GitHubBaseline', 'GitHubUpgrade', 'GitHubFirst', 'GitHubInterrupt', 'GitHubSecond', 'GitHubRollback', 'GitHubOffline', 'GitHubManual')][string]$Step
 )
 $ErrorActionPreference = 'Stop'
 if ($Serial -notmatch '^emulator-\d+$') { throw 'Use a disposable emulator.' }
@@ -9,6 +9,7 @@ $QaDirectory = (Resolve-Path -LiteralPath $QaDirectory).Path
 $app = 'com.littledays.capacitorexperiment'
 $activity = "$app/com.littledays.app.MainActivity"
 $downloads = '/sdcard/Download'
+$shell = if ($Step -like 'GitHub*') { 5 } else { 4 }
 
 function Invoke-Adb {
     & adb -s $Serial @args
@@ -109,7 +110,7 @@ function Set-Release([int]$revision, [string]$mode = 'normal') {
 
 function Require-Version([int]$revision) {
     Touch '^打开应用设置$'
-    Require-Element "当前网页版本 $revision · 外壳 4" | Out-Null
+    Require-Element "当前网页版本 $revision · 外壳 $shell" | Out-Null
     Touch '^返回上一页$'
 }
 
@@ -134,6 +135,30 @@ function Capture-Progress([int]$revision) {
         Invoke-Adb shell screencap -p /sdcard/cozy-progress.png
         Invoke-Adb pull /sdcard/cozy-progress.png "$QaDirectory/web-$revision-progress-$sample.png" | Out-Null
     }
+}
+
+function Open-GitHubRelease([int]$revision) {
+    Touch '^打开应用设置$'
+    Touch '^检查更新$'
+    Require-Element "网页版本 $revision · " | Out-Null
+}
+
+function Import-TestBundle([int]$revision) {
+    $filename = "local-web-$revision.cozyupdate"
+    Invoke-Adb push "$QaDirectory/$filename" "$downloads/$filename" | Out-Null
+    Touch '^打开应用设置$'
+    Touch '^导入网页更新$'
+    Pick-Download $filename
+}
+
+function Go-Offline {
+    Invoke-Adb shell svc wifi disable
+    Invoke-Adb shell svc data disable
+    for ($attempt = 0; $attempt -lt 10; $attempt++) {
+        if ((Invoke-Adb shell dumpsys connectivity) -match 'Active default network: none') { return }
+        Start-Sleep -Seconds 1
+    }
+    throw 'Emulator has an active network'
 }
 
 switch ($Step) {
@@ -202,13 +227,7 @@ switch ($Step) {
     }
     'Offline' {
         if ((Invoke-Adb reverse --list) -match 'tcp:4474 tcp:4474') { Invoke-Adb reverse --remove tcp:4474 }
-        Invoke-Adb shell svc wifi disable
-        Invoke-Adb shell svc data disable
-        for ($attempt = 0; $attempt -lt 10; $attempt++) {
-            if ((Invoke-Adb shell dumpsys connectivity) -match 'Active default network: none') { break }
-            Start-Sleep -Seconds 1
-        }
-        if ($attempt -eq 10) { throw 'Emulator has an active network' }
+        Go-Offline
         Cold-Start
         Require-Version 3
         Compare-Records 'offline'
@@ -221,6 +240,73 @@ switch ($Step) {
             Touch '^导入网页更新$'
         }
         Pick-Download 'manual-5.cozyupdate'
+        Finish-Release 5
+        Compare-Records 'after-manual'
+    }
+    'GitHubBaseline' {
+        Cold-Start
+        Export-Records 'baseline'
+        $baseline = Get-Content -LiteralPath "$QaDirectory/baseline.json" -Raw | ConvertFrom-Json
+        if (!$baseline.records.todos.Count -or !$baseline.records.anniversaries.Count -or
+            !$baseline.records.period.periods.Count -or !$baseline.records.period.days) {
+            throw 'Synthetic baseline records are incomplete'
+        }
+    }
+    'GitHubUpgrade' {
+        Invoke-Adb install -r "$QaDirectory/Cozy-Days-Android-Experiment-0.2.1-5.apk"
+        Cold-Start
+        Touch '^打开应用设置$'
+        Require-Element '当前网页版本 1 · 外壳 5' | Out-Null
+        Require-Element '^当前已是最新版本。$' | Out-Null
+        Touch '^返回上一页$'
+        Compare-Records 'after-apk'
+    }
+    'GitHubFirst' {
+        Touch '^打开应用设置$'
+        Touch '^接收预发布网页更新$'
+        Touch '^返回上一页$'
+        Open-GitHubRelease 2
+        Touch '^立即更新$'
+        Capture-Progress 2
+        Finish-Release 2
+        Compare-Records 'after-web2'
+    }
+    'GitHubInterrupt' {
+        Open-GitHubRelease 3
+        Touch '^立即更新$'
+        Go-Offline
+        Require-Element '下载未完成' | Out-Null
+        Require-Element '^重试下载$' | Out-Null
+        Touch '^关闭$'
+        Cold-Start
+        Require-Version 2
+        Compare-Records 'after-interruption'
+        Invoke-Adb shell svc wifi enable
+        Invoke-Adb shell svc data enable
+    }
+    'GitHubSecond' {
+        Open-GitHubRelease 3
+        Touch '^立即更新$'
+        Capture-Progress 3
+        Finish-Release 3
+        Compare-Records 'after-web3'
+    }
+    'GitHubRollback' {
+        Import-TestBundle 4
+        Require-Element '新网页未能启动，已恢复稳定版本' | Out-Null
+        Require-Element '^当前网页版本 3$' | Out-Null
+        Touch '^关闭$'
+        Require-Version 3
+        Compare-Records 'after-rollback'
+    }
+    'GitHubOffline' {
+        Go-Offline
+        Cold-Start
+        Require-Version 3
+        Compare-Records 'offline'
+    }
+    'GitHubManual' {
+        Import-TestBundle 5
         Finish-Release 5
         Compare-Records 'after-manual'
     }

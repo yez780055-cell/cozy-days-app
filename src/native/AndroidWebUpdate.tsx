@@ -1,10 +1,10 @@
 import { useEffect, useRef } from 'react';
 import { Capacitor } from '@capacitor/core';
-import { Download, RefreshCw, RotateCcw } from 'lucide-react';
+import { Download, FlaskConical, RefreshCw, RotateCcw } from 'lucide-react';
 import { Button } from '../components/Button';
 import { Asset } from '../components/Asset';
 import { useAndroidBack } from './back';
-import { checkWebUpdate, dismissWebUpdate, installOnlineWebUpdate, isOnlineUpdateBusy, isUpdateBusy, runNativeWebUpdate, useWebUpdate } from './webUpdate';
+import { checkWebUpdate, dismissWebUpdate, installOnlineWebUpdate, isOnlineUpdateBusy, isUpdateBusy, runNativeWebUpdate, setPrereleaseUpdates, useWebUpdate } from './webUpdate';
 import './webUpdate.css';
 
 const statusText = {
@@ -80,7 +80,7 @@ export function AndroidWebUpdatePrompt() {
 }
 
 export function AndroidWebUpdate() {
-  const { status, version, release, error } = useWebUpdate();
+  const { status, version, release, error, prerelease } = useWebUpdate();
   if (Capacitor.getPlatform() !== 'android') return null;
   const busy = isUpdateBusy(status);
 
@@ -91,6 +91,11 @@ export function AndroidWebUpdate() {
       <button type="button" className="settings-row" disabled={busy} onClick={() => void checkWebUpdate()}>
         <RefreshCw size={20} aria-hidden="true"/><span>检查更新</span>
       </button>
+      <label className="settings-row">
+        <FlaskConical size={20} aria-hidden="true"/><span>接收预发布网页更新</span>
+        <input type="checkbox" checked={prerelease} disabled={busy}
+          onChange={event => setPrereleaseUpdates(event.currentTarget.checked)} />
+      </label>
       {release && !busy && <button type="button" className="settings-row" onClick={() => void installOnlineWebUpdate()}>
         <Download size={20} aria-hidden="true"/><span>下载网页更新</span><small>网页 {release.web}</small>
       </button>}

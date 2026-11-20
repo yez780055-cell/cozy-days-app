@@ -1,21 +1,23 @@
-import { taskAction } from './task-actions';
+import { openTodos, taskAction } from './task-actions';
 import { test, expect } from '@playwright/test';
 import { execFileSync } from 'node:child_process';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 const sizes = [[360, 740], [393, 852], [430, 932]] as const;
-const screenshotDir = resolve('public/review/evidence/screenshots');
-const videoDir = resolve('public/review/evidence/videos');
+const evidenceDir = resolve(process.env.PLAYWRIGHT_REVIEW_EVIDENCE_DIR ?? 'public/review/evidence');
+const screenshotDir = resolve(evidenceDir, 'screenshots');
+const videoDir = resolve(evidenceDir, 'videos');
 mkdirSync(screenshotDir, { recursive: true });
 mkdirSync(videoDir, { recursive: true });
 
 test.afterAll(()=>{
-  writeFileSync(resolve('public/review/evidence/source.json'),JSON.stringify({sourceCommit:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),capturedAt:new Date().toISOString(),sizes,tool:'Playwright Chromium',data:'isolated synthetic tasks'},null,2)+'\n');
+  writeFileSync(resolve(evidenceDir, 'source.json'),JSON.stringify({sourceCommit:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),capturedAt:new Date().toISOString(),sizes,tool:'Playwright Chromium',data:'isolated synthetic tasks'},null,2)+'\n');
 });
 
 for (const [width, height] of sizes) {
   test(`review evidence: real todo interaction ${width}x${height}`, async ({ browser }) => {
+    test.setTimeout(90_000);
     const context = await browser.newContext({
       viewport: { width, height },
       deviceScaleFactor: 1,
@@ -26,6 +28,7 @@ for (const [width, height] of sizes) {
     page.on('pageerror', error => errors.push(error.message));
     await page.clock.install();
     await page.goto('/');
+    await openTodos(page);
     await page.getByRole('button', { name: '新增待办', exact: true }).click();
     await page.getByRole('textbox', { name: '想做些什么？' }).fill(`验收演示：${width} × ${height} 的小计划`);
     await page.getByRole('button', { name: '保存', exact: true }).click();
@@ -53,16 +56,21 @@ for (const [width, height] of sizes) {
     const completedCard=page.getByRole('button',{name:'编辑：准备明天的工作报告',exact:true});
     await expect(completedCard).toHaveCSS('text-decoration-line','none');
     await page.screenshot({path:resolve(screenshotDir,'completed-'+width+'x'+height+'.png')});
-    // Keep the real five-second product window intact while CI captures the multi-toast evidence.
-    await page.clock.runFor(5_300);
+    // Keep the real ten-second product window intact while CI captures the multi-toast evidence.
+    await page.clock.runFor(10_500);
     await expect(page.locator('.undo-toast')).toHaveCount(0);
     await page.clock.pauseAt(await page.evaluate(() => Date.now() + 1_000));
     await taskAction(page,'准备明天的工作报告','restore');
+    await expect(page.locator('.task-list').getByTestId('todo-card')).toHaveCount(5);
     await taskAction(page,'午后读几页喜欢的书','complete');
     await taskAction(page,'晚上散步十分钟','delete');
     await expect(page.locator('.undo-toast')).toHaveCount(3);
     await page.screenshot({path:resolve(screenshotDir,`undo-${width}x${height}.png`)});
-    for(const text of ['晚上散步十分钟','午后读几页喜欢的书','准备明天的工作报告'])await page.locator('.undo-toast').filter({has:page.locator('small',{hasText:text})}).getByRole('button',{name:'撤销',exact:true}).click();
+    for (const text of ['晚上散步十分钟','午后读几页喜欢的书','准备明天的工作报告']) {
+      const notice=page.locator('.undo-toast').filter({has:page.locator('small',{hasText:text})});
+      await notice.getByRole('button',{name:'撤销',exact:true}).click();
+      await expect(notice).toHaveCount(0);
+    }
     await expect(page.getByTestId('todo-card')).toHaveCount(5);
     expect(errors).toEqual([]);
     const video = page.video();
@@ -70,9 +78,9 @@ for (const [width, height] of sizes) {
     if (video) await video.saveAs(resolve(videoDir, `${width}x${height}.webm`));
     const emptyContext=await browser.newContext({viewport:{width,height},deviceScaleFactor:1});
     const emptyPage=await emptyContext.newPage();await emptyPage.goto('/');
-    await expect(emptyPage.locator('.empty-art')).toBeVisible();
-    await expect(emptyPage.locator('.empty-state').getByRole('button',{name:'新增待办',exact:true})).toHaveCount(0);
-    await expect(emptyPage.locator('.fab')).toBeVisible();
+    await openTodos(emptyPage);
+    await expect(emptyPage.getByRole('region',{name:'待办列表'})).toContainText('这一天的清单是空的');
+    await expect(emptyPage.getByRole('button',{name:'新增待办',exact:true})).toBeVisible();
     await emptyPage.screenshot({path:resolve(screenshotDir,'empty-'+width+'x'+height+'.png')});
     await emptyContext.close();
   });

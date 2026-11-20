@@ -1,9 +1,11 @@
+import { openTodos } from './task-actions';
 import { test, expect } from '@playwright/test';
 
 test('valid local dates save in UTC+14 while impossible dates are rejected', async ({ browser }) => {
   const context = await browser.newContext({ timezoneId: 'Pacific/Kiritimati' });
   const page = await context.newPage();
   await page.goto('/');
+  await openTodos(page);
   await page.getByRole('button', { name: '新增待办', exact: true }).click();
   await page.getByRole('textbox', { name: '想做些什么？' }).fill('跨时区计划');
   await page.getByLabel('归属日期', { exact: true }).fill('2026-02-30');
@@ -18,13 +20,15 @@ test('valid local dates save in UTC+14 while impossible dates are rejected', asy
 });
 
 test('the saved current font can be retried after startup loading fails', async ({ page }) => {
+  await page.addInitScript(() => localStorage.setItem('cozy-days.font-family', 'yozai'));
   await page.route(/Yozai-.*\.woff2/, route => route.abort());
   await page.goto('/');
-  await page.locator('.bottom-nav button').first().dispatchEvent('contextmenu');
-  await page.getByRole('menuitem', { name: '设置' }).click();
+  await page.getByRole('button', { name: '打开应用设置' }).click();
+  await page.getByRole('button', { name: /外观与字体/ }).click();
+  await expect(page.getByRole('radio', { name: '选择悠哉字体' })).toBeChecked();
   await expect(page.getByRole('alert')).toBeVisible();
   await page.unroute(/Yozai-.*\.woff2/);
-  await page.getByRole('radio', { name: '选择悠哉字体' }).click();
+  await page.getByRole('button', { name: '重试加载悠哉字体' }).click();
   await expect(page.getByRole('alert')).toHaveCount(0);
-  await expect.poll(() => page.evaluate(() => document.fonts.check('16px "Yozai"'))).toBe(true);
+  await expect.poll(() => page.evaluate(() => [...document.fonts].filter(font => font.family === 'Yozai' && font.status === 'loaded').length)).toBe(2);
 });

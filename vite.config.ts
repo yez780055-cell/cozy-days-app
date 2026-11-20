@@ -60,6 +60,6 @@ function androidPublicAssets(): Plugin {
 export default defineConfig(({ mode }) => ({
   publicDir: mode === 'android' ? false : 'public',
   plugins: [react(), ...(mode === 'android' ? [androidEntry, androidPublicAssets()] : [reviewBuildInfo(), pwaBuild()])],
-  server: { host: '0.0.0.0' },
+  server: { host: '0.0.0.0', watch: process.env.COZY_E2E_NO_WATCH === '1' ? null : undefined },
 }));
 

@@ -2,7 +2,7 @@ import { expect, test, type Page } from '@playwright/test';
 
 type Outcome = 'installed' | 'rolledBack';
 type Fixture = {
-  web: number; checks: boolean[]; installs: number[];
+  web: number; checks: boolean[]; prereleaseChecks: boolean[]; installs: number[];
   offers: boolean; checkError: boolean; manualError: boolean;
   update(stage: string, received?: number): void;
   fail(message: string): void;
@@ -16,7 +16,7 @@ async function mockShell(page: Page, options: { offline?: boolean; outcome?: Out
     let rejectInstall: ((error: Error) => void) | undefined;
     const bytes = 8 * 1024 * 1024;
     const fixture: Fixture = {
-      web: 2, checks: [], installs: [], offers: !current, checkError: false, manualError: false,
+      web: 2, checks: [], prereleaseChecks: [], installs: [], offers: !current, checkError: false, manualError: false,
       update: (stage, received = 0) => progress?.({ stage, received, total: bytes }),
       fail: message => rejectInstall?.(new Error(message)),
     };
@@ -32,7 +32,7 @@ async function mockShell(page: Page, options: { offline?: boolean; outcome?: Out
           progress = method === 'addListener' ? handler : undefined;
           return 'fixture-listener';
         },
-        async nativePromise(_: string, method: string, args: { retryFailed: boolean; web: number }) {
+        async nativePromise(_: string, method: string, args: { retryFailed: boolean; prerelease: boolean; web: number }) {
           if (method === 'getSafeArea') return { top: 30, right: 0, bottom: 24, left: 0, startupToken: 0, keyboardVisible: false, keyboardViewportHeight: 0 };
           if (method === 'updateInfo') {
             const result = { shell: 4, web: fixture.web, outcome: offeredOutcome };
@@ -41,6 +41,7 @@ async function mockShell(page: Page, options: { offline?: boolean; outcome?: Out
           }
           if (method === 'checkOnlineUpdate') {
             fixture.checks.push(args.retryFailed);
+            fixture.prereleaseChecks.push(args.prerelease);
             if (fixture.checkError) throw new Error('暂时无法连接更新源。');
             return { configured: true, release: fixture.offers ? { web: 3, bytes } : undefined };
           }
@@ -76,6 +77,25 @@ test('startup checks once, supports later, and checks again in Settings', async 
   await page.getByRole('button', { name: '检查更新' }).click();
   await expect(page.getByText('当前已是最新版本。')).toBeVisible();
   expect(await page.evaluate(() => (window as unknown as { fixture: Fixture }).fixture.checks)).toEqual([false, true]);
+});
+
+test('stable is the default and prerelease requires a persistent opt-in', async ({ page }) => {
+  await mockShell(page, { current: true });
+  await settings(page);
+  const toggle = page.getByRole('checkbox', { name: '接收预发布网页更新' });
+  const channels = () => page.evaluate(() => (window as unknown as { fixture: Fixture }).fixture.prereleaseChecks);
+  await expect.poll(channels).toEqual([false]);
+  await expect(toggle).not.toBeChecked();
+  await toggle.check();
+  await page.getByRole('button', { name: '检查更新' }).click();
+  await expect.poll(channels).toEqual([false, true]);
+  await page.reload();
+  await expect.poll(channels).toEqual([true]);
+  await settings(page);
+  await expect(toggle).toBeChecked();
+  await toggle.uncheck();
+  await page.getByRole('button', { name: '检查更新' }).click();
+  await expect.poll(channels).toEqual([true, false]);
 });
 
 test('the progress is byte-based, intermediate stages wait, and errors allow one retry', async ({ page }) => {

@@ -65,13 +65,11 @@ public class AndroidShellPlugin extends Plugin {
         UPDATES.execute(() -> {
             offered = null;
             try {
-                var result = new JSObject().put("configured", online.configured());
-                if (online.configured()) {
-                    var bundles = activity.bundles();
-                    int failed = call.getBoolean("retryFailed", false) ? 0 : bundles.failedRevision();
-                    offered = online.check(bundles.activeRevision(), failed);
-                    if (offered != null) result.put("release", new JSObject().put("web", offered.web).put("bytes", offered.bytes));
-                }
+                var result = new JSObject().put("configured", true);
+                var bundles = activity.bundles();
+                int failed = call.getBoolean("retryFailed", false) ? 0 : bundles.failedRevision();
+                offered = online.check(bundles.activeRevision(), failed, call.getBoolean("prerelease", false));
+                if (offered != null) result.put("release", new JSObject().put("web", offered.web).put("bytes", offered.bytes));
                 call.resolve(result);
             } catch (Exception error) {
                 call.reject("暂时无法连接更新源或读取版本信息。可以继续使用本地网页。", error);

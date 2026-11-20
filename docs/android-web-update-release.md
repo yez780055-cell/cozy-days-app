@@ -1,21 +1,25 @@
 # 小饱日常 Android 网页更新发布流程
 
-外壳 `4` 内置一键网页更新。使用同签名 APK 覆盖安装后，应用启动时检查对应外壳的发布清单。点「立即更新」后，应用内下载、校验、安装并重新打开网页。设置可查看修订号和状态，也可手动检查或导入签名包。
+外壳 `5` 使用公开 GitHub Releases 作为网页更新源。验收 APK 覆盖上一轮外壳 `4`，沿用 `com.littledays.capacitorexperiment` 和同一证书。应用默认检查普通 Release。需要验收 Pre-release 时，可在「设置 → Android 版本」打开「接收预发布网页更新」，然后点「检查更新」。同一 APK 可切换通道。通道偏好保存在本机。
 
-## 生成与发布
+## 生成和暂存
 
-1. 确认目标 APK 的 `versionCode` 和当前最高已发布网页修订号。下例用外壳 `4` 和网页修订 `2`。网页修订号应高于此目标外壳的所有已发布版本。内置修订号为 `1`。
-2. 按现有签名流程在本地配置 `COZY_EXPERIMENT_KEYSTORE`、`COZY_EXPERIMENT_STORE_PASSWORD`、`COZY_EXPERIMENT_KEY_ALIAS` 和 `COZY_EXPERIMENT_KEY_PASSWORD`。网页包须使用目标 APK 对应的 RSA 签名密钥。
-3. 首次构建目标 APK 时，用 `COZY_ANDROID_WEB_UPDATE_ROOT` 指定该外壳的 HTTPS 发布根目录。后续签发网页包时，在项目根目录执行下列命令。替换示例版本号。此步骤只构建网页资源。
+1. 先完成全量回归，并核对目标外壳的 `versionCode`。下面用外壳 `5` 及其首个网页修订 `2`。同一外壳后续发布须递增网页修订号。APK 内置修订号为 `1`。
+2. 使用上一轮 APK 对应的发布 RSA 密钥。按现有本机签名流程注入 `COZY_EXPERIMENT_KEYSTORE`、`COZY_EXPERIMENT_STORE_PASSWORD`、`COZY_EXPERIMENT_KEY_ALIAS` 和 `COZY_EXPERIMENT_KEY_PASSWORD`。签名前对照上轮 APK 的证书 SHA-256 `04b3957c60fdbe0e05f257a1fce99c4d501df58dfec76777aaea032aefda9a9c`。签名材料留在安全的本机存储。
+3. 在项目根目录生成网页包。此步骤只构建网页资源。
 
    ```powershell
    npm run build:android
-   java scripts/PackAndroidWeb.java dist-android 4 2 artifacts/Cozy-Days-Web-4-2.cozyupdate artifacts/android-web-release
+   java scripts/PackAndroidWeb.java dist-android 5 2 artifacts/Cozy-Days-Web-5-2.cozyupdate artifacts/android-web-release
    ```
 
-4. 在隔离模拟器用现有同签名 APK 导入该包，验证网页修订号、数据读写、离线重启和手动恢复。核对本地包、在线包及清单中的 SHA-256 一致。
-5. 先上传 `shell-4/web-2/Cozy-Days-Web-4-2.cozyupdate`，再发布 `shell-4/latest.json`。版本目录使用不可变 URL。清单使用 `Cache-Control: no-store`，包含 `schema`、`shell`、`web`、`bytes` 和 `sha256`。根目录、清单和文件都通过 HTTPS 直接响应。
-6. 用目标 APK 从应用内检查并安装，核对进度、成功提示和当前版本。可以直接分发同一个签名网页包供手动导入。外壳 `3` 仍使用旧的手动安装流程。
+4. 将签发的 `Cozy-Days-Web-5-2.cozyupdate` 和 `shell-5/latest.json` 作为同一 Pre-release 的资产上传。标签为 `android-web-shell-5-web-2`，应指向生成网页包的已审阅提交。先在草稿中上传两个资产和核验，再发布为 Pre-release。
+5. 匿名打开 [发布列表 API](https://api.github.com/repos/yez780055-cell/cozy-days-app/releases?per_page=100)。确认标签、`draft=false`、`prerelease=true` 及两个资产均存在。通过资产的 `browser_download_url` 下载两份文件，检查清单中的 `schema`、`shell`、`web`、`bytes` 和 `sha256`，校验下载的包与本地签发包一致。
+6. 确认本地和暂存验证通过，清除本地夹具变量 `COZY_ANDROID_WEB_UPDATE_ROOT` 和 `COZY_ANDROID_WEB_UPDATE_QA_CA`。使用相同密钥及 `COZY_EXPERIMENT_VERSION_CODE=5` 同步 Web 资源并构建一次签名 APK。
+7. 在隔离设备覆盖安装外壳 `4 → 5`。先验证默认通道不会收到 Pre-release，再开启预发布，检查并安装已验证的网页更新。对照覆盖安装前后导出的待办、纪念日和生理期记录，并验证离线冷启动、手动导入、更新中断及试运行回滚。
+8. 验收结束后保持 Pre-release，等待发布批准。正式通道使用普通 Release。为同一外壳发布较高修订时，将其设为 Latest；当 Latest 是其他类型的发布时，应用会在最近 100 条公开发布中查找兼容版本。
+
+APK 通过 [正式 Release API](https://api.github.com/repos/yez780055-cell/cozy-days-app/releases/latest) 检查正式版本，不携带 GitHub Token。它从仓库的 Release 下载路径请求资产，仅跟随到受限的 GitHub CDN HTTPS 地址。更新包大小和 SHA-256 必须与清单一致，RSA 签名须匹配 APK 证书。GitHub API 暂不可用或限流时继续使用本地网页。
 
 ## 安装、失败与恢复
 
@@ -31,7 +35,7 @@ npx playwright test --config playwright.android.config.ts
 npx playwright test tests/data-safety.spec.ts --config playwright.config.ts
 ```
 
-网页测试模拟 Capacitor 桥接。Windows 使用本机 Edge 时可先设置 `$env:PLAYWRIGHT_CHANNEL = 'msedge'`。原生测试使用 `tests-android/update-fixture.mjs` 和 `tests-android/native-update-qa.ps1`，只连接模拟器及回环 HTTPS。生产构建使用系统信任链，清除 `COZY_ANDROID_WEB_UPDATE_QA_CA` 并设置正式 HTTPS 根目录。
+网页测试模拟 Capacitor 桥接。Windows 使用本机 Edge 时可先设置 `$env:PLAYWRIGHT_CHANNEL = 'msedge'`。原生测试使用 `tests-android/update-fixture.mjs` 和 `tests-android/native-update-qa.ps1`，只连接模拟器及回环 HTTPS。生产构建使用系统信任链，清除 `COZY_ANDROID_WEB_UPDATE_QA_CA` 和 `COZY_ANDROID_WEB_UPDATE_ROOT` 后使用默认 GitHub 源。可用 `tests-android/GitHubWebReleaseProbe.java` 在已联网的隔离 Android 模拟器验证原生 API 和 CDN 数据传输。
 
 ## 外壳 4 验收
 

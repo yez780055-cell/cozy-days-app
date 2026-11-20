@@ -19,7 +19,7 @@ export const AndroidShell = /* @__PURE__ */ registerPlugin<{
   homeBack(options: { exit: boolean }): Promise<void>;
   ready(options: { startupToken?: number; darkStatusIcons: boolean; darkNavigationIcons: boolean }): Promise<void>;
   updateInfo(): Promise<{ shell: number; web: number; outcome?: 'installed' | 'rolledBack' }>;
-  checkOnlineUpdate(options: { retryFailed: boolean }): Promise<{ configured: boolean; release?: { web: number; bytes: number } }>;
+  checkOnlineUpdate(options: { retryFailed: boolean; prerelease: boolean }): Promise<{ configured: boolean; release?: { web: number; bytes: number } }>;
   installOnlineUpdate(options: { web: number }): Promise<void>;
   addListener(event: 'webUpdateProgress', handler: (value: WebUpdateProgress) => void): Promise<PluginListenerHandle>;
   importUpdate(): Promise<void>;

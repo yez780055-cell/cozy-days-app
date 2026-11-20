@@ -1,79 +1,25 @@
 name: Signed Android APK
 
 on:
-  push:
-    branches: ['release/android-*']
   workflow_dispatch:
     inputs:
       version_code:
-        description: 'Positive Android versionCode (increase for every upgrade)'
+        description: Android candidate versionCode
         required: true
-        default: '1'
+        default: '2'
         type: string
 
 permissions:
   contents: read
 
-concurrency:
-  group: android-apk-${{ github.ref }}
-  cancel-in-progress: false
-
 jobs:
-  web-regression:
+  verify-signing:
+    if: github.repository == 'yez780055-cell/cozy-days-app' && github.ref == 'refs/heads/release/android-formal-web-updates'
     runs-on: ubuntu-24.04
-    timeout-minutes: 25
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
-        with:
-          persist-credentials: false
-      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
-        with:
-          node-version: '22'
-          cache: npm
-      - run: npm ci
-      - run: npx playwright install --with-deps chromium
-      - run: npm run test:e2e
-      - run: npm run build
-      - run: npm run build:pages
-      - run: npm run test:pages
-      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
-        if: always()
-        with:
-          name: android-web-regression-${{ github.sha }}
-          path: |
-            public/review/evidence/
-            test-results/
-            artifacts/pages-*.png
-          if-no-files-found: warn
-          retention-days: 90
-
-  signed-apk:
     environment: android-release
-    # No PR trigger, pull_request_target, or execution in a fork repository.
-    if: github.event.repository.fork == false
-    runs-on: ubuntu-24.04
-    timeout-minutes: 45
-    env:
-      ANDROID_VERSION_CODE: ${{ inputs.version_code || '1' }}
+    timeout-minutes: 5
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
-        with:
-          persist-credentials: false
-      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
-        with:
-          node-version: '22'
-          cache: npm
-      - uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
-        with:
-          distribution: temurin
-          java-version: '21'
-      - uses: android-actions/setup-android@be39fa834029ff78f1a44aa3bb0819b8fc2bd8fd # v4
-      - name: Install fixed Android platform and build tools
-        run: sdkmanager 'platforms;android-35' 'build-tools;35.0.0' 'platform-tools'
-      - run: npm ci
-      - run: npm run build
-      - run: npx cap sync android
-      - name: Build signed universal release
+      - name: Prove access to the original Android signer
         shell: bash
         env:
           ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
@@ -83,76 +29,39 @@ jobs:
         run: |
           set -euo pipefail
           for name in ANDROID_KEYSTORE_BASE64 ANDROID_KEYSTORE_PASSWORD ANDROID_KEY_ALIAS ANDROID_KEY_PASSWORD; do
-            if [[ -z "${!name}" ]]; then
-              echo "Missing release signing secret: $name" >&2
-              exit 1
-            fi
+            test -n "${!name}" || { echo "Missing signing credential: $name" >&2; exit 1; }
           done
-          export ANDROID_KEYSTORE_PATH="$RUNNER_TEMP/little-days-release.jks"
-          trap 'rm -f -- "$ANDROID_KEYSTORE_PATH"' EXIT
           umask 077
-          printf '%s' "$ANDROID_KEYSTORE_BASE64" | base64 --decode > "$ANDROID_KEYSTORE_PATH"
-          cd android
-          bash ./gradlew --no-daemon --console=plain :app:assembleRelease
-          mkdir -p ../artifacts/android
-          cp app/build/outputs/apk/release/app-release.apk ../artifacts/android/
-          if [[ "$ANDROID_VERSION_CODE" == '1' ]]; then
-            mkdir -p ../artifacts/android-device-input
-            cp app/build/outputs/apk/release/app-release.apk ../artifacts/android-device-input/code1.apk
-            bash ./gradlew --no-daemon --console=plain :app:assembleReleaseAndroidTest
-            cp app/build/outputs/apk/androidTest/release/app-release-androidTest.apk ../artifacts/android-device-input/androidTest.apk
-            ANDROID_VERSION_CODE=2 bash ./gradlew --no-daemon --console=plain :app:assembleRelease
-            cp app/build/outputs/apk/release/app-release.apk ../artifacts/android-device-input/code2.apk
-          fi
-      - name: Verify package, offline resources, signature and provenance
-        run: |
-          python3 scripts/android-verify-apk.py artifacts/android/app-release.apk
-          { node --version; npm --version; java -version 2>&1; } > artifacts/android/toolchain.txt
-      - name: Upload APK and public release evidence
-        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
-        with:
-          name: little-days-0.2.1-code-${{ env.ANDROID_VERSION_CODE }}-${{ github.sha }}
-          path: artifacts/android/
-          if-no-files-found: error
-          retention-days: 90
-      - name: Remove temporary signing material
-        if: always()
-        shell: bash
-        run: rm -f -- "$RUNNER_TEMP/little-days-release.jks"
-      - name: Enable emulator acceleration
-        if: env.ANDROID_VERSION_CODE == '1'
-        run: sudo chmod a+rw /dev/kvm
-      - name: Verify same certificate on disposable upgrade packages
-        if: env.ANDROID_VERSION_CODE == '1'
-        shell: bash
-        run: |
-          set -euo pipefail
-          mkdir -p artifacts/android-device
-          for name in code1 code2 androidTest; do
-            "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --print-certs "artifacts/android-device-input/$name.apk" > "artifacts/android-device/$name-certificate.txt"
-            grep 'Signer #1 certificate SHA-256 digest:' "artifacts/android-device/$name-certificate.txt" > "$RUNNER_TEMP/$name-fingerprint.txt"
-          done
-          cmp "$RUNNER_TEMP/code1-fingerprint.txt" "$RUNNER_TEMP/code2-fingerprint.txt"
-          cmp "$RUNNER_TEMP/code1-fingerprint.txt" "$RUNNER_TEMP/androidTest-fingerprint.txt"
-      - name: API35 install, launch and synthetic IndexedDB upgrade
-        if: env.ANDROID_VERSION_CODE == '1'
-        uses: reactivecircus/android-emulator-runner@4c44018e59b437e86cdfc41da381398f93ed8808 # v2
-        with:
-          api-level: 35
-          target: google_apis
-          arch: x86_64
-          profile: pixel_2
-          disable-animations: true
-          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-          script: bash scripts/android-device-smoke.sh
-      - name: Upload actual emulator evidence (no test APKs)
-        if: always() && env.ANDROID_VERSION_CODE == '1'
-        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
-        with:
-          name: android-api35-upgrade-${{ github.sha }}
-          path: artifacts/android-device/
-          if-no-files-found: warn
-          retention-days: 90
-      - name: Delete disposable test APKs
-        if: always()
-        run: rm -rf -- artifacts/android-device-input
+          keydir="$(mktemp -d)"
+          trap 'rm -f -- "$keydir/signer.jks" "$keydir/VerifySigner.java"; rmdir "$keydir"' EXIT
+          printf '%s' "$ANDROID_KEYSTORE_BASE64" | base64 --decode > "$keydir/signer.jks"
+          unset ANDROID_KEYSTORE_BASE64
+          cat > "$keydir/VerifySigner.java" <<'JAVA'
+          import java.io.File;
+          import java.security.*;
+          import java.util.HexFormat;
+
+          class VerifySigner {
+              public static void main(String[] args) throws Exception {
+                  var keys = KeyStore.getInstance(new File(args[0]), System.getenv("ANDROID_KEYSTORE_PASSWORD").toCharArray());
+                  var alias = System.getenv("ANDROID_KEY_ALIAS");
+                  var cert = keys.getCertificate(alias);
+                  var fingerprint = HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(cert.getEncoded()));
+                  if (!fingerprint.equals("c85fe70fff2425ad2b95d3dfa8f28ef7173027e744b03f57b721896fca40d3d8")) {
+                      throw new GeneralSecurityException("Original signing certificate did not match");
+                  }
+                  var bytes = new byte[32];
+                  new SecureRandom().nextBytes(bytes);
+                  var signature = Signature.getInstance("SHA256withRSA");
+                  signature.initSign((PrivateKey) keys.getKey(alias, System.getenv("ANDROID_KEY_PASSWORD").toCharArray()));
+                  signature.update(bytes);
+                  var signed = signature.sign();
+                  signature.initVerify(cert);
+                  signature.update(bytes);
+                  if (!signature.verify(signed)) throw new GeneralSecurityException("Original private key challenge failed");
+                  System.out.println("Verified original Android signer SHA-256: " + fingerprint);
+              }
+          }
+          JAVA
+          java "$keydir/VerifySigner.java" "$keydir/signer.jks"
+

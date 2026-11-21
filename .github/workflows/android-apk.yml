@@ -8,13 +8,17 @@ on:
         required: true
         default: '2'
         type: string
+      sign_qa_fixtures:
+        description: Include signed fixture bundles for isolated device QA
+        default: false
+        type: boolean
 
 permissions:
   contents: read
 
 jobs:
   web-regression:
-    if: github.repository == 'yez780055-cell/cozy-days-app' && github.ref == 'refs/heads/release/android-formal-web-updates'
+    if: github.repository == 'yez780055-cell/cozy-days-app' && startsWith(github.ref, 'refs/heads/release/android-')
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     steps:
@@ -51,7 +55,7 @@ jobs:
           retention-days: 1
 
   verify-signing:
-    if: github.repository == 'yez780055-cell/cozy-days-app' && github.ref == 'refs/heads/release/android-formal-web-updates'
+    if: github.repository == 'yez780055-cell/cozy-days-app' && startsWith(github.ref, 'refs/heads/release/android-')
     runs-on: ubuntu-24.04
     environment: android-release
     timeout-minutes: 5
@@ -103,13 +107,14 @@ jobs:
           java "$keydir/VerifySigner.java" "$keydir/signer.jks"
 
   signed-apk:
-    if: github.repository == 'yez780055-cell/cozy-days-app' && github.ref == 'refs/heads/release/android-formal-web-updates'
+    if: github.repository == 'yez780055-cell/cozy-days-app' && startsWith(github.ref, 'refs/heads/release/android-')
     needs: [web-regression, verify-signing]
     runs-on: ubuntu-24.04
     environment: android-release
     timeout-minutes: 35
     env:
       ANDROID_VERSION_CODE: ${{ inputs.version_code }}
+      SIGN_QA_FIXTURES: ${{ inputs.sign_qa_fixtures }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
@@ -147,6 +152,7 @@ jobs:
           bash android/gradlew -p android --no-daemon --console=plain :app:assembleRelease
           mkdir -p artifacts/formal-apk artifacts/formal-fixtures
           cp android/app/build/outputs/apk/release/app-release.apk "artifacts/formal-apk/Cozy-Days-Android-0.2.2-${ANDROID_VERSION_CODE}.apk"
+          if [[ "$SIGN_QA_FIXTURES" != true ]]; then exit 0; fi
           for revision in 2 3; do
             java scripts/PackAndroidWeb.java dist-android "$ANDROID_VERSION_CODE" "$revision" \
               "artifacts/formal-fixtures/Cozy-Days-Web-${ANDROID_VERSION_CODE}-${revision}.cozyupdate" artifacts/formal-fixtures/releases
@@ -165,6 +171,7 @@ jobs:
           if-no-files-found: error
           retention-days: 30
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        if: inputs.sign_qa_fixtures
         with:
           name: formal-device-fixtures
           path: |
@@ -172,4 +179,3 @@ jobs:
             artifacts/formal-fixtures/local-web-*.cozyupdate
           if-no-files-found: error
           retention-days: 1
-

@@ -10,6 +10,12 @@
 
 正式外壳的第一个网页包使用 `shell=2`，修订号从 2 开始。将来得到发布许可后，正式版清单和包应同属 `android-web-shell-2-web-<修订号>`。制品生成命令由 `.github/workflows/android-apk.yml` 保存。
 
+正式签名使用 `release/android-*` 分支，在 Actions 手动运行 **Signed Android APK** 并传入目标 `version_code`。完整网页回归和正式签名挑战均通过后才组装 APK。工作流生成 `formal-apk` 制品；开启 `sign_qa_fixtures` 才额外生成隔离验收用网页包。
+
+已验收制品 `Cozy-Days-Android-0.2.2-2.apk` 的 SHA-256 为 `ed013395ce76df4c16f2aa93cd8b0bf28a970ea408423d97b0f91e030036d7a9`，构建源码为 `9b787f83092bbff0686a9d33287f2332adc4a81c`。CI 通过 Web E2E 168 项、Android 网页回归 13 项、Pages 与 PWA 5 项。 [签名构建及回归记录](https://github.com/yez780055-cell/cozy-days-app/actions/runs/44666634717)
+
+API 37 模拟器使用同一 APK 验证正式外壳 `1 → 2` 直接覆盖安装、网页 `1 → 2 → 3` 连续更新、断网后恢复、校验和签名失败拦截、启动失败自动回滚、离线冷启动和手动导入。旧版合成待办、纪念日、经期和日记均保留，各阶段的完整导出记录一致。在线故障用例使用隔离的 HTTPS 更新源。
+
 ## 实验外壳 5 历史流程
 
 外壳 `5` 使用公开 GitHub Releases 作为网页更新源。验收 APK 覆盖上一轮外壳 `4`，沿用 `com.littledays.capacitorexperiment` 和同一证书。应用默认检查普通 Release。需要验收 Pre-release 时，可在「设置 → Android 版本」打开「接收预发布网页更新」，然后点「检查更新」。同一 APK 可切换通道。通道偏好保存在本机。

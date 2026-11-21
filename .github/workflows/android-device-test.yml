@@ -1,5 +1,10 @@
 name: Signed Android device test only
 on:
+  push:
+    branches: [release/android-delta-3]
+    paths:
+      - android/app/src/androidTest/**
+      - .github/workflows/android-device-test.yml
   workflow_dispatch:
     inputs:
       apk_source:
@@ -23,7 +28,7 @@ jobs:
           persist-credentials: false
       - name: Require unchanged accepted production code
         env:
-          APK_SOURCE: ${{ inputs.apk_source }}
+          APK_SOURCE: ${{ inputs.apk_source || '8e8dac775a6b95aa03e3d422b3a0187f10d3dee5' }}
         run: |
           [[ "$APK_SOURCE" =~ ^[a-f0-9]{40}$ ]] || exit 1
           unexpected=$(git diff --name-only "$APK_SOURCE" HEAD | grep -vE '^(android/app/src/androidTest/|\.github/workflows/|docs/)' || true)

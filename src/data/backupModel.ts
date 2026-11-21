@@ -4,6 +4,7 @@ import { isDateKey } from '../features/todo/dates';
 import { resolveDecoration } from '../features/todo/decorations';
 import { canonicalTime, categoryKey } from './categories';
 import { localId } from './localId';
+import { cloudScope } from './localDatabase';
 import type { PrimaryRecords } from './storageAccess';
 
 const format = 'cozy-days-backup';
@@ -25,8 +26,8 @@ const object = (value: unknown): value is Record<string, unknown> =>
 const text = (value: unknown): value is string => typeof value === 'string';
 const timestamp = (value: unknown): value is number =>
   typeof value === 'number' && Number.isSafeInteger(value) && value >= 0;
-// Leave room for future IndexedDB auto-incremented keys after importing external IDs.
-const rowId = (value: unknown): value is number => timestamp(value) && value > 0 && value <= 0xffffffff;
+// Account-scoped databases also use randomly generated 52-bit IDs.
+const rowId = (value: unknown): value is number => timestamp(value) && value > 0 && value <= (cloudScope ? 0xfffffffffffff : 0xffffffff);
 const optional = (value: unknown, valid: (value: unknown) => boolean) => value === undefined || valid(value);
 
 function validJSON(value: unknown, depth = 0): boolean {

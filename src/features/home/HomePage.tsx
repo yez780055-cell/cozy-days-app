@@ -3,6 +3,7 @@ import { BookImage, ChevronRight, Droplet, Plus, SlidersHorizontal } from 'lucid
 import { Asset } from '../../components/Asset';
 import { Button } from '../../components/Button';
 import { anniversaryRepository, todoRepository, type Todo } from '../../data/database';
+import { cloudChanged } from '../../data/cloudTypes';
 import { nextImportantDate, type Anniversary } from '../anniversary/model';
 import { todayKey, weekday } from '../todo/dates';
 import './home.css';
@@ -16,11 +17,17 @@ export function HomePage({onNavigate,onSettings}:{onNavigate:(page:Destination,a
   const [today,setToday]=useState(todayKey);
   useEffect(()=>{
     let alive=true;
-    Promise.all([todoRepository.all(),anniversaryRepository.all()]).then(([tasks,dates])=>{if(alive){setTodos(tasks);setAnniversaries(dates);setLoaded(true);}}).catch(()=>{if(alive)setError(true);});
+    const read = () => {
+      void Promise.all([todoRepository.all(),anniversaryRepository.all()]).then(([tasks,dates])=>{
+        if(alive){setTodos(tasks);setAnniversaries(dates);setLoaded(true);setError(false);}
+      }).catch(()=>{if(alive)setError(true);});
+    };
+    read();
     const refresh=()=>setToday(todayKey());
     const timer=window.setInterval(refresh,30000);
     window.addEventListener('focus',refresh);
-    return ()=>{alive=false;clearInterval(timer);window.removeEventListener('focus',refresh);};
+    window.addEventListener(cloudChanged,read);
+    return ()=>{alive=false;clearInterval(timer);window.removeEventListener('focus',refresh);window.removeEventListener(cloudChanged,read);};
   },[]);
   const tasks=todos.filter(item=>item.date===today);
   const done=tasks.filter(item=>item.completed).length;

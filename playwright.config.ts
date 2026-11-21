@@ -6,7 +6,7 @@ const baseURL = `http://127.0.0.1:${port}`;
 
 export default defineConfig({
   testDir: './tests',
-  testIgnore: ['pages.spec.ts', 'pwa.spec.ts'],
+  testIgnore: ['pages.spec.ts', 'pwa.spec.ts', 'cloudbase.spec.ts'],
   fullyParallel: false,
   workers: 1,
   timeout: 30_000,

@@ -2,6 +2,9 @@ import { version as appVersion } from '../../package.json';
 import { decodeBackup, encodeBackup, makeBackup, mergeBackup, type Backup, type RestoreMode } from './backupModel';
 import { localId } from './localId';
 import { periodDatabase, readPeriod } from './periodDatabase';
+import { cloudScope } from './localDatabase';
+import { trackBackupChanges } from './cloudStore';
+import { cloudChanged } from './cloudTypes';
 import {
   canRestore, previousBackup, readPrimary, restoreJournal, restoreRevision, rollbackRestore,
   withDataAccess, writePrimary, type PrimaryRecords,
@@ -36,6 +39,16 @@ export function restoreBackup(backup: Backup, mode: RestoreMode) {
       ? mergeBackup(before.records, backup.records)
       : { records: backup.records, periodConflicts: 0 };
     const { state } = periodDatabase;
+    if (cloudScope) {
+      await trackBackupChanges(async () => {
+        if (mode === 'replace') await state.put({ id: previousBackup, value: encodeBackup(before) });
+        await writePrimary(records);
+        if (records.period === null) await state.delete('local');
+        else await state.put({ id: 'local', value: records.period });
+      });
+      window.dispatchEvent(new Event(cloudChanged));
+      return { periodConflicts };
+    }
 
     // Stage the original primary rows before touching either module database.
     // The final period transaction commits the third module and clears the

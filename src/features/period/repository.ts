@@ -1,5 +1,6 @@
 import { periodDatabase, readPeriod } from '../../data/periodDatabase';
 import { withDataAccess } from '../../data/storageAccess';
+import { trackPeriodChanges } from '../../data/cloudStore';
 import { emptyData, validPeriodData, type PeriodData } from './model';
 export { validPeriodData } from './model';
 
@@ -12,10 +13,10 @@ export const periodRepository = {
   async save(value: PeriodData, expected: string) {
     if (!validPeriodData(value)) throw new Error('Invalid period write');
     const { state } = periodDatabase;
-    await withDataAccess(() => periodDatabase.transaction('rw', state, async () => {
+    await withDataAccess(() => trackPeriodChanges(() => periodDatabase.transaction('rw', state, async () => {
       const current = await readPeriod() ?? emptyData();
       if (JSON.stringify(current) !== expected) throw new PeriodConflictError(current);
       await state.put({ id: 'local', value });
-    }));
+    })));
   },
 };

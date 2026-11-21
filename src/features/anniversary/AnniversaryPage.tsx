@@ -1,4 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState, type FormEvent } from 'react';
+import { cloudChanged } from '../../data/cloudTypes';
 import { ArrowLeft, Camera, LayoutGrid, List, Menu, Pencil, Plus, Search, Trash2 } from 'lucide-react';
 import { Button } from '../../components/Button';
 import { Modal } from '../../components/Modal';
@@ -78,11 +79,15 @@ export default function AnniversaryPage({initialAdd=false}:{initialAdd?:boolean}
   }, [detailId]);
   useEffect(() => {
     let mounted = true;
-    void anniversaryRepository.all().then(data => { if (mounted) { setRows(data); setLoaded(true); } }).catch(() => { if (mounted) setError('暂时无法读取收藏，请重新读取或重新进入纪念日页面重试。'); });
+    const read = () => {
+      void anniversaryRepository.all().then(data => { if (mounted) { setRows(data); setLoaded(true); } }).catch(() => { if (mounted) setError('暂时无法读取收藏，请重新读取或重新进入纪念日页面重试。'); });
+    };
+    read();
     const update = () => setToday(dateKey());
     const timer = window.setInterval(update, 30000);
     window.addEventListener('focus', update); document.addEventListener('visibilitychange', update);
-    return () => { mounted = false; clearInterval(timer); window.removeEventListener('focus', update); document.removeEventListener('visibilitychange', update); };
+    window.addEventListener(cloudChanged, read);
+    return () => { mounted = false; clearInterval(timer); window.removeEventListener('focus', update); document.removeEventListener('visibilitychange', update); window.removeEventListener(cloudChanged, read); };
   }, []);
   async function refresh(committed?: '保存' | '删除') {
     setRefreshing(true);
@@ -103,7 +108,8 @@ export default function AnniversaryPage({initialAdd=false}:{initialAdd?:boolean}
       setSaveStatus('已保存');
       await refresh('保存');
     }
-    catch { setSaveStatus(''); setError('保存失败，请检查名称和日期后重试。'); }
+    catch (reason) { setSaveStatus(''); setError(reason instanceof Error && reason.message.startsWith('这条纪念日')
+      ? reason.message : '保存失败，请检查名称和日期后重试。'); }
     finally { mutationPending.current = false; setBusy(false); }
   }
   async function savePhoto(value:Anniversary) {

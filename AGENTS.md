@@ -4,7 +4,7 @@
 - `main` 是正式稳定分支，只由经过批准的 Pull Request 更新；任何情况下都不要直接推送 `main` 或自动合并。
 - 每项功能或视觉任务使用独立的 `feature/*` 分支，并以 `main` 为 PR 目标。纯视觉修改（字体、颜色、插画、间距、装饰、按钮外观）运行必要的快速检查和构建，不默认运行完整 E2E，也不默认生成三档截图、录屏或完整 Review 证据；完成后仅暂存本轮明确修改的文件，提交并推送对应 feature 分支，创建或更新 PR，以 Cloudflare Preview 供手机验收。
 - 修改业务交互时，只运行受影响的测试；涉及任务状态、持久化、撤销等核心逻辑时运行相关 E2E。发布 APK 或进行重大功能重构前运行完整 `npm run test:e2e`、`npm run build`、`npm run build:pages` 和 `npm run test:pages`。
-- GitHub PR 自动验证仅运行快速构建检查；完整 E2E、Pages 交互检查和验收证据可通过 `workflow_dispatch` 手动触发。
+- GitHub PR 默认按 diff 运行构建、相关模块测试与基础 smoke；CloudBase 改动增加对应测试。候选网页包增加 Android 更新链路，不默认全量。仅正式 Release、重大架构、数据库迁移或关键功能合并执行完整回归；重大/关键 PR 标记 `ci:full`，数据库迁移自动升级。完整验证也可通过 `workflow_dispatch` 显式触发，详见 `docs/ci-testing.md`。
 - 禁止强制推送。提交前检查 `git status` 和 staged diff；发现非本轮改动时，保护并保留其原状态，不得混入提交、清理或覆盖。
 - 不自动合并。合并前确认 PR 检查成功、没有冲突且 SHA 是最新；只有用户在 ChatGPT 明确批准后，才能通过已连接 GitHub 的 ChatGPT 执行合并。
 - 每轮结束告知 PR 编号和链接、在线验收地址、测试结果、修改摘要和遗留问题。Cloudflare Pages 连接完成后，将 PR 独立 HTTPS Preview 的 `/review/` 地址作为验收地址；GitHub Pages 只部署 main 正式版。

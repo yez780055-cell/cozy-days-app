@@ -1,45 +1,41 @@
 name: Full regression
-
 on:
   workflow_dispatch:
-
 permissions:
   contents: read
-
 concurrency:
   group: full-regression-${{ github.ref }}
   cancel-in-progress: true
-
 jobs:
   regression:
-    name: regression
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
+    env:
+      CI_TEST_TIER: full
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
-      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
         with:
           node-version: '22'
           cache: npm
       - run: npm ci
+      - run: npm run test:ci:policy
       - run: npx playwright install --with-deps chromium
-      - name: Build isolated resources for existing data regression
-        run: VITE_CLOUDBASE_ENABLED=false npm run build
-      - name: Run complete browser regression and capture evidence
-        run: npm run test:e2e
-      - name: Build GitHub Pages app
-        run: VITE_CLOUDBASE_ENABLED=false npm run build:pages
-      - name: Verify Pages build and mobile layouts
-        run: npm run test:pages
-      - name: Upload real browser evidence and diagnostics
+      - run: node scripts/ci-plan.mjs
+      - name: Complete Web, Pages, Android and CloudBase gate
+        run: npm run test:ci
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
         if: always()
-        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: regression-${{ github.sha }}-evidence
+          name: full-regression-${{ github.sha }}
           path: |
-            public/review/evidence/
+            ci-test-plan.json
             test-results/
-            artifacts/pages-*.png
-            dist/review/build-info.json
+            artifacts/ci-smoke-results/
+            artifacts/cloudbase-test-results/
+            artifacts/cloudbase-android-test-results/
           if-no-files-found: warn
           retention-days: 30

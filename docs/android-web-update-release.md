@@ -5,7 +5,7 @@
 - 使用现有正式 APK `com.littledays.app`、外壳 2 和原证书；不增加 APK 或原生更新协议。主线默认包含邮箱注册/登录、双人共享空间、CloudBase 同步和账号范围的 IndexedDB 离线缓存。
 - 只发布一个正式网页包，标签 `android-web-shell-2-web-<递增修订>`，设为普通 Release 和 Latest。设置不再提供预发布开关，网页始终以 `prerelease:false` 调用现有原生检查接口，忽略遗留偏好。
 - 新的统一首版为修订 9，高于历史修订 6、7、8。旧网页曾开启预发布的设备须在旧设置关闭该开关一次后检查正式更新，或导入同一份签名包；更新后不再区分通道。不要发布第二份包作为迁移渠道。
-- 工作流 `.github/workflows/android-web-release.yml` 只在 main 上手动运行，输入修订号。完整数据/交互回归、CloudBase 回归以及实际 Android 产物的登录/同步/离线/更新集成测试通过后，使用原正式证书签发唯一网页包；测试中关闭 CloudBase 的资源不进入签名制品。
+- 工作流 `.github/workflows/android-web-release.yml` 只在 main 上手动运行，输入修订号和验证等级。候选制品默认按改动范围加 Web/Android 更新链路检查，不公开 Pre-release；正式发布必须选 `validation=formal`，完整数据/交互、Pages/PWA、CloudBase 及实际 Android 集成门禁通过后才签名。仅正式门禁制品可公开为正式 Release，测试隔离资源不进入签名制品。详见 [CI 测试策略](ci-testing.md)。
 - 下载签名制品并用 `VerifyAndroidWeb.java` 与归档 APK 独立验签；核对清单、长度、SHA-256、源提交后上传 Draft，完整核验后公开为正式 Latest。发布后匿名下载并复核哈希与签名。
 - 旧单机 IndexedDB 保留，账号缓存独立。历史记录不会自动成为双人空间的共享记录；不删除数据、不重置数据库、不轮换成员或邀请码。
 - 已有预发布记录仅作历史归档，不再维护或签发双人预发布包。旧的暂存签名工作流移除，不再运行旧 release 分支的签名任务。

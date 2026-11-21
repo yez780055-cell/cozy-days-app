@@ -1,10 +1,11 @@
+import { chooseDate } from './anniversary-actions';
 import { expect, test } from '@playwright/test';
 import { mergeBackup } from '../src/data/backupModel';
 import { nextImportantDate, timing, type Anniversary } from '../src/features/anniversary/model';
 
 const legacy: Anniversary = {
   id: 1, name: '在一起', date: '2025-03-11', yearly: true, theme: '恋爱',
-  icon: '♡', note: '保留旧备注', color: 'lavender', createdAt: 1, updatedAt: 1,
+  specialDays: [], icon: '♡', note: '保留旧备注', color: 'lavender', createdAt: 1, updatedAt: 1,
 };
 
 test.use({ viewport: { width: 393, height: 864 }, timezoneId: 'Asia/Shanghai' });
@@ -90,7 +91,7 @@ test('旧备份恢复后按计时方式展示，搜索、切换视图、编辑�
   await page.getByRole('button', { name: '新增纪念日', exact: true }).click();
   const dialog = page.getByRole('dialog');
   await expect(dialog.getByRole('button', { name: '取消' })).toBeVisible();
-  await expect(dialog.getByRole('combobox')).toHaveCount(1);
+  await expect(dialog.getByRole('group', { name: '计时方式' })).toBeVisible();
   for (const width of [360, 430, 393]) {
     await page.setViewportSize({ width, height: 864 });
     expect(await dialog.evaluate(el => el.scrollWidth <= el.clientWidth && el.scrollHeight <= el.clientHeight)).toBe(true);
@@ -106,7 +107,7 @@ test('旧备份恢复后按计时方式展示，搜索、切换视图、编辑�
 
   await card('当天事项').click();
   await page.getByRole('button', { name: '编辑纪念日', exact: true }).click();
-  await dialog.getByLabel('日期', { exact: true }).fill('2026-11-18');
+  await chooseDate(dialog, '2026-11-18');
   await dialog.getByRole('button', { name: '保存纪念日' }).click();
   await expect(dialog).toHaveCount(0);
   await page.getByRole('button', { name: '返回纪念日列表' }).click();
@@ -125,9 +126,9 @@ test('旧备份恢复后按计时方式展示，搜索、切换视图、编辑�
   await expect(page.getByText('起始日期 · 2025-03-11')).toBeVisible();
   await expect(page.getByText(legacy.note, { exact: true })).toBeVisible();
   await page.getByRole('button', { name: '编辑纪念日', exact: true }).click();
-  await expect(dialog.getByLabel('计时方式')).toHaveValue('cumulative');
+  await expect(dialog.getByRole('button', { name: '正计时', exact: true })).toHaveAttribute('aria-pressed', 'true');
   await expect(dialog.getByLabel('每年重复')).toBeChecked();
-  await dialog.getByLabel('计时方式').selectOption('countdown');
+  await dialog.getByRole('button', { name: '倒计时', exact: true }).click();
   await dialog.getByRole('button', { name: '保存纪念日' }).click();
   await expect(dialog).toHaveCount(0);
   await page.evaluate(async () => {

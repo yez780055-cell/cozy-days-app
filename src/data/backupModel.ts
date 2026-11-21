@@ -1,4 +1,4 @@
-import { colors, resolvedTimingMode, themes, timingModes, validDate } from '../features/anniversary/model';
+import { validCalendarFields, colors, resolvedTimingMode, themes, timingModes, validDate } from '../features/anniversary/model';
 import { sortedPeriods, validPeriodData, type PeriodData } from '../features/period/model';
 import { isDateKey } from '../features/todo/dates';
 import { resolveDecoration } from '../features/todo/decorations';
@@ -70,7 +70,7 @@ function validRecords(value: unknown): value is BackupRecords {
       })) || !unique(todos, row => row.id)) return false;
 
   if (!anniversaries.every(row => object(row) && rowId(row.id) && text(row.name) && !!row.name.trim() &&
-      row.name.length <= 60 && text(row.date) && validDate(row.date) && themes.some(theme => theme === row.theme) &&
+      row.name.length <= 60 && text(row.date) && validDate(row.date) && validCalendarFields(row) && themes.some(theme => theme === row.theme) &&
       colors.some(color => color === row.color) && text(row.note) && row.note.length <= 500 &&
       text(row.icon) && row.icon.length <= 16 && typeof row.yearly === 'boolean' &&
       optional(row.timingMode, value => timingModes.some(mode => mode === value)) &&

@@ -3,15 +3,15 @@ import { cloudChanged } from '../../data/cloudTypes';
 import { ArrowLeft, Camera, LayoutGrid, List, Menu, Pencil, Plus, Search, Trash2 } from 'lucide-react';
 import { Button } from '../../components/Button';
 import { Modal } from '../../components/Modal';
-import { Asset } from '../../components/Asset';
+import { DateWheelPicker } from './DateWheelPicker';
 import { anniversaryRepository } from '../../data/database';
-import { dateKey, nextImportantDate, resolvedTimingMode, timing, timingModes, type Anniversary } from './model';
+import { dateKey, defaultSpecialDays, lunarLabel, nextImportantDate, resolvedTimingMode, timing, timingModes, type Anniversary } from './model';
 import { PhotoEditor } from './PhotoEditor';
 import { AnniversaryArt } from './AnniversaryArt';
 import { useAndroidBack } from '../../native/back';
 import './anniversary.css';
 const filters = ['全部', '即将到来', '累计中', '已过去'] as const;
-const timingLabels = { countdown: '倒计时', cumulative: '累计天数' };
+const timingLabels = { countdown: '倒计时', cumulative: '正计时' };
 const listOrder = { today: 0, upcoming: 0, cumulative: 1, past: 2 };
 const timingPrefix = { today: '', upcoming: '还有', cumulative: '累计', past: '已过去' };
 const monthNames = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
@@ -21,11 +21,11 @@ function eventType(row: Anniversary) {
   return row.yearly && (row.theme === '恋爱' || resolvedTimingMode(row) === 'cumulative') ? '周年' : row.theme;
 }
 
-function DateTicket({ row }: { row: Anniversary }) {
+function DateTicket({ row, date = row.date }: { row: Anniversary; date?: string }) {
   const type = eventType(row);
   const tone = type === '生日' ? ' ann-ticket--birthday' : type === '周年' ? ' ann-ticket--yearly' : '';
-  return <time className={`ann-ticket${tone}`} dateTime={row.date}>
-    <span>{monthNames[Number(row.date.slice(5, 7)) - 1]}</span><b>{row.date.slice(8)}</b>
+  return <time className={`ann-ticket${tone}`} dateTime={date}>
+    <span>{monthNames[Number(date.slice(5, 7)) - 1]}</span><b>{date.slice(8)}</b>
   </time>;
 }
 
@@ -36,18 +36,28 @@ function newAnniversary(date: string): Anniversary {
 
 function AnniversaryForm({ value, onSave, busy, onDirty }: { value: Anniversary; onSave: (value: Anniversary) => Promise<void>; busy: boolean; onDirty: (dirty: boolean) => void }) {
   const [draft, setDraft] = useState(value);
-  useEffect(() => { onDirty(JSON.stringify(draft) !== JSON.stringify(value)); }, [draft, value, onDirty]);
+  const [dateDirty, setDateDirty] = useState(false);
+  const [dateOpen, setDateOpen] = useState(false);
+  const [specialInput, setSpecialInput] = useState((value.specialDays ?? defaultSpecialDays).join('、'));
+  const parsedSpecial = specialInput.trim() ? specialInput.split(/[、,，\s]+/).map(Number) : [];
+  const specialValid = parsedSpecial.length <= 100 && parsedSpecial.every(day => Number.isSafeInteger(day) && day > 0 && day <= 1000000);
+  useEffect(() => { onDirty(dateDirty || JSON.stringify(draft) !== JSON.stringify(value)); }, [draft, value, dateDirty, onDirty]);
   const mode = resolvedTimingMode(draft);
-  function submit(event: FormEvent) { event.preventDefault(); void onSave({ ...draft, timingMode: mode }); }
+  function submit(event: FormEvent) { event.preventDefault(); if (!dateOpen && specialValid) void onSave({ ...draft, timingMode: mode }); }
   return <form className="ann-form" onSubmit={submit}>
     <label>纪念日名称<input data-autofocus aria-label="纪念日名称" required maxLength={60} value={draft.name} onChange={e => setDraft({ ...draft, name: e.target.value })} placeholder="输入名称"/></label>
-    <div className="ann-fields">
-      <label>日期<input aria-label="日期" type="date" required min="1000-01-01" max="9999-12-31" value={draft.date} onChange={e => setDraft({ ...draft, date: e.target.value })}/></label>
-      <label>计时方式<select value={mode} onChange={e => setDraft({ ...draft, timingMode: e.target.value as Anniversary['timingMode'] })}>{timingModes.map(value => <option key={value} value={value}>{timingLabels[value]}</option>)}</select></label>
-    </div>
+    <div className="ann-edit-row"><span>起始日期</span><button type="button" className="ann-date-trigger" aria-label="选择日期" aria-expanded={dateOpen} onClick={() => setDateOpen(!dateOpen)}>{draft.date.replace(/-/g, ' / ')} <span aria-hidden="true">›</span></button></div>
+    {dateOpen && <DateWheelPicker value={draft} onDirty={setDateDirty} onCancel={() => setDateOpen(false)} onConfirm={patch => { setDraft({ ...draft, ...patch }); setDateOpen(false); }}/>}
+    <div className="ann-edit-row"><span>历法</span><button type="button" className="ann-date-trigger" onClick={() => setDateOpen(!dateOpen)}>{draft.calendar === 'lunar' ? lunarLabel(draft) : '公历'} <span aria-hidden="true">›</span></button></div>
+    <div className="ann-edit-row"><span>计时方式</span><div className="ann-segment" role="group" aria-label="计时方式">{timingModes.map(value => <button type="button" key={value} aria-pressed={mode === value} onClick={() => setDraft({ ...draft, timingMode: value })}>{timingLabels[value]}</button>)}</div></div>
     <label className="ann-repeat">每年重复<input type="checkbox" checked={draft.yearly} onChange={e => setDraft({ ...draft, yearly: e.target.checked })}/></label>
+    {mode === 'cumulative' && <details className="ann-advanced"><summary>累计节点设置</summary><label>自定义累计天数<input aria-label="自定义累计天数" value={specialInput} onChange={event => {
+      const text = event.target.value; setSpecialInput(text);
+      const values = text.trim() ? text.split(/[、,，\s]+/).map(Number) : [];
+      setDraft({ ...draft, specialDays: [...new Set(values)].sort((a, b) => a - b) });
+    }}/></label><p>用逗号分隔，留空关闭。仅用于最近日期计算。</p>{!specialValid && <p role="alert">请输入 1～1000000 之间的整数，最多 100 个。</p>}</details>}
     <label>备注 <span className="ann-field-note" aria-hidden="true">选填</span><textarea aria-label="备注" rows={2} maxLength={500} value={draft.note} onChange={e => setDraft({ ...draft, note: e.target.value })}/></label>
-    <footer className="modal-actions"><Button type="submit" disabled={busy || !draft.name.trim()}>{busy ? '正在保存…' : '保存纪念日'}</Button></footer>
+    <footer className="modal-actions"><Button type="submit" disabled={busy || dateOpen || !draft.name.trim() || !specialValid}>{busy ? '正在保存…' : '保存纪念日'}</Button></footer>
   </form>;
 }
 
@@ -173,6 +183,7 @@ export default function AnniversaryPage({initialAdd=false}:{initialAdd?:boolean}
       </header>
       <AnniversaryArt image={detail.backgroundImage} x={detail.backgroundX} y={detail.backgroundY}/>
       <div className="ann-detail-meta">
+        {detail.calendar === 'lunar' && <p>{lunarLabel(detail)}</p>}
         <p>{eventType(detail)} · {detail.yearly ? '每年重复' : '单次纪念'}</p>
         <p>{resolvedTimingMode(detail) === 'cumulative' && detailTiming.occurrence === detail.date ? '起始日期' : '纪念日期'} · <time dateTime={detailTiming.occurrence}>{detailTiming.occurrence}</time></p>
         {detailTiming.occurrence !== detail.date && <p>起始日期 · <time dateTime={detail.date}>{detail.date}</time></p>}
@@ -207,16 +218,16 @@ export default function AnniversaryPage({initialAdd=false}:{initialAdd?:boolean}
         </div>
         <button type="button" className="icon-button" aria-label="新增纪念日" disabled={!loaded} onClick={create}><Plus size={20}/></button>
       </header>
-      {featured ? <button type="button" className="ann-featured" onClick={() => openDetail(featured.row)}>
-        <span className="ann-featured-meta">{featured.days === 0 ? '今天' : '即将到来'} · {eventType(featured.row)}</span>
+      {featured ? <button type="button" className={`ann-featured${featured.row.backgroundImage ? ' ann-featured--photo' : ''}`} onClick={() => openDetail(featured.row)}>
+        <span className="ann-featured-copy"><span className="ann-featured-meta">{featured.days === 0 ? '今天' : '最近纪念日'}</span>
         <strong className="ann-featured-title">{featured.title}</strong>
         <span className="ann-featured-count">
           {featured.days === 0 ? <strong className="ann-today">今天</strong> : <><strong>{featured.days}</strong><small> 天后</small></>}
         </span>
-        <time dateTime={featured.occurrence}>{featured.occurrence.replace(/-/g, ' / ')}</time>
+        <time dateTime={featured.occurrence}>{featured.occurrence.replace(/-/g, ' / ')}</time></span>
         {featured.row.backgroundImage
           ? <AnniversaryArt image={featured.row.backgroundImage} x={featured.row.backgroundX} y={featured.row.backgroundY}/>
-          : <Asset name="empty" className="ann-featured-cats"/>}
+          : null}
       </button> : loaded && <div className="ann-featured-empty">
         <p>{rows.length ? '近期没有重要日子' : '还没有纪念日'}</p>
         {!rows.length && <Button variant="soft" onClick={create}>添加纪念日</Button>}
@@ -235,12 +246,12 @@ export default function AnniversaryPage({initialAdd=false}:{initialAdd?:boolean}
           {visible.map(({ row, status }) =>
             <article key={row.id} data-testid="anniversary-card" className="ann-card">
               <button type="button" className="ann-card-main" aria-label={`查看详情：${row.name}`} aria-description={status.label} onClick={() => openDetail(row)}>
-                <DateTicket row={row}/>
+                <DateTicket row={row} date={row.calendar === 'lunar' && status.kind !== 'cumulative' ? status.occurrence : row.date}/>
                 <span className="ann-card-copy">
                   <strong>{row.name}</strong>
-                  <small>{eventType(row)} · {row.yearly ? '每年' : '单次'}</small>
+                  {row.calendar === 'lunar' && <small className="ann-lunar-label">☾ {lunarLabel(row)}</small>}
                 </span>
-                <small className="ann-count">{status.label}</small>
+                <span className="ann-count" aria-label={status.label}>{status.kind === 'today' ? '今天' : <><b>{Math.abs(status.days)}</b><small>{status.kind === 'upcoming' ? '天后' : status.kind === 'past' ? '天前' : '天'}</small></>}</span>
               </button>
             </article>
           )}

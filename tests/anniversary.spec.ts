@@ -1,3 +1,4 @@
+import { chooseDate } from './anniversary-actions';
 import { test, expect, type Page } from '@playwright/test';
 
 async function open(page: Page) {
@@ -9,7 +10,7 @@ async function add(page: Page, name: string, date: string, yearly = true) {
   await page.getByRole('button', { name:'新增纪念日', exact:true }).click();
   const form = page.getByRole('dialog', { name:'新增纪念日', exact:true });
   await form.getByLabel('纪念日名称').fill(name);
-  await form.getByLabel('日期', { exact:true }).fill(date);
+  await chooseDate(form, date);
   await form.getByLabel('每年重复').setChecked(yearly);
   await form.getByLabel('备注', { exact:true }).fill('把这一天，好好收藏 ♡');
 
@@ -52,7 +53,7 @@ test('插画缺失仍可显示，离线新增后重新进入仍保留', async ({
   await expect(page.getByText('还没有纪念日', {exact:true})).toBeVisible();
   await context.setOffline(true);
   await add(page, '离线也能收藏', '2026-10-23');
-  await expect(page.locator('.ann-featured-cats')).toHaveAttribute('src', /^data:image\/svg\+xml/);
+  await expect(page.locator('.ann-featured')).toContainText('离线也能收藏');
   await page.getByRole('navigation').getByRole('button', { name:'待办', exact:true }).click();
   await page.getByRole('navigation').getByRole('button', { name:'纪念日', exact:true }).click();
   await expect(page.getByTestId('anniversary-card')).toContainText('离线也能收藏');
@@ -78,8 +79,8 @@ test('360×480 可取消草稿并保存所有可编辑字段', async ({ page }) 
   await edit.click();
   await expect(editor.getByLabel('纪念日名称')).toHaveValue('小屏编辑');
   await editor.getByLabel('纪念日名称').fill('小屏完整编辑');
-  await editor.getByLabel('日期',{exact:true}).fill('2024-02-29');
-  await editor.getByLabel('计时方式').selectOption('cumulative');
+  await chooseDate(editor, '2024-02-29');
+  await editor.getByRole('button', { name: '正计时', exact: true }).click();
   await editor.getByLabel('每年重复').uncheck();
   await editor.getByLabel('备注').fill('小屏备注完整保留');
   const save = editor.getByRole('button',{name:'保存纪念日'});

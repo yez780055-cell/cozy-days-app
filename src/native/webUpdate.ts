@@ -12,9 +12,11 @@ function prefersPrerelease() {
   try { return localStorage.getItem(releasePreference) === '1'; } catch { return false; }
 }
 
-let state: { prerelease: boolean; status: Status; version?: Version; release?: Release; prompt: boolean; error?: string; received: number } = {
-  prerelease: prefersPrerelease(), status: 'idle', prompt: false, received: 0,
+let state: { prerelease: boolean; status: Status; version?: Version; release?: Release; prompt: boolean; feedback: boolean; error?: string; received: number } = {
+  prerelease: prefersPrerelease(), status: 'idle', prompt: false, feedback: false, received: 0,
 };
+// Automatic checks run once per document lifetime, even after dismissal or channel changes.
+let startupChecked = false;
 const listeners = new Set<() => void>();
 
 function setState(next: Partial<typeof state>) {
@@ -42,19 +44,20 @@ function message(cause: unknown, fallback: string) {
 }
 
 export async function checkWebUpdate(startup = false) {
-  if (isUpdateBusy(state.status) || (startup && state.status !== 'idle')) return;
-  setState({ status: 'checking', release: undefined, error: undefined, prompt: true });
+  if (isUpdateBusy(state.status) || (startup && startupChecked)) return;
+  if (startup) startupChecked = true;
+  setState({ status: 'checking', release: undefined, error: undefined, prompt: false, feedback: !startup });
   try {
     await androidPageReady;
     const version = await AndroidShell.updateInfo();
     setState({ version });
-    if (version.outcome) { setState({ status: version.outcome }); return; }
+    if (version.outcome) { setState({ status: version.outcome, prompt: true, feedback: true }); return; }
     if (!navigator.onLine) { setState({ status: 'offline', prompt: false }); return; }
     const { configured, release } = await AndroidShell.checkOnlineUpdate({ retryFailed: !startup, prerelease: state.prerelease });
     setState({ status: release ? 'available' : configured ? 'current' : 'unconfigured', release, prompt: Boolean(release) });
   } catch (cause) {
     setState({ status: navigator.onLine ? 'checkFailed' : 'offline', prompt: false,
-      error: message(cause, '暂时无法检查更新。可以继续使用本地网页。') });
+      error: startup ? undefined : message(cause, '暂时无法检查更新。可以继续使用本地网页。') });
   }
 }
 
@@ -64,7 +67,7 @@ export function setPrereleaseUpdates(prerelease: boolean) {
     if (prerelease) localStorage.setItem(releasePreference, '1');
     else localStorage.removeItem(releasePreference);
   } catch { /* In-memory opt-in lasts only until the app reloads. */ }
-  setState({ prerelease, status: 'idle', release: undefined, error: undefined, prompt: false });
+  setState({ prerelease, feedback: false, status: 'idle', release: undefined, error: undefined, prompt: false });
 }
 
 export function dismissWebUpdate() {
@@ -74,7 +77,7 @@ export function dismissWebUpdate() {
 export async function installOnlineWebUpdate() {
   const release = state.release;
   if (!release || isUpdateBusy(state.status)) return;
-  setState({ status: 'downloading', received: 0, error: undefined, prompt: true });
+  setState({ status: 'downloading', feedback: true, received: 0, error: undefined, prompt: true });
   try {
     const listener = await AndroidShell.addListener('webUpdateProgress', progress => {
       setState({ status: progress.stage, received: progress.received });
@@ -94,7 +97,7 @@ export async function installOnlineWebUpdate() {
 export async function runNativeWebUpdate(action: 'importUpdate' | 'restoreBundled') {
   if (isUpdateBusy(state.status)) return;
   const previous = state.status;
-  setState({ status: action === 'importUpdate' ? 'importing' : 'restoring', error: undefined, prompt: false });
+  setState({ feedback: true, status: action === 'importUpdate' ? 'importing' : 'restoring', error: undefined, prompt: false });
   try {
     await AndroidShell[action]();
     const version = await AndroidShell.updateInfo();

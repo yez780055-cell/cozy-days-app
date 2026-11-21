@@ -49,6 +49,7 @@ public class AndroidDeltaReleaseTest {
                 }
             };
             int before = activity.bundles().activeRevision();
+            File active = onUpdater(() -> {
             File staged = DeltaWebUpdates.prepareOrFull(
                 () -> activity.bundles().prepareDelta(release, transport, (n, total) -> {}, () -> {}),
                 activity.bundles()::discardStaged, () -> {
@@ -60,7 +61,8 @@ public class AndroidDeltaReleaseTest {
             assertEquals(before, activity.bundles().activeRevision());
             assertEquals(revision == 2 ? List.of("index.html") : List.of(), downloaded);
             assertEquals(revision == 3 ? 1 : 0, full[0]);
-            File active = activity.bundles().activate(staged, revision);
+            return activity.bundles().activate(staged, revision);
+            });
             instrumentation.runOnMainSync(() -> activity.reloadBundle(active));
             await(() -> !activity.bundles().isPending(), 25);
             assertEquals(revision, activity.bundles().activeRevision());
@@ -69,6 +71,8 @@ public class AndroidDeltaReleaseTest {
         // Signed page intentionally never calls ready(): the real 15-second timer must roll it back.
         installLocal(new File(fixtures, "local-web-4.cozyupdate"));
         await(() -> activity.bundles().activeRevision() == 3 && !activity.bundles().isPending(), 30);
+        await(() -> evaluate("!!document.querySelector('.phone')").equals("true"), 15);
+        Thread.sleep(250);
         checkData();
         // Same installer used by the manual file picker, while the device has no network.
         installLocal(new File(fixtures, "local-web-5.cozyupdate"));
@@ -87,14 +91,21 @@ public class AndroidDeltaReleaseTest {
     }
 
     void installLocal(File file) throws Exception {
-        File active;
-        try (InputStream input = new FileInputStream(file)) { active = activity.bundles().install(input, null, () -> {}); }
+        File active = onUpdater(() -> {
+            try (InputStream input = new FileInputStream(file)) { return activity.bundles().install(input, null, () -> {}); }
+        });
         instrumentation.runOnMainSync(() -> activity.reloadBundle(active));
+    }
+    File onUpdater(Callable<File> action) throws Exception {
+        var field = AndroidShellPlugin.class.getDeclaredField("UPDATES");
+        field.setAccessible(true);
+        return ((ExecutorService) field.get(null)).submit(action).get(60, TimeUnit.SECONDS);
     }
     void start() throws Exception {
         Intent intent = new Intent(instrumentation.getTargetContext(), MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         activity = (MainActivity) instrumentation.startActivitySync(intent);
         await(() -> evaluate("!!document.querySelector('.phone')").equals("true"), 45);
+        Thread.sleep(250);
         assertEquals("https://localhost", evaluate("location.origin"));
     }
     void checkData() throws Exception {

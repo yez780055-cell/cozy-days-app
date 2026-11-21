@@ -93,7 +93,7 @@ jobs:
         with:
           name: stable-tested-android-web
           path: dist-stable
-      - name: Sign stable revision 5 and CloudBase revision 7 for formal shell 2
+      - name: Sign stable revision 8 and CloudBase revision 7 for formal shell 2
         shell: bash
         env:
           ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
@@ -111,15 +111,15 @@ jobs:
           cp artifacts/release/shell-2/latest.json artifacts/latest.json
           sha256sum artifacts/Cozy-Days-Web-2-7.cozyupdate > artifacts/SHA256SUMS.txt
           printf 'source=%s\nshell=2\nweb=7\ncloudbase=true\n' "$GITHUB_SHA" > artifacts/provenance.txt
-          java scripts/PackAndroidWeb.java dist-stable 2 5 artifacts/stable/Cozy-Days-Web-2-5.cozyupdate artifacts/stable/release
+          java scripts/PackAndroidWeb.java dist-stable 2 8 artifacts/stable/Cozy-Days-Web-2-8.cozyupdate artifacts/stable/release
           cp artifacts/stable/release/shell-2/latest.json artifacts/stable/latest.json
-          sha256sum artifacts/stable/Cozy-Days-Web-2-5.cozyupdate > artifacts/stable/SHA256SUMS.txt
-          printf 'source=8bce68c4851635a01405cf696e99e875cc74522e\nshell=2\nweb=5\ncloudbase=false\n' > artifacts/stable/provenance.txt
+          sha256sum artifacts/stable/Cozy-Days-Web-2-8.cozyupdate > artifacts/stable/SHA256SUMS.txt
+          printf 'source=8bce68c4851635a01405cf696e99e875cc74522e\nshell=2\nweb=8\ncloudbase=false\n' > artifacts/stable/provenance.txt
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
         with:
-          name: stable-signed-web-shell-2-web-5
+          name: stable-signed-web-shell-2-web-8
           path: |
-            artifacts/stable/Cozy-Days-Web-2-5.cozyupdate
+            artifacts/stable/Cozy-Days-Web-2-8.cozyupdate
             artifacts/stable/latest.json
             artifacts/stable/SHA256SUMS.txt
             artifacts/stable/provenance.txt

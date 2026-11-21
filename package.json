@@ -15,7 +15,10 @@
     "android:sync": "npm run build:android && cap sync android",
     "android:open": "cap open android",
     "test:e2e": "playwright test",
-    "test:cloudbase": "playwright test --config playwright.cloudbase.config.ts"
+    "test:cloudbase": "playwright test --config playwright.cloudbase.config.ts",
+    "test:ci": "node scripts/ci-run.mjs",
+    "test:ci:policy": "node --test scripts/ci-plan.test.mjs",
+    "test:smoke": "playwright test --config playwright.smoke.config.ts"
   },
   "dependencies": {
     "@capacitor/android": "^7.4.3",

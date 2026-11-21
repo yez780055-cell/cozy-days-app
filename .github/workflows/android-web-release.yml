@@ -1,4 +1,5 @@
-name: Signed Android web release
+name: Android web package
+run-name: Web ${{ inputs.web_revision }} - ${{ inputs.validation }}
 
 on:
   workflow_dispatch:
@@ -6,8 +7,23 @@ on:
       web_revision:
         description: Monotonically increasing formal web revision
         required: true
-        default: '9'
+        default: '10'
         type: string
+
+      validation:
+        description: Candidate artifact uses scoped tests; formal Release requires the complete gate
+        required: true
+        default: candidate
+        type: choice
+        options: [candidate, formal]
+      changed_base:
+        description: Optional base commit or tag; defaults to the latest published web tag
+        required: false
+        type: string
+      full_regression:
+        description: Force the full gate for critical features or architecture changes
+        default: false
+        type: boolean
 
 permissions:
   contents: read
@@ -21,30 +37,31 @@ jobs:
     if: github.repository == 'yez780055-cell/cozy-days-app' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
     timeout-minutes: 30
+    env:
+      CI_TEST_TIER: ${{ inputs.validation }}
+      CI_CHANGE_BASE: ${{ inputs.changed_base }}
+      CI_FULL: ${{ inputs.full_regression }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           persist-credentials: false
+          fetch-depth: 0
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
         with:
           node-version: '22'
           cache: npm
       - run: npm ci
       - run: npx playwright install --with-deps chromium
-      - name: Existing data and interaction regressions
-        run: |
-          VITE_CLOUDBASE_ENABLED=false npm run build
-          VITE_CLOUDBASE_ENABLED=false npm run build:pages
-          VITE_CLOUDBASE_ENABLED=false npm run build:android
-          npm run test:e2e -- --reporter=line
-          npm run test:pages -- --reporter=line
-          npx playwright test --config playwright.android.config.ts --reporter=line
-      - name: CloudBase registration, sharing, conflicts and offline regressions
-        run: npm run test:cloudbase -- --reporter=line
-      - name: Build and verify the unified Android resources
-        run: |
-          npm run build:android
-          npx playwright test --config playwright.cloudbase.android.config.ts --reporter=line
+      - run: npm run test:ci:policy
+      - name: Explain the selected validation scope
+        run: node scripts/ci-plan.mjs
+      - name: Validate this package at the selected tier
+        run: npm run test:ci
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          name: web-validation-plan
+          path: ci-test-plan.json
+          if-no-files-found: error
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
         with:
           name: unified-tested-android-web
@@ -68,6 +85,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           persist-credentials: false
+          fetch-depth: 0
       - uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad
         with:
           distribution: temurin
@@ -76,9 +94,14 @@ jobs:
         with:
           name: unified-tested-android-web
           path: dist-android
-      - name: Sign one formal web update for the existing APK
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131
+        with:
+          name: web-validation-plan
+          path: .
+      - name: Sign one tested web package for the existing APK
         shell: bash
         env:
+          VALIDATION_KIND: ${{ inputs.validation }}
           WEB_REVISION: ${{ inputs.web_revision }}
           ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
@@ -87,6 +110,9 @@ jobs:
         run: |
           set -euo pipefail
           [[ "$WEB_REVISION" =~ ^[1-9][0-9]{0,8}$ ]] && (( WEB_REVISION >= 9 )) || { echo 'Invalid web revision' >&2; exit 1; }
+          if [[ "$VALIDATION_KIND" == formal ]]; then
+            python3 -c 'import json; p=json.load(open("ci-test-plan.json")); assert p["tier"] == "formal" and p["full"], "Formal release requires the full gate"'
+          fi
           umask 077
           export ANDROID_KEYSTORE_PATH="$RUNNER_TEMP/cozy-web-signer.jks"
           trap 'rm -f -- "$ANDROID_KEYSTORE_PATH"' EXIT
@@ -95,14 +121,15 @@ jobs:
           java scripts/PackAndroidWeb.java dist-android 2 "$WEB_REVISION" "artifacts/Cozy-Days-Web-2-${WEB_REVISION}.cozyupdate" artifacts/release
           cp artifacts/release/shell-2/latest.json artifacts/latest.json
           sha256sum "artifacts/Cozy-Days-Web-2-${WEB_REVISION}.cozyupdate" > artifacts/SHA256SUMS.txt
-          printf 'source=%s\nshell=2\nweb=%s\nchannel=stable\ncloudbase=true\n' "$GITHUB_SHA" "$WEB_REVISION" > artifacts/provenance.txt
+          printf 'source=%s\nshell=2\nweb=%s\nchannel=stable\ncloudbase=true\nvalidation=%s\n' "$GITHUB_SHA" "$WEB_REVISION" "$VALIDATION_KIND" > artifacts/provenance.txt
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
         with:
-          name: signed-web-shell-2-web-${{ inputs.web_revision }}
+          name: ${{ inputs.validation == 'formal' && 'signed' || 'candidate' }}-web-shell-2-web-${{ inputs.web_revision }}
           path: |
             artifacts/Cozy-Days-Web-2-${{ inputs.web_revision }}.cozyupdate
             artifacts/latest.json
             artifacts/SHA256SUMS.txt
             artifacts/provenance.txt
+            ci-test-plan.json
           if-no-files-found: error
           retention-days: 30

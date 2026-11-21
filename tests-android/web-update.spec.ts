@@ -8,15 +8,15 @@ type Fixture = {
   fail(message: string): void;
 };
 
-async function mockShell(page: Page, options: { offline?: boolean; outcome?: Outcome; current?: boolean } = {}) {
-  await page.addInitScript(({ offline, outcome, current }) => {
+async function mockShell(page: Page, options: { offline?: boolean; outcome?: Outcome; current?: boolean; checkDelay?: number; checkError?: boolean } = {}) {
+  await page.addInitScript(({ offline, outcome, current, checkDelay, checkError }) => {
     if (offline) Object.defineProperty(navigator, 'onLine', { get: () => false });
     let offeredOutcome = outcome;
     let progress: ((value: unknown) => void) | undefined;
     let rejectInstall: ((error: Error) => void) | undefined;
     const bytes = 8 * 1024 * 1024;
     const fixture: Fixture = {
-      web: 2, checks: [], prereleaseChecks: [], installs: [], offers: !current, checkError: false, manualError: false,
+      web: 2, checks: [], prereleaseChecks: [], installs: [], offers: !current, checkError: !!checkError, manualError: false,
       update: (stage, received = 0) => progress?.({ stage, received, total: bytes }),
       fail: message => rejectInstall?.(new Error(message)),
     };
@@ -41,6 +41,7 @@ async function mockShell(page: Page, options: { offline?: boolean; outcome?: Out
           }
           if (method === 'checkOnlineUpdate') {
             fixture.checks.push(args.retryFailed);
+            if (checkDelay) await new Promise(resolve => setTimeout(resolve, checkDelay));
             fixture.prereleaseChecks.push(args.prerelease);
             if (fixture.checkError) throw new Error('暂时无法连接更新源。');
             return { configured: true, release: fixture.offers ? { web: 3, bytes } : undefined };
@@ -151,6 +152,8 @@ test('offline keeps local content and the manual import and restore entry points
   await mockShell(page, { offline: true });
   await expect(page.getByRole('navigation', { name: '应用模块' })).toBeVisible();
   await settings(page);
+  await expect(page.getByText('当前离线，继续使用本地网页。')).toHaveCount(0);
+  await page.getByRole('button', { name: '检查更新' }).click();
   await expect(page.getByText('当前离线，继续使用本地网页。')).toBeVisible();
   expect(await page.evaluate(() => (window as unknown as { fixture: Fixture }).fixture.checks)).toEqual([]);
   await page.evaluate(() => { (window as unknown as { fixture: Fixture }).fixture.manualError = true; });
@@ -178,3 +181,37 @@ for (const [outcome, title] of [['installed', '更新完成！！！'], ['rolled
     }
   });
 }
+
+for (const checkError of [false, true]) {
+  test(`startup stays silent while pending and after ${checkError ? 'failure' : 'no update'}`, async ({ page }) => {
+    await mockShell(page, { current: true, checkDelay: 1200, checkError });
+    await expect.poll(() => page.evaluate(() => (window as unknown as { fixture: Fixture }).fixture.checks.length)).toBe(1);
+    await expect(page.locator('.android-update-frame')).toHaveCount(0);
+    await expect(page.locator('.app-shell')).not.toHaveAttribute('inert');
+    await settings(page);
+    await expect(page.getByText('正在检查小饱有没有更新')).toHaveCount(0);
+    await expect(page.getByRole('button', { name: '检查更新' })).toBeEnabled();
+    await expect(page.locator('.android-update-frame')).toHaveCount(0);
+    await expect(page.getByText('当前已是最新版本。')).toHaveCount(0);
+    await expect(page.getByRole('alert')).toHaveCount(0);
+    await page.getByRole('button', { name: '检查更新' }).click();
+    await expect(page.getByText('正在检查小饱有没有更新')).toBeVisible();
+    await expect(page.locator('.android-update-frame')).toHaveCount(0);
+    if (checkError) await expect(page.getByRole('alert')).toHaveText('暂时无法连接更新源。');
+    else await expect(page.getByText('当前已是最新版本。')).toBeVisible();
+  });
+}
+
+test('an available offer stays still until consent and later survives channel changes', async ({ page }) => {
+  await mockShell(page);
+  await expect(page.getByRole('button', { name: '立即更新' })).toBeVisible();
+  await expect(page.locator('.android-update-cat, .android-update-wait, progress')).toHaveCount(0);
+  expect(await calls(page)).toEqual([]);
+  await page.getByRole('button', { name: '稍后更新' }).click();
+  await settings(page);
+  await page.getByRole('checkbox', { name: '接收预发布网页更新' }).check();
+  await expect(page.locator('.android-update-frame')).toHaveCount(0);
+  expect(await page.evaluate(() => (window as unknown as { fixture: Fixture }).fixture.checks)).toEqual([false]);
+  await page.getByRole('button', { name: '检查更新' }).click();
+  await expect(page.getByRole('button', { name: '立即更新' })).toBeVisible();
+});

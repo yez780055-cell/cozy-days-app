@@ -38,6 +38,9 @@ async function fixture() {
   }
   let dropNext = false;
   let dropped = 0;
+  let failSignup = false;
+  const registered = new Set<string>();
+  const requests = { verify: 0, signup: 0, signin: 0, signout: 0 };
   async function install(context: BrowserContext) {
     await context.route(gateway, async route => {
       const req = route.request();
@@ -49,12 +52,34 @@ async function fixture() {
       const user = req.headers().authorization?.slice(7) || null;
       let data: unknown;
       try {
-        if (path.endsWith('/verification')) data = { verification_id:body.email };
-        else if (path.endsWith('/verify')) data = { verification_token:body.verification_id };
+        if (path.endsWith('/verification')) {
+          const exists = registered.has(body.email);
+          if (body.target === 'USER' && !exists) return route.fulfill({ status:400, headers,
+            json:{ code:'FAILED_PRECONDITION', error:'failed_precondition', error_description:'账号不存在' } });
+          data = { verification_id:body.email, is_user:exists };
+        } else if (path.endsWith('/verify')) {
+          requests.verify++;
+          if (body.verification_code !== '123456') return route.fulfill({ status:400, headers,
+            json:{ error:'invalid_verification_code' } });
+          data = { verification_token:body.verification_id };
+        }
         else if (path.endsWith('/signup') || path.endsWith('/signin') || path.endsWith('/token')) {
+          if (path.endsWith('/signup')) {
+            requests.signup++;
+            if (failSignup) {
+              failSignup = false;
+              return route.fulfill({ status:503, headers, json:{ error:'unavailable' } });
+            }
+            registered.add(body.email);
+          }
+          if (path.endsWith('/signin')) {
+            requests.signin++;
+            if (!registered.has(body.verification_token)) return route.fulfill({ status:400, headers,
+              json:{ error:'failed_precondition', error_description:'账号不存在' } });
+          }
           const sub = users.find((_, i) => email(i) === body.verification_token) ?? body.refresh_token;
           data = { sub, access_token:sub, refresh_token:sub, expires_in:3600 };
-        } else if (path.endsWith('/signout')) data = {};
+        } else if (path.endsWith('/signout')) { requests.signout++; data = {}; }
         else if (path.endsWith('cozy_days_space')) data = await rpc(user, 'space', [body.p_invite]);
         else if (path.endsWith('cozy_days_pull')) data = await rpc(user, 'pull', [body.p_user, body.p_space, body.p_after]);
         else if (path.endsWith('cozy_days_push')) {
@@ -66,7 +91,8 @@ async function fixture() {
       return route.fulfill({ status:200, headers, json:data });
     });
   }
-  return { db, rpc, invitations, install, dropNext: () => { dropNext = true; }, dropped: () => dropped };
+  return { db, rpc, invitations, install, requests, failNextSignup: () => { failSignup = true; },
+    dropNext: () => { dropNext = true; }, dropped: () => dropped };
 }
 
 test('PostgreSQL enforces two verified members and isolates private records', async () => {
@@ -103,17 +129,64 @@ test('PostgreSQL enforces two verified members and isolates private records', as
 
 async function join(page: Page, index: number, invite?: string) {
   await page.goto('/');
-  if (invite) await page.getByRole('button', { name:/首次使用/ }).click();
+  await page.getByRole('button', { name:invite ? '首次使用，注册账号' : '已有账号，登录' }).click();
   await page.getByLabel('邮箱', { exact:true }).fill(email(index));
+  if (invite) await page.getByLabel('邀请码').fill(invite);
   await page.getByRole('button', { name:'发送验证码' }).click();
   await page.getByLabel('邮箱验证码').fill('123456');
-  await page.getByRole('button', { name:'验证邮箱' }).click();
-  if (invite) {
-    await page.getByLabel('邀请码').fill(invite);
-    await page.getByRole('button', { name:'加入空间' }).click();
-  }
+  await page.getByRole('button', { name:invite ? '注册并加入空间' : '验证并登录' }).click();
   await expect(page.getByRole('button', { name:'打开应用设置' })).toBeVisible();
 }
+
+test('unregistered email can register and retry OTP, account creation and invitation without losing the form', async ({ page, context }) => {
+  const f = await fixture();
+  try {
+    await f.install(context);
+    await page.goto('/');
+    await expect(page.getByRole('heading', { name:'欢迎来到双人空间' })).toBeVisible();
+    await page.getByRole('button', { name:'已有账号，登录' }).click();
+    const mailbox = page.getByLabel('邮箱', { exact:true });
+    await mailbox.fill(email(0));
+    await page.getByRole('button', { name:'发送验证码' }).click();
+    await expect(page.getByRole('alert')).toContainText('这个邮箱还没有账号');
+    expect(f.requests.signin).toBe(0);
+    await page.getByRole('button', { name:'用此邮箱注册' }).click();
+    await expect(mailbox).toHaveValue(email(0));
+
+    const invalidInvite = '0'.repeat(32);
+    const invite = page.getByLabel('邀请码');
+    await invite.fill(invalidInvite);
+    await page.getByRole('button', { name:'发送验证码' }).click();
+    const code = page.getByLabel('邮箱验证码');
+    await code.fill('000000');
+    await page.getByRole('button', { name:'注册并加入空间' }).click();
+    await expect(page.getByRole('alert')).toContainText('邮箱验证码有误');
+    await expect(code).toHaveValue('000000');
+    await expect(invite).toHaveValue(invalidInvite);
+    expect(f.requests.signup).toBe(0);
+
+    f.failNextSignup();
+    await code.fill('123456');
+    await page.getByRole('button', { name:'注册并加入空间' }).click();
+    await expect(page.getByRole('alert')).toContainText('请求没有完成');
+    await expect(code).toHaveValue('123456');
+    await expect(mailbox).toHaveValue(email(0));
+    await page.getByRole('button', { name:'注册并加入空间' }).click();
+    await expect(page.getByRole('alert')).toContainText('邀请码无效');
+    await expect(page.getByRole('heading', { name:'注册账号' })).toBeVisible();
+    await expect(invite).toHaveValue(invalidInvite);
+    await expect(code).toHaveValue('123456');
+    await expect(f.rpc(users[0], 'space', [null])).resolves.toBeNull();
+
+    await invite.fill(f.invitations[0].code);
+    await page.getByRole('button', { name:'重试加入空间' }).click();
+    await expect(page.getByRole('button', { name:'打开应用设置' })).toBeVisible();
+    await expect(f.rpc(users[0], 'space', [null])).resolves.toMatchObject({ members:1 });
+    expect(f.requests).toEqual({ verify:2, signup:2, signin:0, signout:0 });
+    await page.reload();
+    await expect(page.getByRole('button', { name:'打开应用设置' })).toBeVisible();
+  } finally { await f.db.close(); }
+});
 const go = (page: Page, name: string) => page.getByRole('navigation').getByRole('button', { name, exact:true }).click();
 const kick = (page: Page) => page.evaluate(() => window.dispatchEvent(new Event('focus')));
 const detail = (page: Page, name: string) => page.getByRole('button', { name:'查看详情：' + name });
@@ -199,7 +272,7 @@ test('browser syncs after reconnect, retries a committed write and preserves a c
     await settings(a);
     await a.getByRole('button', { name:'退出登录', exact:true }).click();
     await a.getByRole('button', { name:'确认退出', exact:true }).click();
-    await expect(a.getByRole('heading', { name:'登录双人空间' })).toBeVisible();
+    await expect(a.getByRole('heading', { name:'欢迎来到双人空间' })).toBeVisible();
     await join(a, 1);
     await go(a, '待办');
     await expect(a.getByRole('button', { name:'编辑：A 的私密待办' })).toHaveCount(0);

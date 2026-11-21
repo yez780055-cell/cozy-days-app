@@ -18,7 +18,7 @@ type Session = {
 };
 
 type TokenResponse = {
-  sub: string;
+  sub?: string;
   access_token: string;
   refresh_token: string;
   expires_in: number;
@@ -55,7 +55,13 @@ async function request<T>(path: string, body: object, token?: string, keepalive 
     if (!response.ok || data?.error) {
       const message = typeof data?.message === 'string' ? data.message : '';
       const cozyCode = /^COZY_[A-Z_]+$/.test(message) ? message : '';
-      throw new CloudError(response.status, cozyCode || String(data?.error ?? data?.code ?? 'CLOUD_REQUEST_FAILED'));
+      const description = typeof data?.error_description === 'string' ? data.error_description : message;
+      const providerCode = String(data?.error ?? data?.code ?? 'CLOUD_REQUEST_FAILED').toLowerCase();
+      const missing = providerCode === 'user_not_found' ||
+        (providerCode === 'failed_precondition' && /账号不存在|未绑定账号|user (?:does not exist|not found)/i.test(description));
+      const exists = providerCode === 'already_exists' || providerCode === 'user_already_exists' ||
+        (providerCode === 'failed_precondition' && /账号已存在|已绑定账号|already (?:registered|exists)/i.test(description));
+      throw new CloudError(response.status, cozyCode || (missing ? 'ACCOUNT_NOT_FOUND' : exists ? 'ACCOUNT_EXISTS' : providerCode));
     }
     return data as T;
   } catch (error) {
@@ -84,26 +90,35 @@ export function watchSession(read: (next: Session | null) => void) {
 }
 
 function fromTokens(value: TokenResponse, email: string): Session {
-  if (!value || typeof value.sub !== 'string' || !value.sub.length || value.sub.length > 64
-    || typeof value.access_token !== 'string' || typeof value.refresh_token !== 'string'
+  const userId = value?.sub;
+  if (typeof userId !== 'string' || !userId.length || userId.length > 64
+    || typeof value.access_token !== 'string' || !value.access_token || typeof value.refresh_token !== 'string' || !value.refresh_token
     || !Number.isFinite(value.expires_in) || value.expires_in <= 0) throw new CloudError(502, 'INVALID_TOKEN_RESPONSE');
-  return { userId: value.sub, accessToken: value.access_token, refreshToken: value.refresh_token,
+  return { userId, accessToken: value.access_token, refreshToken: value.refresh_token,
     expiresAt: Date.now() + value.expires_in * 1000, email };
 }
 
 export async function sendEmailCode(email: string, register: boolean) {
-  const data = await request<{ verification_id: string }>('/auth/v1/verification', { email, target: register ? 'ANY' : 'USER' });
+  const data = await request<{ verification_id: string; is_user?: boolean }>('/auth/v1/verification', {
+    email, target: register ? 'ANY' : 'USER',
+  });
+  if (register && data?.is_user === true) throw new CloudError(409, 'ACCOUNT_EXISTS');
+  if (!register && data?.is_user === false) throw new CloudError(400, 'ACCOUNT_NOT_FOUND');
   if (!data?.verification_id) throw new CloudError(502, 'INVALID_VERIFICATION_RESPONSE');
   return data.verification_id;
 }
 
-export async function authenticate(email: string, verificationId: string, code: string, register: boolean) {
-  const start = session()?.refreshToken;
+export async function verifyEmailCode(verificationId: string, code: string) {
   const verified = await request<{ verification_token: string }>('/auth/v1/verification/verify', {
     verification_id: verificationId, verification_code: code,
   });
   if (!verified?.verification_token) throw new CloudError(502, 'INVALID_VERIFICATION_RESPONSE');
-  const body = { verification_token: verified.verification_token, ...(register ? { email } : {}) };
+  return verified.verification_token;
+}
+
+export async function authenticate(email: string, verificationToken: string, register: boolean) {
+  const start = session()?.refreshToken;
+  const body = { verification_token: verificationToken, ...(register ? { email } : {}) };
   const next = fromTokens(await request<TokenResponse>(register ? '/auth/v1/signup' : '/auth/v1/signin', body), email);
   if (session()?.refreshToken !== start) throw new CloudError(401, 'SESSION_CHANGED');
   saveSession(next);

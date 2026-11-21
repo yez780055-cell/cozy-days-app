@@ -1,5 +1,6 @@
 import java.io.DataOutputStream;
 import java.io.File;
+import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -13,6 +14,7 @@ import java.util.HexFormat;
 import java.util.Objects;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
+import java.util.zip.ZipInputStream;
 
 // Run with JDK 21 after npm run build:android. Signing credentials use the same environment as the APK.
 class PackAndroidWeb {
@@ -64,13 +66,13 @@ class PackAndroidWeb {
                 packaged.write(signature);
                 packaged.write(data);
             }
-            if (args.length == 5) writeRelease(Path.of(args[4]), output, shell, revision);
+            if (args.length == 5) writeRelease(Path.of(args[4]), output, shell, revision, data, key);
         } finally {
             Files.deleteIfExists(archive);
         }
     }
 
-    private static void writeRelease(Path root, Path output, int shell, int web) throws Exception {
+    private static void writeRelease(Path root, Path output, int shell, int web, byte[] payload, PrivateKey key) throws Exception {
         Path shellRoot = root.resolve("shell-" + shell);
         Files.createDirectories(shellRoot);
         Path revisionRoot = shellRoot.resolve("web-" + web);
@@ -78,6 +80,7 @@ class PackAndroidWeb {
         String filename = "Cozy-Days-Web-" + shell + "-" + web + ".cozyupdate";
         Path archive = Files.copy(output, revisionRoot.resolve(filename));
         String sha256 = HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(Files.readAllBytes(archive)));
+        writeDelta(revisionRoot, payload, key, shell, web, Files.size(archive), sha256);
         String page = Files.readString(Path.of("scripts/android-web-download.html"))
             .replace("__WEB_REVISION__", Integer.toString(web))
             .replace("__PACKAGE_NAME__", filename)
@@ -94,6 +97,35 @@ class PackAndroidWeb {
         }
     }
 
+    private static void writeDelta(Path root, byte[] archive, PrivateKey key, int shell, int web,
+            long packageBytes, String packageSha256) throws Exception {
+        var entries = new java.util.ArrayList<String>();
+        long total = 0;
+        // Derive both the manifest and objects from the signed ZIP, never from a second build/read.
+        try (var zip = new ZipInputStream(new ByteArrayInputStream(archive))) {
+            for (var entry = zip.getNextEntry(); entry != null; entry = zip.getNextEntry()) {
+                if (entry.getName().equals("cozy-update.json")) continue;
+                byte[] bytes = zip.readAllBytes();
+                total += bytes.length;
+                if (total > 96L * 1024 * 1024 || entries.size() >= 1_999) throw new IllegalArgumentException("Web files exceed limits");
+                String hash = HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(bytes));
+                Path object = root.resolve("file-" + hash);
+                if (!Files.exists(object)) Files.write(object, bytes);
+                entries.add("{\"path\":\"" + entry.getName() + "\",\"bytes\":" + bytes.length + ",\"sha256\":\"" + hash + "\"}");
+            }
+        }
+        String manifest = "{\"schema\":1,\"shell\":" + shell + ",\"web\":" + web
+            + ",\"packageBytes\":" + packageBytes + ",\"packageSha256\":\"" + packageSha256
+            + "\",\"files\":[" + String.join(",", entries) + "]}\n";
+        byte[] bytes = manifest.getBytes(StandardCharsets.UTF_8);
+        if (bytes.length > 512 * 1024) throw new IllegalArgumentException("File manifest exceeds limits");
+        var signer = Signature.getInstance("SHA256withRSA");
+        signer.initSign(key);
+        signer.update(bytes);
+        Files.write(root.resolve("web-manifest.json"), bytes);
+        Files.write(root.resolve("web-manifest.sig"), signer.sign());
+    }
+
     private static String env(String name) {
         return Objects.requireNonNull(System.getenv(name), name + " is required");
     }
@@ -102,6 +134,9 @@ class PackAndroidWeb {
         String name = dist.relativize(path).toString().replace('\\', '/');
         if (!name.equals("index.html") && !name.matches("(assets|icons)/[A-Za-z0-9][A-Za-z0-9._/-]*")) {
             throw new IllegalArgumentException("Unexpected web asset path " + name);
+        }
+        for (String segment : name.split("/", -1)) {
+            if (segment.isEmpty() || segment.equals(".") || segment.equals("..")) throw new IllegalArgumentException("Unsafe asset path");
         }
         zip.putNextEntry(new ZipEntry(name));
         Files.copy(path, zip);

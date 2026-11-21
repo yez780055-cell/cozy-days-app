@@ -128,6 +128,37 @@ final class OnlineWebUpdates {
         if (!MessageDigest.isEqual(expected, digest.digest())) throw new SecurityException("网页包 SHA-256 校验失败。");
     }
 
+    DeltaWebUpdates.Transport files(Release release) {
+        return new DeltaWebUpdates.Transport() {
+            private URL url(String name) throws Exception {
+                // Names are fixed protocol names or file-<SHA256>; never manifest-supplied URLs.
+                return new URL(release.url, name);
+            }
+            public byte[] metadata(String name, int limit) throws Exception {
+                HttpsURLConnection connection = response(url(name), 8_000, release.githubAsset);
+                long start = SystemClock.elapsedRealtime();
+                try {
+                    if (connection.getResponseCode() != 200) throw new IOException("Incremental metadata unavailable");
+                    try (var input = connection.getInputStream(); var output = new ByteArrayOutputStream()) {
+                        byte[] buffer = new byte[8192];
+                        for (int n; (n = input.read(buffer)) != -1;) {
+                            if (output.size() + n > limit || SystemClock.elapsedRealtime() - start > 15_000) {
+                                throw new IOException("Incremental metadata exceeded limits");
+                            }
+                            output.write(buffer, 0, n);
+                        }
+                        return output.toByteArray();
+                    }
+                } finally { connection.disconnect(); }
+            }
+            public void download(WebFileManifest.Entry entry, File target, Progress progress) throws Exception {
+                // Same HTTPS redirect, byte limits, identity encoding and SHA-256 checks as full packages.
+                OnlineWebUpdates.this.download(new Release(release.web, entry.bytes, entry.sha256,
+                    url(entry.objectName()), release.githubAsset), target, progress, () -> {});
+            }
+        };
+    }
+
     static long integer(JSONObject json, String key) throws Exception {
         Object value = json.get(key);
         if (!(value instanceof Integer) && !(value instanceof Long)) throw new IOException("Invalid catalog number");

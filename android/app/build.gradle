@@ -1,6 +1,6 @@
 apply plugin: 'com.android.application'
 
-def releaseCodeText = System.getenv('ANDROID_VERSION_CODE') ?: '2'
+def releaseCodeText = System.getenv('ANDROID_VERSION_CODE') ?: '3'
 if (!(releaseCodeText ==~ /[1-9][0-9]*/) || new BigInteger(releaseCodeText) > 2100000000) {
     throw new GradleException('ANDROID_VERSION_CODE must be a positive integer no greater than 2100000000')
 }
@@ -23,7 +23,7 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode Integer.parseInt(releaseCodeText)
-        versionName "0.2.2"
+        versionName "0.2.3"
         buildConfigField 'String', 'WEB_UPDATE_ROOT', groovy.json.JsonOutput.toJson(webUpdateRoot)
         buildConfigField 'String', 'WEB_UPDATE_QA_CA', groovy.json.JsonOutput.toJson(qaCa)
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"

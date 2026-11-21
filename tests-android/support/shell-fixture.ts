@@ -4,7 +4,7 @@ type Outcome = 'installed' | 'rolledBack';
 export type Fixture = {
   web: number; checks: boolean[]; prereleaseChecks: boolean[]; installs: number[];
   offers: boolean; checkError: boolean; manualError: boolean;
-  update(stage: string, received?: number): void;
+  update(stage: string, received?: number, total?: number): void;
   fail(message: string): void;
 };
 
@@ -17,7 +17,7 @@ export async function mockShell(page: Page, options: { offline?: boolean; outcom
     const bytes = 8 * 1024 * 1024;
     const fixture: Fixture = {
       web: 2, checks: [], prereleaseChecks: [], installs: [], offers: !current, checkError: !!checkError, manualError: false,
-      update: (stage, received = 0) => progress?.({ stage, received, total: bytes }),
+      update: (stage, received = 0, total = bytes) => progress?.({ stage, received, total }),
       fail: message => rejectInstall?.(new Error(message)),
     };
     Object.assign(window, {

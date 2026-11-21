@@ -8,10 +8,10 @@ export function planTests(paths, { tier = 'pr', fullRequested = false, schemaCha
   const migrations = changed.some(p => /^cloudbase\/\d+.*\.sql$/.test(p)
     || /^(src|migrations)\/.*(?:\/migrations?\/|migration|schema)/i.test(p));
   const criticalNative = changed.some(p => /^scripts\/(?:PackAndroidWeb|VerifyAndroidWeb)\.java$/.test(p) || /^android\/app\/src\/main\/java\/.*(?:OnlineWebUpdates|GitHubWebReleases|WebBundles)\.java$/.test(p));
-  const full = criticalNative || tier === 'formal' || tier === 'full' || fullRequested || schemaChanged || migrations;
+  const full = tier === 'formal' || tier === 'full' || fullRequested || schemaChanged || migrations;
   const web = new Set();
   const modules = new Set();
-  let cloud = false, android = tier === 'candidate', nativeInteraction = false, pages = false;
+  let cloud = false, android = tier === 'candidate' || criticalNative, nativeInteraction = false, pages = false;
   const add = (module, ...tests) => { modules.add(module); tests.forEach(t => web.add('tests/' + t + '.spec.ts')); };
   for (const p of changed) {
     if (/^src\/app\//.test(p)) add('app', 'home-ux', 'todo');
@@ -49,13 +49,13 @@ export function planTests(paths, { tier = 'pr', fullRequested = false, schemaCha
   if (!modules.size && changed.some(p => /^src\//.test(p))) add('shared-logic', 'todo', 'period-model', 'anniversary-dates');
   if (full) { cloud = true; android = true; pages = true; }
   const reasons = [
-    ...(criticalNative ? ['native signature / update loader change'] : []),
     ...(tier === 'formal' ? ['formal release'] : []),
     ...(tier === 'full' ? ['explicit full regression'] : []),
     ...(fullRequested ? ['critical change / architecture label'] : []),
     ...(migrations || schemaChanged ? ['database migration / schema change'] : []),
   ];
-  return { tier, full, reasons, modules: [...modules].sort(), smoke: true, cloud, android, pages,
+  const nativeDelta = criticalNative || changed.some(p => /(?:WebFileManifest|DeltaWebUpdates|DeltaUpdateProbe|test-android-delta|write-web-inventory)/.test(p));
+  return { tier, full, reasons, modules: [...modules].sort(), smoke: true, cloud, android, pages, nativeDelta,
     webTests: [...web].sort(), androidInteraction: nativeInteraction || full,
     androidCloudSuite: full || cloud };
 }

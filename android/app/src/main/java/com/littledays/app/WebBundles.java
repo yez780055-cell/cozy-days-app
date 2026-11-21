@@ -9,15 +9,22 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.Signature;
 import java.security.cert.CertificateFactory;
 import java.util.zip.ZipFile;
+import java.util.ArrayList;
+import java.util.List;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 final class WebBundles {
+    static final class SignatureMismatch extends SecurityException {
+        SignatureMismatch() { super("Web bundle signature does not match the APK"); }
+    }
     private static final int MAGIC = 0x434F5A31; // COZ1
     private static final int MAX_DOWNLOAD = 64 * 1024 * 1024;
     private static final int MAX_EXTRACTED = 96 * 1024 * 1024;
@@ -26,9 +33,16 @@ final class WebBundles {
     private final Context context;
     private final SharedPreferences state;
     private final File root;
+    interface Verifier { Signature create() throws Exception; }
+    private final Verifier testVerifier;
 
     WebBundles(Context context) {
+        this(context, null);
+    }
+
+    WebBundles(Context context, Verifier testVerifier) {
         this.context = context.getApplicationContext();
+        this.testVerifier = testVerifier;
         state = context.getSharedPreferences("cozy-web-bundle", Context.MODE_PRIVATE);
         root = new File(context.getFilesDir(), "cozy-web-bundles");
     }
@@ -94,6 +108,15 @@ final class WebBundles {
     }
 
     File install(InputStream source, Integer expectedRevision, Runnable onVerified) throws Exception {
+        try {
+            File staged = prepareFull(source, expectedRevision, onVerified);
+            return activate(staged, stagedRevision);
+        } finally { discardStaged(); }
+    }
+
+    private int stagedRevision;
+
+    File prepareFull(InputStream source, Integer expectedRevision, Runnable onVerified) throws Exception {
         if (isPending()) throw new IOException("A web bundle is already starting");
         if (!root.isDirectory() && !root.mkdirs()) throw new IOException("Bundle directory unavailable");
         File cache = context.getCacheDir();
@@ -106,20 +129,103 @@ final class WebBundles {
             onVerified.run();
             remove(staged);
             if (!staged.mkdir()) throw new IOException("Staging directory unavailable");
-            int revision = extract(archive, staged, expectedRevision);
-            int current = activeRevision();
-            int previous = isCurrentShell() ? state.getInt("previous", BUNDLED_REVISION) : BUNDLED_REVISION;
-            File destination = directory(revision);
-            // A retry after rollback may replace the failed candidate, never either stable directory.
-            remove(destination);
-            if (!staged.renameTo(destination)) throw new IOException("Could not activate web bundle");
-            commit(versionState(revision).putInt("previous", current).putBoolean("pending", true)
-                .putInt("priorPrevious", previous).putBoolean("trialStarted", false).remove("outcome"));
-            prune();
-            return destination;
+            stagedRevision = extract(archive, staged, expectedRevision);
+            inventory(staged);
+            return staged;
+        } catch (Exception error) {
+            remove(staged);
+            throw error;
         } finally {
             archive.delete();
-            remove(staged);
+        }
+    }
+
+    void discardStaged() { remove(new File(root, "staging")); }
+
+    File prepareDelta(OnlineWebUpdates.Release release, DeltaWebUpdates.Transport transport,
+            OnlineWebUpdates.Progress progress, Runnable verifying) throws Exception {
+        if (isPending()) throw new IOException("A web bundle is already starting");
+        if (!root.isDirectory() && !root.mkdirs()) throw new IOException("Bundle directory unavailable");
+        File staged = new File(root, "staging");
+        remove(staged);
+        if (!staged.mkdir()) throw new IOException("Staging directory unavailable");
+        final File active = activeRevision() == BUNDLED_REVISION ? null : directory(activeRevision());
+        DeltaWebUpdates.assemble(staged, BuildConfig.VERSION_CODE, release, verifier(), new DeltaWebUpdates.Source() {
+            public List<WebFileManifest.Entry> inventory() throws Exception { return WebBundles.this.inventory(active); }
+            public InputStream open(String path) throws Exception {
+                return active == null ? context.getAssets().open("public/" + path)
+                    : new FileInputStream(WebFileManifest.target(active, path));
+            }
+        }, transport, progress, verifying);
+        return staged;
+    }
+
+    File activate(File staged, int revision) throws Exception {
+        if (isPending() || revision <= activeRevision() || !staged.equals(new File(root, "staging"))
+                || !new File(staged, "index.html").isFile()) throw new IOException("Invalid prepared web version");
+        int current = activeRevision();
+        int previous = isCurrentShell() ? state.getInt("previous", BUNDLED_REVISION) : BUNDLED_REVISION;
+        // Do not replace either stable directory during preparation or activation.
+        if (revision == previous) throw new IOException("Cannot replace a rollback directory");
+        File destination = directory(revision);
+        remove(destination);
+        if (!staged.renameTo(destination)) throw new IOException("Could not activate web bundle");
+        commit(versionState(revision).putInt("previous", current).putBoolean("pending", true)
+            .putInt("priorPrevious", previous).putBoolean("trialStarted", false).remove("outcome"));
+        prune();
+        return destination;
+    }
+
+    private List<WebFileManifest.Entry> inventory(File directory) throws Exception {
+        try (InputStream input = directory == null ? context.getAssets().open("public/" + WebFileManifest.LOCAL)
+                : new FileInputStream(new File(directory, WebFileManifest.LOCAL))) {
+            ByteArrayOutputStream output = new ByteArrayOutputStream();
+            byte[] buffer = new byte[8192];
+            for (int n; (n = input.read(buffer)) != -1;) {
+                if (output.size() + n > WebFileManifest.MAX_BYTES) throw new IOException("Local inventory too large");
+                output.write(buffer, 0, n);
+            }
+            return WebFileManifest.entries(new JSONObject(output.toString("UTF-8")).getJSONArray("files"));
+        } catch (java.io.FileNotFoundException missing) {
+            // Old signed packages/APKs have no inventory. Scan local trusted installation once.
+            List<WebFileManifest.Entry> files = new ArrayList<>();
+            collect(directory, "index.html", files);
+            collect(directory, "assets", files);
+            collect(directory, "icons", files);
+            if (directory != null) writeInventory(directory, files);
+            return files;
+        }
+    }
+
+    private void collect(File directory, String path, List<WebFileManifest.Entry> files) throws Exception {
+        if (files.size() >= WebFileManifest.MAX_FILES) throw new IOException("Too many local files");
+        if (directory == null) {
+            String[] children = context.getAssets().list("public/" + path);
+            if (children != null && children.length > 0) {
+                for (String child : children) collect(null, path + "/" + child, files);
+                return;
+            }
+            if (!WebFileManifest.safePath(path)) return;
+            try (InputStream input = context.getAssets().open("public/" + path)) {
+                files.add(WebFileManifest.describe(path, input));
+            }
+        } else {
+            File file = new File(directory, path);
+            if (file.isDirectory()) {
+                for (File child : children(file)) collect(directory, path + "/" + child.getName(), files);
+            } else if (file.isFile()) {
+                file = WebFileManifest.target(directory, path);
+                try (InputStream input = new FileInputStream(file)) { files.add(WebFileManifest.describe(path, input)); }
+            }
+        }
+    }
+
+    private static void writeInventory(File directory, List<WebFileManifest.Entry> files) throws Exception {
+        JSONArray entries = new JSONArray();
+        for (WebFileManifest.Entry entry : files) entries.put(new JSONObject().put("path", entry.path)
+            .put("bytes", entry.bytes).put("sha256", entry.sha256));
+        try (FileOutputStream output = new FileOutputStream(new File(directory, WebFileManifest.LOCAL))) {
+            output.write(new JSONObject().put("files", entries).toString().getBytes(StandardCharsets.UTF_8));
         }
     }
 
@@ -157,6 +263,7 @@ final class WebBundles {
 
     @SuppressWarnings("deprecation")
     private Signature verifier() throws Exception {
+        if (testVerifier != null) return testVerifier.create();
         PackageManager manager = context.getPackageManager();
         String app = context.getPackageName();
         var signers = Build.VERSION.SDK_INT >= 28
@@ -188,7 +295,7 @@ final class WebBundles {
                 output.write(buffer, 0, count);
             }
         }
-        if (!verifier.verify(signature)) throw new SecurityException("Web bundle signature does not match the APK");
+        if (!verifier.verify(signature)) throw new SignatureMismatch();
     }
 
     private int extract(File archive, File staged, Integer expectedRevision) throws Exception {

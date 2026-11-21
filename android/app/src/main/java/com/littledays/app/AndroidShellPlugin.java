@@ -87,36 +87,44 @@ public class AndroidShellPlugin extends Plugin {
         }
         if (!beginUpdate(call, activity)) return;
         UPDATES.execute(() -> {
-            File download = null;
             try {
                 if (release.web <= activity.bundles().activeRevision()) throw new IOException("Package is no longer newer");
-                File cache = getContext().getCacheDir();
-                File[] stale = cache.listFiles((directory, name) -> name.startsWith("cozy-online-") && name.endsWith(".cozyupdate"));
-                if (stale != null) for (File file : stale) file.delete();
-                download = File.createTempFile("cozy-online-", ".cozyupdate", cache);
-                progress("downloading", 0, release.bytes);
-                online.download(release, download, (received, total) -> progress("downloading", received, total),
-                    () -> progress("verifying", 0, 0));
-                File directory;
-                try (var input = new FileInputStream(download)) {
-                    directory = activity.bundles().install(input, release.web, () -> progress("installing", 0, 0));
-                } catch (SecurityException error) {
-                    call.reject("网页包签名与当前 APK 不匹配。", error);
-                    return;
-                } catch (Exception error) {
-                    call.reject("网页包安装失败。请检查设备存储空间，或重新检查更新。", error);
-                    return;
-                }
+                var bundles = activity.bundles();
+                File staged = DeltaWebUpdates.prepareOrFull(
+                    () -> bundles.prepareDelta(release, online.files(release),
+                        (received, total) -> progress("downloading", received, total),
+                        () -> progress("verifying", 0, 0)),
+                    bundles::discardStaged,
+                    () -> prepareFullDownload(activity, release));
+                progress("installing", 0, 0);
+                File directory = bundles.activate(staged, release.web);
                 reload(call, activity, directory);
+            } catch (WebBundles.SignatureMismatch error) {
+                call.reject("网页包签名与当前 APK 不匹配。", error);
             } catch (SecurityException error) {
                 call.reject("网页包 SHA-256 校验失败，请重试。", error);
             } catch (Exception error) {
                 call.reject("下载未完成。请检查网络和可用存储空间后重试。", error);
             } finally {
-                if (download != null) download.delete();
+                activity.bundles().discardStaged();
                 UPDATING.set(false);
             }
         });
+    }
+
+    private File prepareFullDownload(MainActivity activity, OnlineWebUpdates.Release release) throws Exception {
+        File cache = getContext().getCacheDir();
+        File[] stale = cache.listFiles((directory, name) -> name.startsWith("cozy-online-") && name.endsWith(".cozyupdate"));
+        if (stale != null) for (File file : stale) file.delete();
+        File download = File.createTempFile("cozy-online-", ".cozyupdate", cache);
+        try {
+            progress("downloading", 0, release.bytes);
+            online.download(release, download, (received, total) -> progress("downloading", received, total),
+                () -> progress("verifying", 0, 0));
+            try (var input = new FileInputStream(download)) {
+                return activity.bundles().prepareFull(input, release.web, () -> progress("installing", 0, 0));
+            }
+        } finally { download.delete(); }
     }
 
     private void progress(String stage, long received, long total) {

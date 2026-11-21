@@ -100,6 +100,22 @@ test('offline keeps local content and the manual import and restore entry points
   await expect(page.getByText('当前网页版本 1 · 外壳 4')).toBeVisible();
 });
 
+test('delta progress uses actual bytes and resets correctly on full fallback', async ({ page }) => {
+  await mockShell(page);
+  await start(page);
+  const progress = page.getByRole('progressbar', { name: '网页包下载进度' });
+  await page.evaluate(() => (window as unknown as { fixture: Fixture }).fixture.update('downloading', 512, 1024));
+  await expect(progress).toHaveAttribute('max', '1024');
+  await expect(page.getByText('50%', { exact: true })).toBeVisible();
+  await page.evaluate(() => (window as unknown as { fixture: Fixture }).fixture.update('downloading', 0, 8 * 1024 * 1024));
+  await expect(progress).toHaveAttribute('max', `${8 * 1024 * 1024}`);
+  await expect(progress).toHaveAttribute('value', '0');
+  await expect(page.getByText('0%', { exact: true })).toBeVisible();
+  await page.evaluate(() => (window as unknown as { fixture: Fixture }).fixture.update('downloading', 0, 0));
+  await expect(progress).toHaveCount(0);
+  await expect(page.getByRole('alert')).toHaveCount(0);
+});
+
 for (const [outcome, title] of [['installed', '更新完成！！！'], ['rolledBack', '新网页未能启动，已恢复稳定版本。']] as const) {
   test(`startup displays the native ${outcome} outcome`, async ({ page }) => {
     await mockShell(page, { outcome });

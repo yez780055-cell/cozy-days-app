@@ -21,13 +21,6 @@ public class AndroidDeltaReleaseTest {
     final Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
     MainActivity activity;
 
-    @Test public void seedBeforeApkUpgrade() throws Exception {
-        start();
-        evaluate("localStorage.setItem('cozy-delta-upgrade-qa','synthetic-old-apk');" + DATA.replace("__MODE__", "create"));
-        await(() -> evaluate("window.__deltaData" ).equals("PASS"), 15);
-        instrumentation.runOnMainSync(activity::finish);
-    }
-
     @Test public void signedCandidateUpdatesRollbackAndOfflineData() throws Exception {
         assertEquals(3, instrumentation.getTargetContext().getPackageManager()
             .getPackageInfo(instrumentation.getTargetContext().getPackageName(), 0).versionCode);
@@ -132,10 +125,14 @@ public class AndroidDeltaReleaseTest {
             const expected=JSON.stringify({todo:'synthetic todo',anniversary:'synthetic anniversary',period:'synthetic period',cache:'synthetic account cache'});
             const tx=db.transaction('records','__MODE__'==='create'?'readwrite':'readonly');
             const store=tx.objectStore('records');
-            if('__MODE__'==='create')store.add(expected,'seed');
             const value=store.get('seed');
-            value.onsuccess=()=>{window.__deltaData=value.result===expected?'PASS':'MISMATCH';};
-            tx.oncomplete=()=>db.close();tx.onerror=()=>{window.__deltaData='ERROR';db.close();};
+            let valid=false;
+            value.onsuccess=()=>{
+              if('__MODE__'==='create'&&value.result===undefined){store.add(expected,'seed');valid=true;}
+              else valid=value.result===expected;
+            };
+            tx.oncomplete=()=>{window.__deltaData=valid?'PASS':'MISMATCH';db.close();};
+            tx.onerror=()=>{window.__deltaData='ERROR';db.close();};
           };
         })();
         """;

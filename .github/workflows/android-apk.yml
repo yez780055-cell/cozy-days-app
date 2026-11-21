@@ -208,3 +208,10 @@ jobs:
             artifacts/formal-fixtures/app-release-androidTest.apk
           if-no-files-found: error
           retention-days: 1
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        if: inputs.sign_qa_fixtures
+        with:
+          name: formal-device-test-apk
+          path: artifacts/formal-fixtures/app-release-androidTest.apk
+          if-no-files-found: error
+          retention-days: 1

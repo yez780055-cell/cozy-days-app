@@ -33,7 +33,7 @@ jobs:
       - run: npx playwright install --with-deps chromium
       - name: Existing data and interaction regressions
         run: |
-          npm run build
+          VITE_CLOUDBASE_ENABLED=false npm run build
           VITE_CLOUDBASE_ENABLED=false npm run build:pages
           VITE_CLOUDBASE_ENABLED=false npm run build:android
           npm run test:e2e -- --reporter=line

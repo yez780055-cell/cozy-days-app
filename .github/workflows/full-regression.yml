@@ -23,10 +23,10 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npx playwright install --with-deps chromium
+      - name: Build isolated resources for existing data regression
+        run: VITE_CLOUDBASE_ENABLED=false npm run build
       - name: Run complete browser regression and capture evidence
         run: npm run test:e2e
-      - name: Build web app
-        run: npm run build
       - name: Build GitHub Pages app
         run: VITE_CLOUDBASE_ENABLED=false npm run build:pages
       - name: Verify Pages build and mobile layouts

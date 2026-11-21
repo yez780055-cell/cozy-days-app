@@ -80,7 +80,7 @@ export function AndroidWebUpdatePrompt() {
 }
 
 export function AndroidWebUpdate() {
-  const { status, version, release, error, prerelease } = useWebUpdate();
+  const { status, version, release, error, prerelease, feedback } = useWebUpdate();
   if (Capacitor.getPlatform() !== 'android') return null;
   const busy = isUpdateBusy(status);
 
@@ -107,7 +107,7 @@ export function AndroidWebUpdate() {
         <RotateCcw size={20} aria-hidden="true"/><span>恢复内置网页</span>
       </button>}
     </div>
-    <p className="settings-notice" role="status">{statusText[status]}</p>
+    {feedback && <p className="settings-notice" role="status">{statusText[status]}</p>}
     {error && <p className="settings-notice settings-notice--error" role="alert">{error}</p>}
   </section>;
 }

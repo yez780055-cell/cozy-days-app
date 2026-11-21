@@ -1,3 +1,7 @@
+# 历史 CloudBase 暂存记录（已停止）
+
+修订 9 起，CloudBase 完整合入主线，仅维护一个正式网页版本。本文保留修订 6 的历史验收边界，不再作为发布操作说明。当前流程见 [统一 Android 网页发布](android-web-update-release.md)。
+
 # CloudBase 前端与 Android 网页暂存发布
 
 ## 发布边界

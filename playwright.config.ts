@@ -18,7 +18,7 @@ export default defineConfig({
   },
   webServer: {
     command: `npm run dev -- --host 127.0.0.1 --port ${port} --strictPort`,
-    env: { COZY_E2E_NO_WATCH: '1' },
+    env: { COZY_E2E_NO_WATCH: '1', VITE_CLOUDBASE_ENABLED: 'false' },
     url: baseURL,
     reuseExistingServer: false,
   },

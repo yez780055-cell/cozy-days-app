@@ -1,7 +1,10 @@
 import { readFile } from 'node:fs/promises';
+import { resolve, extname, sep } from 'node:path';
 import { PGlite } from '@electric-sql/pglite';
 import { expect, test, type BrowserContext, type Page } from '@playwright/test';
 import { openPeriod, recordClosedPeriod } from './period-actions';
+
+import { mockShell, type Fixture } from '../tests-android/support/shell-fixture';
 
 const gateway = '**/vicarious-cardinal-d6c5m0ec4d9c0.api.tcloudbasegateway.com/**';
 const room = 'cf1390bd-8749-4c04-a975-c4994c871f62';
@@ -44,6 +47,17 @@ async function fixture() {
   const registered = new Set<string>();
   const requests = { verify: 0, signup: 0, signin: 0, signout: 0 };
   async function install(context: BrowserContext) {
+    if (test.info().project.metadata.androidShell) {
+      for (const page of context.pages()) await mockShell(page, { current: true }, false);
+      // Model the APK asset server: bundled resources remain available without a network.
+      await context.route('http://127.0.0.1:4193/**', async route => {
+        const url = new URL(route.request().url());
+        const file = resolve('dist-android', '.' + (url.pathname === '/' ? '/index.html' : decodeURIComponent(url.pathname)));
+        if (!file.startsWith(resolve('dist-android') + sep)) return route.abort();
+        const contentType = ({ '.html': 'text/html', '.js': 'application/javascript', '.css': 'text/css', '.woff2': 'font/woff2', '.svg': 'image/svg+xml', '.png': 'image/png', '.webp': 'image/webp' } as Record<string, string>)[extname(file)];
+        await route.fulfill({ body: await readFile(file), contentType });
+      });
+    }
     await context.route(gateway, async route => {
       const req = route.request();
       const headers = { 'access-control-allow-origin': '*', 'access-control-allow-methods': 'POST, OPTIONS',
@@ -277,7 +291,7 @@ test('browser syncs after reconnect, retries a committed write and preserves a c
     await Promise.all([f.install(aContext), f.install(bContext)]);
     await join(a, 0, f.invitations[0].code);
     await join(b, 1, f.invitations[1].code);
-    await a.waitForFunction(() => !!navigator.serviceWorker.controller, undefined, { timeout:20000 });
+    if (!test.info().project.metadata.androidShell) await a.waitForFunction(() => !!navigator.serviceWorker.controller, undefined, { timeout:20000 });
     await go(a, '纪念日');
     await aContext.setOffline(true);
     await anniversary(a, '离线创建');
@@ -339,4 +353,29 @@ test('browser syncs after reconnect, retries a committed write and preserves a c
     await Promise.all([aContext.close(), bContext.close()]);
     await f.db.close();
   }
+});
+
+
+test('unified Android retains formal update checks through login and offline reload', async ({ page, context }, info) => {
+  test.skip(!info.project.metadata.androidShell, 'Android bridge integration');
+  const f = await fixture();
+  try {
+    await f.install(context);
+    await join(page, 0, f.invitations[0].code);
+    await page.getByRole('button', { name: '打开应用设置' }).click();
+    await expect(page.getByRole('checkbox', { name: '接收预发布网页更新' })).toHaveCount(0);
+    await expect.poll(() => page.evaluate(() => (window as unknown as { fixture: Fixture }).fixture.prereleaseChecks)).toEqual([false]);
+    await page.getByRole('button', { name: '检查更新' }).click();
+    await expect(page.getByText('当前已是最新版本。')).toBeVisible();
+    await page.evaluate(() => { (window as unknown as { fixture: Fixture }).fixture.offers = true; });
+    await page.getByRole('button', { name: '检查更新' }).click();
+    await page.getByRole('button', { name: '立即更新' }).click();
+    await expect.poll(() => page.evaluate(() => (window as unknown as { fixture: Fixture }).fixture.installs)).toEqual([3]);
+    await page.evaluate(() => (window as unknown as { fixture: Fixture }).fixture.update('downloading', 4194304));
+    await expect(page.getByRole('progressbar')).toHaveAttribute('value', '4194304');
+    await context.setOffline(true);
+    await page.reload();
+    await expect(page.getByRole('button', { name: '打开应用设置' })).toBeVisible();
+    await expect(page.locator('.android-update-frame')).toHaveCount(0);
+  } finally { await context.setOffline(false).catch(() => {}); await f.db.close(); }
 });

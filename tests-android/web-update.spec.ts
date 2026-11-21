@@ -1,66 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
-
-type Outcome = 'installed' | 'rolledBack';
-type Fixture = {
-  web: number; checks: boolean[]; prereleaseChecks: boolean[]; installs: number[];
-  offers: boolean; checkError: boolean; manualError: boolean;
-  update(stage: string, received?: number): void;
-  fail(message: string): void;
-};
-
-async function mockShell(page: Page, options: { offline?: boolean; outcome?: Outcome; current?: boolean; checkDelay?: number; checkError?: boolean } = {}) {
-  await page.addInitScript(({ offline, outcome, current, checkDelay, checkError }) => {
-    if (offline) Object.defineProperty(navigator, 'onLine', { get: () => false });
-    let offeredOutcome = outcome;
-    let progress: ((value: unknown) => void) | undefined;
-    let rejectInstall: ((error: Error) => void) | undefined;
-    const bytes = 8 * 1024 * 1024;
-    const fixture: Fixture = {
-      web: 2, checks: [], prereleaseChecks: [], installs: [], offers: !current, checkError: !!checkError, manualError: false,
-      update: (stage, received = 0) => progress?.({ stage, received, total: bytes }),
-      fail: message => rejectInstall?.(new Error(message)),
-    };
-    Object.assign(window, {
-      fixture, androidBridge: {},
-      Capacitor: {
-        PluginHeaders: [{ name: 'CozyAndroidShell', methods: [
-          ...['getSafeArea', 'ready', 'updateInfo', 'checkOnlineUpdate', 'installOnlineUpdate', 'importUpdate', 'restoreBundled']
-            .map(name => ({ name, rtype: 'promise' })),
-          { name: 'addListener', rtype: 'callback' },
-        ] }],
-        async nativeCallback(_: string, method: string, _args: unknown, handler: (value: unknown) => void) {
-          progress = method === 'addListener' ? handler : undefined;
-          return 'fixture-listener';
-        },
-        async nativePromise(_: string, method: string, args: { retryFailed: boolean; prerelease: boolean; web: number }) {
-          if (method === 'getSafeArea') return { top: 30, right: 0, bottom: 24, left: 0, startupToken: 0, keyboardVisible: false, keyboardViewportHeight: 0 };
-          if (method === 'updateInfo') {
-            const result = { shell: 4, web: fixture.web, outcome: offeredOutcome };
-            offeredOutcome = undefined;
-            return result;
-          }
-          if (method === 'checkOnlineUpdate') {
-            fixture.checks.push(args.retryFailed);
-            if (checkDelay) await new Promise(resolve => setTimeout(resolve, checkDelay));
-            fixture.prereleaseChecks.push(args.prerelease);
-            if (fixture.checkError) throw new Error('暂时无法连接更新源。');
-            return { configured: true, release: fixture.offers ? { web: 3, bytes } : undefined };
-          }
-          if (method === 'installOnlineUpdate') {
-            fixture.installs.push(args.web);
-            return new Promise((_, reject) => { rejectInstall = reject; });
-          }
-          if (method === 'importUpdate') {
-            if (fixture.manualError) throw new Error('更新未安装。');
-            fixture.web = 3;
-          }
-          if (method === 'restoreBundled') fixture.web = 1;
-        },
-      },
-    });
-  }, options);
-  await page.goto('/');
-}
+import { mockShell, type Fixture } from './support/shell-fixture';
 
 const settings = (page: Page) => page.getByRole('button', { name: '打开应用设置' }).click();
 const start = (page: Page) => page.getByRole('button', { name: '立即更新' }).click();
@@ -80,23 +19,17 @@ test('startup checks once, supports later, and checks again in Settings', async 
   expect(await page.evaluate(() => (window as unknown as { fixture: Fixture }).fixture.checks)).toEqual([false, true]);
 });
 
-test('stable is the default and prerelease requires a persistent opt-in', async ({ page }) => {
+test('only the formal channel is used even with a legacy prerelease preference', async ({ page }) => {
+  await page.addInitScript(() => localStorage.setItem('cozy-days.android-prerelease-updates', '1'));
   await mockShell(page, { current: true });
   await settings(page);
-  const toggle = page.getByRole('checkbox', { name: '接收预发布网页更新' });
   const channels = () => page.evaluate(() => (window as unknown as { fixture: Fixture }).fixture.prereleaseChecks);
   await expect.poll(channels).toEqual([false]);
-  await expect(toggle).not.toBeChecked();
-  await toggle.check();
+  await expect(page.getByRole('checkbox', { name: '接收预发布网页更新' })).toHaveCount(0);
   await page.getByRole('button', { name: '检查更新' }).click();
-  await expect.poll(channels).toEqual([false, true]);
+  await expect.poll(channels).toEqual([false, false]);
   await page.reload();
-  await expect.poll(channels).toEqual([true]);
-  await settings(page);
-  await expect(toggle).toBeChecked();
-  await toggle.uncheck();
-  await page.getByRole('button', { name: '检查更新' }).click();
-  await expect.poll(channels).toEqual([true, false]);
+  await expect.poll(channels).toEqual([false]);
 });
 
 test('the progress is byte-based, intermediate stages wait, and errors allow one retry', async ({ page }) => {
@@ -202,14 +135,13 @@ for (const checkError of [false, true]) {
   });
 }
 
-test('an available offer stays still until consent and later survives channel changes', async ({ page }) => {
+test('an available offer stays still until consent and later only manual checks can reopen it', async ({ page }) => {
   await mockShell(page);
   await expect(page.getByRole('button', { name: '立即更新' })).toBeVisible();
   await expect(page.locator('.android-update-cat, .android-update-wait, progress')).toHaveCount(0);
   expect(await calls(page)).toEqual([]);
   await page.getByRole('button', { name: '稍后更新' }).click();
   await settings(page);
-  await page.getByRole('checkbox', { name: '接收预发布网页更新' }).check();
   await expect(page.locator('.android-update-frame')).toHaveCount(0);
   expect(await page.evaluate(() => (window as unknown as { fixture: Fixture }).fixture.checks)).toEqual([false]);
   await page.getByRole('button', { name: '检查更新' }).click();

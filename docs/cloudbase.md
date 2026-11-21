@@ -7,18 +7,17 @@
 1. 在目标环境的 PostgreSQL SQL 编辑器以管理员依次运行 [001_shared_space.sql](../cloudbase/001_shared_space.sql) 和 [002_email_signup_identity.sql](../cloudbase/002_email_signup_identity.sql)。前者创建一个空间、两个空席位、私有表和三个 RPC，后者兼容 CloudBase 邮箱验证码注册留下的身份标记。
 2. 在「身份认证 → 登录方式 → 邮箱验证码」配置 CloudBase 邮件代发或已有 SMTP，并启用邮箱验证码。
 3. 两位成员准备注册时，由管理员运行 [issue_invitations.sql](../cloudbase/issue_invitations.sql)。它为未占用席位随机生成一次性邀请码，有效期 7 天。请私下分别交给两位成员。重复执行会轮换尚未使用的邀请码。
-4. 构建双人版时设置 `VITE_CLOUDBASE_ENABLED=true`。如果部署需要 Publishable Key，可额外设置 `VITE_CLOUDBASE_PUBLISHABLE_KEY`。前端构建只可使用 Publishable Key。若环境限制来源，请为 Web 预览、正式域名和 Android WebView 配置相应的安全来源。
+4. 主线 Web、Pages 和 Android 默认启用 CloudBase，无需启用开关。如果部署需要 Publishable Key，可额外设置 `VITE_CLOUDBASE_PUBLISHABLE_KEY`。前端构建只可使用 Publishable Key。若环境限制来源，请为 Web 预览、正式域名和 Android WebView 配置相应的安全来源。
 5. 两位成员在欢迎页选择「首次使用，注册账号」，填入各自的邮箱和一次性邀请码，再输入邮件验证码。应用验证邮箱、创建账号，并用该登录会话验证和使用邀请码。绑定成功后会自动进入空间。邀请码错误时，可留在注册页更换邀请码并重试绑定。已有账号选择「已有账号，登录」。每台新设备首次进入需联网初始化缓存。
 
 在 Windows PowerShell 启动本机双人版。
 
 ```powershell
 npm ci
-$env:VITE_CLOUDBASE_ENABLED = 'true'
 npm run dev -- --host 127.0.0.1
 ```
 
-同一 PowerShell 会话下可用 `npm run build`、`npm run build:pages` 或 `npm run build:android` 构建双人版。未设置开关的构建沿用单机模式。双人版分别为两个账号建立新的 IndexedDB 和草稿范围，旧本机记录不自动导入。
+同一 PowerShell 会话下可用 `npm run build`、`npm run build:pages` 或 `npm run build:android` 构建同一个正式版本。`VITE_CLOUDBASE_ENABLED=false` 只用于隔离既有数据/交互回归，不生成或发布另一条产品线。双人版分别为两个账号建立新的 IndexedDB 和草稿范围，旧本机记录不自动导入。
 
 ## 权限和同步
 

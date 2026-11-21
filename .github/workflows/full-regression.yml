@@ -28,7 +28,7 @@ jobs:
       - name: Build web app
         run: npm run build
       - name: Build GitHub Pages app
-        run: npm run build:pages
+        run: VITE_CLOUDBASE_ENABLED=false npm run build:pages
       - name: Verify Pages build and mobile layouts
         run: npm run test:pages
       - name: Upload real browser evidence and diagnostics

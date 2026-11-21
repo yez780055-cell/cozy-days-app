@@ -10,7 +10,7 @@ import './styles/global.css';
 import './styles/swipe.css';
 import './styles/settings.css';
 
-const CloudGate = import.meta.env.VITE_CLOUDBASE_ENABLED === 'true'
+const CloudGate = import.meta.env.VITE_CLOUDBASE_ENABLED !== 'false'
   ? lazy(() => import('./features/cloud/CloudGate').then(module => ({ default: module.CloudGate })))
   : null;
 

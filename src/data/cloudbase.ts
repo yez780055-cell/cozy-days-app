@@ -1,7 +1,7 @@
 import { localId } from './localId';
 import type { CloudRecord, CloudScope, PushResponse, SyncAttempt } from './cloudTypes';
 
-export const cloudEnabled = import.meta.env.VITE_CLOUDBASE_ENABLED === 'true';
+export const cloudEnabled = import.meta.env.VITE_CLOUDBASE_ENABLED !== 'false';
 const envId = 'vicarious-cardinal-d6c5m0ec4d9c0';
 const gateway = 'https://' + envId + '.api.tcloudbasegateway.com';
 const authKey = 'cozy-days:cloud-auth:' + envId;

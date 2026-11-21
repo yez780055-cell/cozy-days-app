@@ -1,3 +1,4 @@
+import { chooseDate } from './anniversary-actions';
 import { test, expect, type Page } from '@playwright/test';
 
 async function open(page: Page) {
@@ -23,7 +24,7 @@ async function fill(page: Page, name: string) {
   await page.getByRole('button', { name:'新增纪念日', exact:true }).click();
   const dialog = page.getByRole('dialog', { name:'新增纪念日', exact:true });
   await dialog.getByLabel('纪念日名称').fill(name);
-  await dialog.getByLabel('日期', { exact:true }).fill('2026-10-23');
+  await chooseDate(dialog, '2026-10-23');
   return dialog;
 }
 

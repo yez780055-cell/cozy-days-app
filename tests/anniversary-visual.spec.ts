@@ -31,7 +31,7 @@ for (const viewport of [{width:360,height:740},{width:393,height:852},{width:430
     await expect(page.locator('.ann-featured-count')).toHaveText('今天');
     await expect(cards.locator('.ann-ticket--birthday')).toHaveText('DEC06');
     await expect(cards.locator('.ann-ticket--yearly')).toHaveText('JAN01');
-    await expect(cards.filter({hasText:'更晚才开始'}).locator('.ann-count')).toHaveText('还有 31 天');
+    await expect(cards.filter({hasText:'更晚才开始'}).locator('.ann-count')).toHaveText('31天后');
     const search = page.getByRole('searchbox',{name:'搜索纪念日'});
     await search.fill('没有匹配');
     await expect(page.getByText('没有符合条件的纪念日')).toBeVisible();

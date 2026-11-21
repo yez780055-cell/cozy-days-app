@@ -1,17 +1,17 @@
+import { chooseDate } from './anniversary-actions';
 import { test, expect, type Page } from '@playwright/test';
 async function add(page:Page,name:string,date:string,yearly:boolean) {
  await page.getByRole('button',{name:'新增纪念日',exact:true}).click();
  const dialog=page.getByRole('dialog',{name:'新增纪念日'});
  await dialog.getByLabel('纪念日名称').fill(name);
- await dialog.getByLabel('日期',{exact:true}).fill(date);
+ await chooseDate(dialog, date);
  await dialog.getByLabel('每年重复').setChecked(yearly);
  await dialog.getByRole('button',{name:'保存纪念日'}).click();
  await expect(dialog).toHaveCount(0);
 }
 test.beforeEach(async({page})=>{
  await page.clock.setFixedTime(new Date('2026-02-20T04:00:00Z'));
- await page.route('http://cozy-days.test/**',async route=>{const path=new URL(route.request().url()).pathname;try{await route.fulfill({path:'dist'+(path==='/'?'/index.html':path)});}catch{await route.fulfill({status:404});}});
- await page.goto('http://cozy-days.test/');
+ await page.goto('/');
  await page.getByRole('navigation').getByRole('button',{name:'纪念日'}).click();
 });
 test('sort, repeat, leap day, shared dates and editing',async({page})=>{
@@ -36,7 +36,7 @@ test('sort, repeat, leap day, shared dates and editing',async({page})=>{
  await page.getByRole('button',{name:'查看详情：闰日'}).click();
  await expect(page.getByText('纪念日期 · 2026-02-28')).toBeVisible();
  await page.getByRole('button',{name:'编辑纪念日',exact:true}).click();
- await expect(page.getByRole('dialog',{name:'编辑纪念日'}).getByLabel('日期',{exact:true})).toHaveValue('2020-02-29');
+ await expect(page.getByRole('dialog',{name:'编辑纪念日'}).getByRole('button',{name:'选择日期',exact:true})).toContainText('2020 / 02 / 29');
  await page.getByRole('dialog').getByRole('button',{name:'取消',exact:true}).click();
  await page.reload();
  await page.getByRole('navigation').getByRole('button',{name:'纪念日'}).click();

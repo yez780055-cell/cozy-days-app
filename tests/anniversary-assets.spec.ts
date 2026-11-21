@@ -1,3 +1,4 @@
+import { chooseDate } from './anniversary-actions';
 import { test, expect } from '@playwright/test';
 test.use({timezoneId:'Asia/Shanghai'});
 
@@ -8,7 +9,7 @@ const viewports = [
 ];
 
 for (const viewport of viewports) {
-  test(`registered double-cat artwork and gold cover framing at ${viewport.width}px`, async ({ page }) => {
+  test(`compact cream cover and preserved detail artwork at ${viewport.width}px`, async ({ page }) => {
     await page.setViewportSize(viewport);
     await page.clock.setFixedTime(new Date('2026-11-19T12:00:00+08:00'));
     await page.goto('/');
@@ -16,18 +17,16 @@ for (const viewport of viewports) {
     await page.getByRole('button', { name:'新增纪念日', exact:true }).click();
     const form = page.getByRole('dialog');
     await form.getByLabel('纪念日名称').fill('相遇纪念');
-    await form.getByLabel('日期', { exact:true }).fill('2023-05-20');
+    await chooseDate(form, '2023-05-20');
     await form.getByRole('button', { name:'保存纪念日', exact:true }).click();
     await expect(form).toHaveCount(0);
     const cover = page.locator('.ann-featured');
-    await expect(cover).toHaveCSS('background-color','rgb(235, 216, 198)');
+    expect((await cover.boundingBox())!.height).toBeLessThan(180);
     await expect(cover).toHaveCSS('border-top-width','4px');
-    await expect(cover).toHaveCSS('border-radius','24px 6px');
-    await expect(cover.locator('.ann-featured-count strong')).toHaveCSS('font-size','64px');
+    await expect(cover).toHaveCSS('border-radius','24px');
+    await expect(cover.locator('.ann-featured-count strong')).toBeVisible();
     await expect(page.locator('.ann-ticket')).toHaveCSS('height','59px');
-    const cats = cover.locator('img');
-    await expect(cats).toHaveAttribute('src',/cats_empty_state/);
-    await cats.evaluate(img => (img as HTMLImageElement).decode());
+    await expect(cover.locator('img')).toHaveCount(0);
     await page.getByRole('button',{name:'查看详情：相遇纪念'}).click();
     const art = page.locator('.ann-detail .ann-art');
     await expect(art.locator('img')).toHaveAttribute('src',/cats_empty_state/);

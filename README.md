@@ -1,5 +1,7 @@
 # 小饱日常 Cozy Days
 
+双人版的 CloudBase 配置、邀请码和测试说明见 [CloudBase 双人空间](docs/cloudbase.md)。
+
 一个本地存储的手机手账。待办支持分类、收藏、日期、时间、滑动与撤销；生理期支持经期区间、月历、统计和每日记录；纪念日支持倒计时、年度重复和月历。三个模块均可使用真实数据，初始不写入示例记录。
 
 ## 本地运行
@@ -48,3 +50,5 @@ npm run test:pages
 ## Android
 
 项目已包含原生工程。安装 JDK 21、Android Studio 和 Android SDK Platform 35 后，用 `npm run android:sync` 同步 Web 产物，再用 `npm run android:open` 打开工程。APK 内置网页资源，发布签名、覆盖升级和离线模拟器记录见 [Android 发布说明](docs/android-release.md) 与 [0.2.1 交付记录](docs/android-deliveries/v0.2.1-android.1.md)。换设备或卸载前请先导出备份。
+
+Android 自网页修订 9 起统一为现有正式 APK、一个含 CloudBase 的正式网页版本和正式更新通道。默认构建包含邮箱登录/注册、双人共享、云端同步和 IndexedDB 缓存；发布见 [统一 Android 网页发布](docs/android-web-update-release.md)。

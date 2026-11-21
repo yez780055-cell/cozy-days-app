@@ -2,6 +2,7 @@ import Dexie, { type Table } from 'dexie';
 import type { Anniversary } from '../features/anniversary/model';
 import { decorationIdentity, resolveDecoration, type TaskDecoration } from '../features/todo/decorations';
 import { DEFAULT_CATEGORY, categoryKey, defaultCategories, type Category } from './categories';
+import type { CloudScope, SyncConflict, SyncRecord } from './cloudTypes';
 
 export interface Todo {
   id?: number;
@@ -44,8 +45,22 @@ class LocalDatabase extends Dexie {
   anniversaries!: Table<Anniversary, number>;
   todos!: Table<Todo, number>;
   categories!: Table<Category,string>;
-  constructor() {
-    super('little-days');
+  state!: Table<{ id: string; value: unknown }, string>;
+  syncRecords!: Table<SyncRecord, string>;
+  syncConflicts!: Table<SyncConflict, string>;
+  constructor(scope?: CloudScope) {
+    super(scope ? `little-days-cloud-${scope.spaceId}-${scope.userId}` : 'little-days');
+    if (scope) {
+      this.version(1).stores({
+        todos: 'id,date,completed,createdAt,categoryId',
+        categories: 'id,key,createdAt',
+        anniversaries: 'id,date,createdAt',
+        state: 'id',
+        syncRecords: 'key,dirty',
+        syncConflicts: 'operation,at',
+      });
+      return;
+    }
     this.version(1).stores({ todos: '++id,date,completed,createdAt' });
     this.version(2).stores({ todos: '++id,date,completed,createdAt' }).upgrade(transaction =>
       transaction.table<Todo>('todos').toCollection().modify(todo => {
@@ -61,4 +76,20 @@ class LocalDatabase extends Dexie {
     this.on('populate',transaction=>transaction.table('categories').bulkPut(defaultCategories));
   }
 }
-export const database = new LocalDatabase();
+export let database = new LocalDatabase();
+export let cloudScope: CloudScope | undefined;
+
+export function openCloudDatabase(scope: CloudScope) {
+  if (cloudScope) throw new Error('Changing accounts requires a fresh app session');
+  const cloudDatabase = new LocalDatabase(scope);
+  return cloudDatabase.open().then(() => {
+    database = cloudDatabase;
+    cloudScope = scope;
+  });
+}
+
+export function newCloudRecordId(): number | undefined {
+  if (!cloudScope) return undefined;
+  const [high, low] = crypto.getRandomValues(new Uint32Array(2));
+  return (high % 0x100000) * 0x100000000 + low || 1;
+}

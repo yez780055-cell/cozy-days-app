@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { lazy, Suspense } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './app/App';
 import { PwaUpdate } from './PwaUpdate';
@@ -10,8 +10,14 @@ import './styles/global.css';
 import './styles/swipe.css';
 import './styles/settings.css';
 
+const CloudGate = import.meta.env.VITE_CLOUDBASE_ENABLED !== 'false'
+  ? lazy(() => import('./features/cloud/CloudGate').then(module => ({ default: module.CloudGate })))
+  : null;
+
 createRoot(document.getElementById('root')!).render(
-  <React.StrictMode><App/><PwaUpdate/>{import.meta.env.MODE === 'android' && Capacitor.getPlatform() === 'android'
+  <React.StrictMode>{CloudGate
+    ? <Suspense fallback={<p role="status">正在打开小饱日常…</p>}><CloudGate><App/></CloudGate></Suspense>
+    : <App/>}<PwaUpdate/>{import.meta.env.MODE === 'android' && Capacitor.getPlatform() === 'android'
     && <AndroidWebUpdatePrompt/>}</React.StrictMode>,
 );
 

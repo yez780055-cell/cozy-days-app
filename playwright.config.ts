@@ -6,7 +6,7 @@ const baseURL = `http://127.0.0.1:${port}`;
 
 export default defineConfig({
   testDir: './tests',
-  testIgnore: ['pages.spec.ts', 'pwa.spec.ts'],
+  testIgnore: ['pages.spec.ts', 'pwa.spec.ts', 'cloudbase.spec.ts'],
   fullyParallel: false,
   workers: 1,
   timeout: 30_000,
@@ -18,7 +18,7 @@ export default defineConfig({
   },
   webServer: {
     command: `npm run dev -- --host 127.0.0.1 --port ${port} --strictPort`,
-    env: { COZY_E2E_NO_WATCH: '1' },
+    env: { COZY_E2E_NO_WATCH: '1', VITE_CLOUDBASE_ENABLED: 'false' },
     url: baseURL,
     reuseExistingServer: false,
   },

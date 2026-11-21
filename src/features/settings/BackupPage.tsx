@@ -4,6 +4,7 @@ import { Download, FileUp } from 'lucide-react';
 import { Button } from '../../components/Button';
 import { SettingsHeader } from './SettingsHeader';
 import { exportBackup, exportPreviousBackup, restoreBackup } from '../../data/backup';
+import { cloudScope } from '../../data/localDatabase';
 import { decodeBackup, maxBackupBytes, type Backup, type RestoreMode } from '../../data/backupModel';
 import { canRestore } from '../../data/storageAccess';
 import { useAndroidBack } from '../../native/back';
@@ -125,7 +126,8 @@ export function BackupPage({ onBack }: { onBack: () => void }) {
             <label><input type="radio" name="restore-mode" checked={mode === 'replace'} onChange={() => setMode('replace')}/>替换本机数据</label>
           </fieldset>
           <p className={mode === 'replace' ? 'settings-notice settings-notice--warning' : undefined}>{mode === 'merge' ? '跳过重复项；同日或重叠的生理期记录优先保留本机版本。'
-            : '本机三个模块的已保存数据将被替换。应用会先保存一份本机备份。'}</p>
+            : '当前三个模块的已保存数据将被替换。应用会先保存一份本机备份。'}</p>
+          {cloudScope && <p className="settings-notice settings-notice--warning">恢复会同步到云端。纪念日和生理期的更改也会对另一位成员生效。</p>}
           <p>继续前请关闭其他已打开的旧版应用页面。</p>
           <div className="backup-confirm">
             <Button variant="soft" disabled={busy} onClick={cancelSelection}>取消</Button>

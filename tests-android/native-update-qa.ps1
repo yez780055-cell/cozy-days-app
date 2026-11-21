@@ -158,6 +158,9 @@ function Import-TestBundle([int]$revision) {
 }
 
 function Go-Offline {
+    if ($Formal -and ((Invoke-Adb reverse --list) -match 'tcp:4489 tcp:4489')) {
+        Invoke-Adb reverse --remove tcp:4489
+    }
     Invoke-Adb shell svc wifi disable
     Invoke-Adb shell svc data disable
     for ($attempt = 0; $attempt -lt 10; $attempt++) {
@@ -346,6 +349,7 @@ switch ($Step) {
         Compare-Records 'after-interruption'
         Invoke-Adb shell svc wifi enable
         Invoke-Adb shell svc data enable
+        if ($Formal) { Invoke-Adb reverse tcp:4489 tcp:4489 }
     }
     'GitHubSecond' {
         Open-GitHubRelease 3

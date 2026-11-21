@@ -14,16 +14,18 @@ async function fixture() {
     create role anon;
     create role authenticated;
     create schema auth;
-    create table auth.users(id bigint primary key, email text, email_verified boolean);
+    create table auth.users(id bigint primary key, email text, email_verified boolean, created_from text);
     create function auth.jwt() returns jsonb language sql stable as $$
       select nullif(current_setting('request.jwt.claims', true), '')::jsonb
     $$;
     create function auth.uid() returns text language sql stable as $$ select auth.jwt()->>'sub' $$;
     create function auth.role() returns text language sql stable as $$ select auth.jwt()->>'role' $$;
-    insert into auth.users values (${users[0]}, '${email(0)}', true), (${users[1]}, '${email(1)}', true),
-      (${users[2]}, '${email(2)}', true), (4, 'unverified@example.test', false);
+    insert into auth.users values (${users[0]}, '${email(0)}', null, 'email'), (${users[1]}, '${email(1)}', true, 'email'),
+      (${users[2]}, '${email(2)}', true, 'email'), (4, 'unverified@example.test', null, 'admin'),
+      (5, 'explicitly-unverified@example.test', false, 'email');
   `);
   await db.exec(await readFile(new URL('../cloudbase/001_shared_space.sql', import.meta.url), 'utf8'));
+  await db.exec(await readFile(new URL('../cloudbase/002_email_signup_identity.sql', import.meta.url), 'utf8'));
   const { rows: invitations } = await db.query<{ code: string }>(
     await readFile(new URL('../cloudbase/issue_invitations.sql', import.meta.url), 'utf8'));
 
@@ -101,6 +103,7 @@ test('PostgreSQL enforces two verified members and isolates private records', as
     const [a, b, outsider] = users;
     await expect(rpc(null, 'space', [null])).rejects.toThrow();
     await expect(rpc('4', 'space', [invitations[0].code])).rejects.toThrow('COZY_AUTH_REQUIRED');
+    await expect(rpc('5', 'space', [invitations[0].code])).rejects.toThrow('COZY_AUTH_REQUIRED');
     await expect(rpc(a, 'space', [invitations[0].code])).resolves.toMatchObject({ userId:a, members:1 });
     await expect(rpc(outsider, 'space', [invitations[0].code])).rejects.toThrow('COZY_INVITE_INVALID');
     await expect(rpc(b, 'space', [invitations[1].code])).resolves.toMatchObject({ userId:b, members:2 });

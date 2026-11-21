@@ -4,7 +4,7 @@
 
 ## 初始化与启用
 
-1. 在目标环境的 PostgreSQL SQL 编辑器以管理员运行 [001_shared_space.sql](../cloudbase/001_shared_space.sql)。脚本创建一个空间、两个空席位、私有表和三个 RPC。
+1. 在目标环境的 PostgreSQL SQL 编辑器以管理员依次运行 [001_shared_space.sql](../cloudbase/001_shared_space.sql) 和 [002_email_signup_identity.sql](../cloudbase/002_email_signup_identity.sql)。前者创建一个空间、两个空席位、私有表和三个 RPC，后者兼容 CloudBase 邮箱验证码注册留下的身份标记。
 2. 在「身份认证 → 登录方式 → 邮箱验证码」配置 CloudBase 邮件代发或已有 SMTP，并启用邮箱验证码。
 3. 两位成员准备注册时，由管理员运行 [issue_invitations.sql](../cloudbase/issue_invitations.sql)。它为未占用席位随机生成一次性邀请码，有效期 7 天。请私下分别交给两位成员。重复执行会轮换尚未使用的邀请码。
 4. 构建双人版时设置 `VITE_CLOUDBASE_ENABLED=true`。如果部署需要 Publishable Key，可额外设置 `VITE_CLOUDBASE_PUBLISHABLE_KEY`。前端构建只可使用 Publishable Key。若环境限制来源，请为 Web 预览、正式域名和 Android WebView 配置相应的安全来源。

@@ -130,7 +130,12 @@ final class WebBundles {
             remove(staged);
             if (!staged.mkdir()) throw new IOException("Staging directory unavailable");
             stagedRevision = extract(archive, staged, expectedRevision);
-            inventory(staged);
+            // Inventory is an optimization. A legacy full package must install independently of it.
+            try { inventory(staged); }
+            catch (Exception error) {
+                new File(staged, WebFileManifest.LOCAL).delete();
+                android.util.Log.w("CozyDays", "Full package verified; local inventory will be rebuilt later", error);
+            }
             return staged;
         } catch (Exception error) {
             remove(staged);

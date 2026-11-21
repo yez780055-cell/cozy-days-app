@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react';
+import { cloudChanged } from '../../data/cloudTypes';
+import { cloudScope } from '../../data/localDatabase';
 import { emptyData, type PeriodData } from './model';
 import { PeriodConflictError, periodRepository, validPeriodData } from './repository';
 import { archiveConflict, conflictArchives, isRecoveryStorageKey, pendingRecovery, recoveryNotice, recoveryStatus, setPending } from './recovery';
@@ -62,9 +64,18 @@ export function usePeriod() {
   useEffect(() => {
     const notify = () => render(n => n + 1);
     const storage=(event:StorageEvent)=>{if(isRecoveryStorageKey(event.key))notify();};
+    const refresh = () => {
+      if (writing) {
+        void writing.then(refresh);
+      } else if (!state.restoring && !conflict && !pendingRecovery()) {
+        void (loading ?? Promise.resolve()).then(load);
+      }
+    };
     listeners.add(notify);window.addEventListener('storage',storage);
+    window.addEventListener(cloudChanged, refresh);
     if (!state.ready&&!state.restoring&&!conflict) void load();
-    return () => { listeners.delete(notify);window.removeEventListener('storage',storage); };
+    else if (cloudScope) refresh();
+    return () => { listeners.delete(notify);window.removeEventListener('storage',storage);window.removeEventListener(cloudChanged, refresh); };
   }, []);
   function update(change: (value: PeriodData) => PeriodData) {
     if (!state.ready) return Promise.resolve(false);

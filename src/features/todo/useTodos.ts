@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { categoryRepository, todoRepository, type Todo } from '../../data/database';
 import { CategoryError, canonicalTime, DEFAULT_CATEGORY, type Category } from '../../data/categories';
 import type { TaskDecoration } from './decorations';
+import { cloudChanged } from '../../data/cloudTypes';
 export function useTodos() {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [categories,setCategories]=useState<Category[]>([]);
@@ -15,7 +16,13 @@ export function useTodos() {
     catch { if (alive.current) setError('暂时无法读取本地数据，请检查浏览器是否允许本地存储。'); }
     finally { if (alive.current) setLoading(false); }
   }, []);
-  useEffect(() => { alive.current = true; void refresh(); return () => { alive.current = false; }; }, [refresh]);
+  useEffect(() => {
+    alive.current = true;
+    void refresh();
+    const read = () => { void refresh(); };
+    window.addEventListener(cloudChanged, read);
+    return () => { alive.current = false; window.removeEventListener(cloudChanged, read); };
+  }, [refresh]);
   const mutate = useCallback((action: () => Promise<unknown>) => {
     const result = queue.current.then(async () => {
       if (alive.current) setSaveStatus('正在保存…');

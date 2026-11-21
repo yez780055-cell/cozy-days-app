@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { CalendarDays, ChevronRight, DatabaseBackup, Type } from 'lucide-react';
+import { CalendarDays, ChevronRight, Cloud, DatabaseBackup, Type } from 'lucide-react';
+import { CloudAccount, useCloudAccount } from '../cloud/CloudAccount';
 import { Button } from '../../components/Button';
 import { CycleInfoPage } from '../period/CycleInfoPage';
 import { BackupPage } from './BackupPage';
@@ -11,11 +12,13 @@ export function SettingsPage({ fontId, pendingFontId, failedFontId, onSelect, on
   fontId: FontId; pendingFontId: FontId | null; failedFontId: FontId | null;
   onSelect: (id: FontId) => void; onBack: () => void;
 }) {
-  const [section, setSection] = useState<'appearance' | 'cycle' | 'backup'>();
+  const [section, setSection] = useState<'appearance' | 'cycle' | 'backup' | 'cloud'>();
+  const account = useCloudAccount();
   const returnToSettings = () => setSection(undefined);
   const selected = getFontOption(fontId);
   if (section === 'cycle') return <CycleInfoPage onBack={returnToSettings}/>;
   if (section === 'backup') return <BackupPage onBack={returnToSettings}/>;
+  if (section === 'cloud') return <CloudAccount onBack={returnToSettings}/>;
 
   if (section === 'appearance') return <section className="settings-page" aria-label="外观与字体">
     <SettingsHeader title="外观与字体" onBack={returnToSettings}/>
@@ -40,6 +43,10 @@ export function SettingsPage({ fontId, pendingFontId, failedFontId, onSelect, on
   </section>;
 
   const groups = [
+    ...(account ? [{ id:'cloud', heading:'双人空间', label:'账号与同步', Icon:Cloud,
+      value:account.status.conflicts.length ? `${account.status.conflicts.length} 条冲突` :
+        account.status.pending ? `${account.status.pending} 条待同步` : account.status.phase === 'offline' ? '离线' : '已绑定',
+    } as const] : []),
     { id:'appearance', heading:'外观', label:'外观与字体', value:selected.name, Icon:Type },
     { id:'cycle', heading:'记录', label:'周期信息', Icon:CalendarDays },
     { id:'backup', heading:'数据', label:'数据备份与恢复', Icon:DatabaseBackup },
@@ -57,6 +64,6 @@ export function SettingsPage({ fontId, pendingFontId, failedFontId, onSelect, on
       </div>
     </section>)}
     {import.meta.env.MODE === 'android' && <AndroidWebUpdate/>}
-    <p className="settings-intro">记录保存在本机。换设备前请导出备份。</p>
+    <p className="settings-intro">{account ? '断网时可继续记录，联网后自动同步。' : '记录保存在本机。换设备前请导出备份。'}</p>
   </section>;
 }

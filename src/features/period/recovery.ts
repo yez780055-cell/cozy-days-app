@@ -1,9 +1,11 @@
 import { localId } from '../../data/localId';
 import { useState } from 'react';
-const key = 'cozy-days-period-recovery-v1';
-const prefix = key + '-document-';
+const legacyKey = 'cozy-days-period-recovery-v1';
+let key = legacyKey;
+let prefix = key + '-document-';
 type Recovery = { pending?: {data:unknown;base:string}; drafts?: Record<string, unknown>; stamp?: number; conflicts?: unknown[]; owner?:string; tab?:string };
-const owner=localId(), localKey=prefix+owner;
+const owner=localId();
+let localKey=prefix+owner;
 let kind: 'local'|'session'|'memory' = 'memory';
 function parse(raw:string|null):Recovery|undefined {
   try { const value=raw?JSON.parse(raw):undefined;return value&&typeof value==='object'&&!Array.isArray(value)&&Number.isSafeInteger(value.stamp)&&value.stamp>=0?value:undefined; } catch { return undefined; }
@@ -13,17 +15,23 @@ function localRecords() {
   try { for(let i=0;i<localStorage.length;i++) {const name=localStorage.key(i);if(name&&(name===key||name.startsWith(prefix))) {const value=parse(localStorage.getItem(name));if(value)records.push({key:name,value});}} } catch { /* optional local storage */ }
   return records;
 }
-let session:Recovery|undefined;
-try { session=parse(sessionStorage.getItem(key)); } catch { /* optional session storage */ }
-const records=localRecords();
-const related=session?records.filter(r=>session!.tab?r.value.tab===session!.tab:r.value.owner===session!.owner):records;
-const candidates=[...related.map(r=>({value:r.value,kind:'local' as const})),...(session?[{value:session,kind:'session' as const}]:[])];
-candidates.sort((a,b)=>(b.value.stamp??0)-(a.value.stamp??0));
-let memory:Recovery=candidates[0]?.value??{};
-kind=candidates[0]?.kind??'memory';
-// Each document owns its local slot. Reloads and duplicate tabs never overwrite
-// another document's pending snapshot; per-tab session state selects continuity.
-memory={...memory,owner,tab:session?.tab??localId()};
+let memory: Recovery;
+export function setPeriodRecoveryScope(scope?: string) {
+  key = scope ? legacyKey + ':cloud:' + scope : legacyKey;
+  prefix = key + '-document-';
+  localKey = prefix + owner;
+  let session: Recovery | undefined;
+  try { session = parse(sessionStorage.getItem(key)); } catch { /* optional session storage */ }
+  const records = localRecords();
+  const related = session ? records.filter(r => session.tab ? r.value.tab === session.tab : r.value.owner === session.owner) : records;
+  const candidates = [...related.map(r => ({ value: r.value, kind: 'local' as const })),
+    ...(session ? [{ value: session, kind: 'session' as const }] : [])];
+  candidates.sort((a,b) => (b.value.stamp ?? 0) - (a.value.stamp ?? 0));
+  kind = candidates[0]?.kind ?? 'memory';
+  // Each document owns its local slot. Per-tab session state selects continuity.
+  memory = { ...candidates[0]?.value, owner, tab: session?.tab ?? localId() };
+}
+setPeriodRecoveryScope();
 export function persistRecovery() {
   memory.stamp = Math.max(Date.now(), (memory.stamp ?? 0) + 1);
   kind='memory';

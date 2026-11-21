@@ -1,5 +1,6 @@
 import Dexie, { type Table } from 'dexie';
 import { validPeriodData, type PeriodData } from '../features/period/model';
+import { database } from './localDatabase';
 
 class PeriodDatabase extends Dexie {
   state!: Table<{ id: string; value: unknown }, string>;
@@ -10,7 +11,8 @@ class PeriodDatabase extends Dexie {
   }
 }
 
-export const periodDatabase = new PeriodDatabase();
+export let periodDatabase: Dexie & { state: PeriodDatabase['state'] } = new PeriodDatabase();
+export function useCloudPeriodDatabase() { periodDatabase = database; }
 
 export async function readPeriod(): Promise<PeriodData | null> {
   const record = await periodDatabase.state.get('local');

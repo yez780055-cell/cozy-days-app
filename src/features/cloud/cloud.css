@@ -1,0 +1,19 @@
+.cloud-gate { overflow: auto; padding: 1.5rem; }
+.cloud-gate-content { flex: none; width: min(100%, 24rem); margin: auto; }
+.cloud-gate h1 { margin: .5rem 0; }
+.cloud-gate-art { display: block; width: 8rem; height: 6rem; object-fit: contain; }
+.cloud-gate form, .cloud-entry { display: grid; gap: .75rem; }
+.cloud-gate h2, .cloud-gate p, .cloud-panel p { margin: 0; }
+.cloud-gate label { display: grid; gap: .35rem; }
+.cloud-gate input {
+  width: 100%;
+  min-height: var(--field-height);
+  padding: .5rem .75rem;
+  border: 1px solid var(--control);
+  border-radius: var(--control-radius);
+  background: var(--surface);
+}
+.cloud-gate .error-message { margin-top: 1rem; }
+.cloud-panel { display: grid; padding: 1rem; gap: .65rem; margin-bottom: .75rem; overflow-wrap: anywhere; }
+.cloud-panel pre { white-space: pre-wrap; max-height: 15rem; overflow: auto; }
+.cloud-actions { display: flex; flex-wrap: wrap; gap: .5rem; }

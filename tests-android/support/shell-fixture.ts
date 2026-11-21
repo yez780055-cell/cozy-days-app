@@ -61,4 +61,3 @@ export async function mockShell(page: Page, options: { offline?: boolean; outcom
   }, options);
   if (navigate) await page.goto('/');
 }
-

@@ -25,7 +25,14 @@ function Wheel({ label, options, value, onChange, onMoving }: { label: string; o
       setScrollIndex(nextIndex);
       onMoving(true);
       clearTimeout(timer.current);
-      timer.current = setTimeout(() => { if (ref.current) ref.current.scrollTop = nextIndex * 40; if (options[nextIndex].value !== value) onChange(options[nextIndex].value); onMoving(false); }, 120);
+      timer.current = setTimeout(() => {
+        // Read the actual position at settling time: a newer scroll may precede its scroll event.
+        const settled = Math.max(0, Math.min(options.length - 1, Math.round((ref.current?.scrollTop ?? nextIndex * 40) / 40)));
+        if (ref.current) ref.current.scrollTop = settled * 40;
+        setScrollIndex(settled);
+        if (options[settled].value !== value) onChange(options[settled].value);
+        onMoving(false);
+      }, 120);
     }}>
     <div style={{ height: options.length * 40 + 160, position: 'relative' }}>
     {options.slice(start, scrollIndex + 5).map((option, offset) => <div key={option.value} id={`ann-${label}-${option.value}`} role="option" aria-selected={value === option.value}

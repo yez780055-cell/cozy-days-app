@@ -1,5 +1,7 @@
 # Android 0.2.1 发布
 
+本文记录正式外壳 1 的历史交付流程。外壳 2 的一键更新、签名构建和验收证据见 [Android 网页更新发布流程](android-web-update-release.md)。
+
 正式应用固定为 `com.littledays.app`，`versionName=0.2.1`，默认 `versionCode=1`。`ANDROID_VERSION_CODE` 可覆盖为不超过 2100000000 的正整数。Capacitor 默认源站保持 `https://localhost`；应用使用 APK 内置的 HTML、JS 和 CSS，不设置 `server.url`。不改变业务逻辑、数据库或权限。
 
 ## 长期签名与升级

@@ -5,7 +5,7 @@ import { Modal } from '../../components/Modal';
 import { Button } from '../../components/Button';
 import { cycleStats, shortDate, sortedPeriods, validatePeriod, type CycleSettings, type PeriodData, type PeriodEntry } from './model';
 
-export function PeriodEditor({ entry, data, today, onSave, onClose }: {entry:PeriodEntry;data:PeriodData;today:string;onSave:(entry:PeriodEntry)=>Promise<boolean>;onClose:()=>void}) {
+export function PeriodEditor({ entry, data, today, onSave, onClose, onAndroidBack }: {entry:PeriodEntry;data:PeriodData;today:string;onSave:(entry:PeriodEntry)=>Promise<boolean>;onClose:()=>void;onAndroidBack?:()=>boolean}) {
   const [draft,setDraft]=usePeriodDraft('editor-'+entry.id,()=>({id:entry.id,start:entry.start,end:entry.end??''}));
   const {start,end}=draft;
   const maxDate = [today, entry.start, entry.end ?? today].sort()[2];
@@ -19,7 +19,7 @@ export function PeriodEditor({ entry, data, today, onSave, onClose }: {entry:Per
     if(message) {setError(message);return;}
     setSaving(true); const ok=await onSave(value); setSaving(false); if(!ok) setError('保存失败，表单草稿已保留，请重试。');
   }
-  return <Modal title="修改经期记录" onClose={onClose} canClose={()=>!saving} className="period-dialog"><form onSubmit={submit}>
+  return <Modal title="修改经期记录" onClose={onClose} onAndroidBack={onAndroidBack} canClose={()=>!saving} className="period-dialog"><form onSubmit={submit}>
     <label>开始日期<input type="date" disabled={saving} required value={start} max={maxDate} onChange={e=>setStart(e.target.value)}/></label>
     <label>结束日期（修改进行中记录时可留空）<input type="date" disabled={saving} value={end} min={start} max={maxDate} onChange={e=>setEnd(e.target.value)}/></label>
     <p className="period-fine">只填写真实发生的日期。流量、症状与心情在对应日期单独记录。</p>
@@ -28,7 +28,8 @@ export function PeriodEditor({ entry, data, today, onSave, onClose }: {entry:Per
 }
 export function PeriodHistory({ data, error, saving, onRetry, onEdit, onRemove, onClose }: {data:PeriodData;error:string;saving:boolean;onRetry:()=>void;onEdit:(entry:PeriodEntry)=>void;onRemove:(id:string)=>void;onClose:()=>void}) {
   const [removing,setRemoving]=useState<string>();
-  return <Modal title="历史经期记录" onClose={onClose} className="period-dialog">
+  return <Modal title="历史经期记录" onClose={onClose} className="period-dialog"
+    onAndroidBack={() => { if (!removing) return false; setRemoving(undefined); return true; }}>
     {error && <div role="alert" className="period-error">
       <p>{error}</p><p>{recoveryNotice()}</p>
       <Button variant="soft" disabled={saving} onClick={onRetry}>重试保存</Button>

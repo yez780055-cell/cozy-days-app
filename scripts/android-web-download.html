@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="zh-CN">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<title>小饱日常网页更新</title>
+<style>
+  body { max-width: 32rem; margin: 4rem auto; padding: 0 1.25rem; font: 1rem/1.6 system-ui, sans-serif; color: #42352e; background: #fbf6ec; }
+  h1 { font-size: 1.5rem; }
+  a, button { color: #7c412b; font: inherit; }
+</style>
+<main>
+  <h1>小饱日常网页更新 · __WEB_REVISION__</h1>
+  <p id="status" role="status">正在下载并校验网页包…</p>
+  <a id="save" download="__PACKAGE_NAME__" hidden>保存网页包</a>
+  <p id="guide" hidden>保存后，返回小饱日常，点「选择网页包」，从下载目录选取网页包。也可从设置导入。</p>
+  <button type="button" id="retry" hidden>重新下载</button>
+</main>
+<script type="module">
+  const sha256 = '__SHA256__';
+  const size = __PACKAGE_SIZE__;
+  const status = document.getElementById('status');
+  const save = document.getElementById('save');
+  const guide = document.getElementById('guide');
+  const retry = document.getElementById('retry');
+
+  async function download() {
+    retry.hidden = true;
+    status.textContent = '正在下载并校验网页包…';
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 180_000);
+    try {
+      if (location.hash && location.hash.slice(1) !== sha256) throw new Error('Release mismatch');
+      const response = await fetch('./__PACKAGE_NAME__', {
+        signal: controller.signal, credentials: 'omit', cache: 'no-store', redirect: 'error',
+      });
+      if (!response.ok || !response.body) throw new Error('Download unavailable');
+      const reader = response.body.getReader();
+      const bytes = new Uint8Array(size);
+      let offset = 0;
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        if (offset + value.length > size) throw new Error('Unexpected length');
+        bytes.set(value, offset);
+        offset += value.length;
+      }
+      if (offset !== size) throw new Error('Incomplete download');
+      const digest = new Uint8Array(await crypto.subtle.digest('SHA-256', bytes));
+      const actual = Array.from(digest, value => value.toString(16).padStart(2, '0')).join('');
+      if (actual !== sha256) throw new Error('Checksum mismatch');
+      save.href = URL.createObjectURL(new Blob([bytes], { type: 'application/octet-stream' }));
+      status.textContent = 'SHA-256 校验通过，可以保存网页包。';
+      save.hidden = false;
+      guide.hidden = false;
+    } catch {
+      controller.abort();
+      status.textContent = '下载或完整性校验失败，请重试。';
+      retry.hidden = false;
+    } finally {
+      clearTimeout(timeout);
+    }
+  }
+
+  retry.addEventListener('click', download);
+  void download();
+</script>
+</html>

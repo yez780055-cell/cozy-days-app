@@ -27,3 +27,5 @@ jobs:
         run: npm run build
       - name: Build GitHub Pages app
         run: npm run build:pages
+      - name: Build bundled Android web assets
+        run: npm run build:android

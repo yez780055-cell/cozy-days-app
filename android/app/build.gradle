@@ -1,22 +1,31 @@
 apply plugin: 'com.android.application'
 
-def releaseCodeText = System.getenv('ANDROID_VERSION_CODE') ?: '1'
+def releaseCodeText = System.getenv('ANDROID_VERSION_CODE') ?: '2'
 if (!(releaseCodeText ==~ /[1-9][0-9]*/) || new BigInteger(releaseCodeText) > 2100000000) {
     throw new GradleException('ANDROID_VERSION_CODE must be a positive integer no greater than 2100000000')
 }
 def signingEnvironment = ['ANDROID_KEYSTORE_PATH', 'ANDROID_KEYSTORE_PASSWORD', 'ANDROID_KEY_ALIAS', 'ANDROID_KEY_PASSWORD']
 def hasReleaseSigning = signingEnvironment.every { System.getenv(it)?.trim() }
+def webUpdateRoot = System.getenv('COZY_ANDROID_WEB_UPDATE_ROOT')?.trim() ?: ''
+def qaCaPath = System.getenv('COZY_ANDROID_WEB_UPDATE_QA_CA')?.trim()
+if (qaCaPath && !(webUpdateRoot ==~ /https:\/\/127\.0\.0\.1:[0-9]+\/.*/)) {
+    throw new GradleException('The update test CA requires a loopback HTTPS update root')
+}
+def qaCa = qaCaPath ? file(qaCaPath).getText('UTF-8') : ''
 
 android {
     namespace "com.littledays.app"
     compileSdk rootProject.ext.compileSdkVersion
     testBuildType "release"
+    buildFeatures { buildConfig true }
     defaultConfig {
         applicationId "com.littledays.app"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode Integer.parseInt(releaseCodeText)
-        versionName "0.2.1"
+        versionName "0.2.2"
+        buildConfigField 'String', 'WEB_UPDATE_ROOT', groovy.json.JsonOutput.toJson(webUpdateRoot)
+        buildConfigField 'String', 'WEB_UPDATE_QA_CA', groovy.json.JsonOutput.toJson(qaCa)
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
@@ -52,10 +61,23 @@ android {
 gradle.taskGraph.whenReady { graph ->
     if (graph.allTasks.any { it.project == project && it.name.toLowerCase().contains('release') }) {
         if (!hasReleaseSigning) {
-            throw new GradleException('Release signing requires ANDROID_KEYSTORE_PATH, ANDROID_KEYSTORE_PASSWORD, ANDROID_KEY_ALIAS and ANDROID_KEY_PASSWORD; refusing an unsigned/debug-signed release')
+            throw new GradleException('Release signing requires the ANDROID signing environment')
         }
         if (!android.signingConfigs.release.storeFile.isFile()) {
             throw new GradleException('ANDROID_KEYSTORE_PATH must point to an existing keystore file')
+        }
+        if (Integer.parseInt(releaseCodeText) <= 1) {
+            throw new GradleException('Formal upgrade requires Android versionCode > 1')
+        }
+        if (webUpdateRoot || qaCa) {
+            throw new GradleException('Formal release builds must use the default GitHub HTTPS source')
+        }
+        def signer = android.signingConfigs.release
+        def store = java.security.KeyStore.getInstance(signer.storeFile, signer.storePassword.toCharArray())
+        def cert = store.getCertificate(signer.keyAlias)
+        def sha256 = cert ? java.security.MessageDigest.getInstance('SHA-256').digest(cert.encoded).encodeHex().toString() : ''
+        if (sha256 != 'c85fe70fff2425ad2b95d3dfa8f28ef7173027e744b03f57b721896fca40d3d8') {
+            throw new GradleException('Release signing certificate differs from the pinned formal Android certificate')
         }
     }
 }

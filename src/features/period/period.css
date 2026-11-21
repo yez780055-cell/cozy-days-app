@@ -99,6 +99,11 @@
 .period-choices { display: flex; flex-wrap: wrap; gap: 4px; }
 .period-choices .button { gap: 4px; padding: 4px 8px; font-weight: 400; }
 .period-choice-icon { width: 16px; height: 16px; flex: none; }
+.period-mood-emoji {
+  display: grid;
+  place-items: center;
+  font: 400 16px/1 "Noto Color Emoji", "Segoe UI Emoji", "Apple Color Emoji", emoji, sans-serif;
+}
 .period-choices .button[aria-pressed="true"] { background: var(--blush); color: var(--period); border-color: var(--period); }
 .period-choices .button:disabled { opacity: 1; background: var(--disabled-bg); color: var(--disabled-ink); }
 .period-storage { margin: 4px 0 0; color: var(--muted); font-size: 13px; }

@@ -11,6 +11,7 @@ import { motion } from '../styles/motion';
 import { dataChangedEvent } from '../data/storageAccess';
 import { SettingsPage } from '../features/settings/SettingsPage';
 import { applyFontStack, DEFAULT_FONT_ID, FONT_PREFERENCE_KEY, getStoredFontId, loadFont, type FontId } from '../styles/fontRegistry';
+import { backFromAndroidHome, resetAndroidExit, useAndroidBack } from '../native/back';
 
 const PreviewStates = import.meta.env.DEV ? lazy(() => import('../dev/PreviewStates')) : null;
 const devices = [{ name:'小屏', width:360, height:740 }, { name:'标准', width:393, height:852 }, { name:'大屏', width:430, height:932 }];
@@ -30,6 +31,15 @@ export default function App() {
   const [failedFontId, setFailedFontId] = useState<FontId | null>(null);
   const [device, setDevice] = useState<typeof devices[number]>();
   const preview = import.meta.env.DEV && new URLSearchParams(location.search).has('preview');
+  useAndroidBack('root', true, () => {
+    if (page === 'home') backFromAndroidHome();
+    else {
+      resetAndroidExit();
+      setQuickAdd(false);
+      setShowAllTodos(false);
+      setPage('home');
+    }
+  });
   useEffect(() => {
     const requireReload = () => setReloadRequired(true);
     window.addEventListener(dataChangedEvent, requireReload);
@@ -68,6 +78,7 @@ export default function App() {
     root.style.setProperty('--motion-check', `${motion.checkbox}ms`);
     root.style.setProperty('--motion-modal', `${motion.modal}ms`);
     root.style.setProperty('--motion-list', `${motion.list}ms`);
+    if (import.meta.env.MODE === 'android') return;
     const update = () => {
       root.style.setProperty('--visible-height', `${window.visualViewport?.height ?? window.innerHeight}px`);
       root.style.setProperty('--visible-offset', `${window.visualViewport?.offsetTop ?? 0}px`);

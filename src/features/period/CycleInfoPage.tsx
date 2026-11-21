@@ -14,10 +14,14 @@ export function CycleInfoPage({onBack}:{onBack:()=>void}) {
   const [editing, setEditing] = useState<PeriodEntry>();
   const today = localToday();
 
-  function close() {
+  function closeEditor() {
     if (editing) clearPeriodDraft('editor-'+editing.id);
-    if (panel === 'settings') clearPeriodDraft('settings');
     setEditing(undefined);
+  }
+
+  function close() {
+    closeEditor();
+    if (panel === 'settings') clearPeriodDraft('settings');
     setPanel(undefined);
   }
 
@@ -30,7 +34,8 @@ export function CycleInfoPage({onBack}:{onBack:()=>void}) {
       <CycleSummary data={data} today={today} onHistory={()=>setPanel('history')} onSettings={()=>setPanel('settings')}/>
       {panel === 'history' && !editing && <PeriodHistory data={data} onClose={close} error={error} saving={saving} onRetry={()=>void retry()}
         onEdit={setEditing} onRemove={id=>update(d=>({...d,periods:d.periods.filter(p=>p.id!==id)}))}/>}
-      {editing && <PeriodEditor entry={editing} data={data} today={today} onClose={close} onSave={async entry => {
+      {editing && <PeriodEditor entry={editing} data={data} today={today} onClose={close}
+        onAndroidBack={() => { closeEditor(); return true; }} onSave={async entry => {
         const ok = await update(d => {
           const previous = d.periods.find(p => p.id === editing.id);
           const unchanged = previous?.start === editing.start && previous.end === editing.end;

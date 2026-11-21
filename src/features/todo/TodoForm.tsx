@@ -48,7 +48,9 @@ export function TodoForm({ todo, date, categories=defaultCategories, defaultCate
     if (saved) onClose();
     else setError('保存失败，请重试。输入内容仍保留在这里。');
   };
-  return <Modal title={todo ? '编辑待办' : '新建待办'} className="todo-editor" onClose={onClose} dirty={dirty} canClose={() => !busy} headerAction={<button className="icon-button favorite-star" type="button" aria-label={favorite?'已收藏这件小事':'收藏这件小事'} aria-pressed={favorite} onClick={()=>setFavorite(value=>!value)}><Star size={20} fill={favorite?'currentColor':'none'}/></button>}>{requestClose => <form onSubmit={submit}>
+  return <Modal title={todo ? '编辑待办' : '新建待办'} className="todo-editor" onClose={onClose} dirty={dirty} canClose={() => !busy}
+    onAndroidBack={() => { if (!panel) return false; setPanel(null); return true; }}
+    headerAction={<button className="icon-button favorite-star" type="button" aria-label={favorite?'已收藏这件小事':'收藏这件小事'} aria-pressed={favorite} onClick={()=>setFavorite(value=>!value)}><Star size={20} fill={favorite?'currentColor':'none'}/></button>}>{requestClose => <form onSubmit={submit}>
     <label className="field-label" htmlFor="todo-content">想做些什么？</label>
     <textarea id="todo-content" data-autofocus rows={3} maxLength={1000} placeholder="写下要做的事情…" value={text} onChange={event => setText(event.target.value)} required/>
     <div className="form-date"><label className="field-label" htmlFor="form-date">归属日期（年-月-日）</label><div className="date-entry"><input id="form-date" aria-label="归属日期" type="text" inputMode="text" value={formDate} onChange={event=>setFormDate(event.target.value)} placeholder="YYYY-MM-DD"/><button className="todo-field-button" type="button" aria-label="选择归属日期" aria-expanded={panel==='date'} aria-controls="form-date-panel" onClick={()=>togglePanel('date')}><CalendarDays size={17}/><ChevronDown size={16}/></button></div></div>

@@ -24,7 +24,7 @@ def main():
     parser.add_argument("apk", type=Path)
     parser.add_argument("--output", type=Path, default=Path("artifacts/android"))
     args = parser.parse_args()
-    code = os.environ.get("ANDROID_VERSION_CODE", "1")
+    code = os.environ.get("ANDROID_VERSION_CODE", "2")
     require(re.fullmatch(r"[1-9][0-9]*", code) and int(code) <= 2100000000,
             "ANDROID_VERSION_CODE must be a positive integer <= 2100000000")
     sdk = os.environ.get("ANDROID_HOME") or os.environ.get("ANDROID_SDK_ROOT")
@@ -40,7 +40,7 @@ def main():
             "Release certificate differs from the pinned long-term signing identity")
     badging = run(aapt, "dump", "badging", str(args.apk))
     package = re.search(r"^package: name='([^']+)' versionCode='([^']+)' versionName='([^']+)'", badging, re.M)
-    require(package and package.groups() == ("com.littledays.app", code, "0.2.1"),
+    require(package and package.groups() == ("com.littledays.app", code, "0.2.2"),
             "Unexpected application ID or release version")
     require("application-debuggable" not in badging and " split=" not in badging,
             "Expected a non-debuggable universal APK")

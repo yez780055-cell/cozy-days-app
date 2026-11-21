@@ -37,7 +37,7 @@ public class AndroidReleaseUpgradeTest {
     public void syntheticIndexedDbSurvivesSignedUpgrade() throws Exception {
         String phase = InstrumentationRegistry.getArguments().getString("phase");
         assertTrue("Expected create or verify phase", "create".equals(phase) || "verify".equals(phase));
-        assertEquals("com.littledays.app", instrumentation.getTargetContext().getPackageName());
+        assertEquals(BuildConfig.APPLICATION_ID, instrumentation.getTargetContext().getPackageName());
         Intent intent = new Intent(instrumentation.getTargetContext(), MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         Activity activity = instrumentation.startActivitySync(intent);

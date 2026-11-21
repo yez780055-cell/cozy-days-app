@@ -31,7 +31,7 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npx playwright install --with-deps chromium
-      - run: npm run build && VITE_CLOUDBASE_ENABLED=false npm run build:pages && VITE_CLOUDBASE_ENABLED=false npm run build:android
+      - run: VITE_CLOUDBASE_ENABLED=false npm run build && VITE_CLOUDBASE_ENABLED=false npm run build:pages && VITE_CLOUDBASE_ENABLED=false npm run build:android
       - name: Full Web E2E and Android UI tests
         run: |
           export PLAYWRIGHT_REVIEW_EVIDENCE_DIR=artifacts/review-evidence

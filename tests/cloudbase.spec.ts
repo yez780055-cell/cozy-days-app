@@ -191,6 +191,62 @@ test('unregistered email can register and retry OTP, account creation and invita
   } finally { await f.db.close(); }
 });
 const go = (page: Page, name: string) => page.getByRole('navigation').getByRole('button', { name, exact:true }).click();
+
+test('CloudBase registration and reload preserve all existing single-user databases', async ({ page, context }) => {
+  const f = await fixture();
+  async function legacy(seed = false) {
+    return page.evaluate(async seed => {
+      const result: Record<string, unknown> = {};
+      for (const [name, version, stores] of [
+        ['little-days', 40, ['todos', 'categories', 'anniversaries']],
+        ['cozy-days-period', 10, ['state']],
+      ] as const) {
+        const db = await new Promise<IDBDatabase>((resolve, reject) => {
+          const request = indexedDB.open(name, version);
+          request.onupgradeneeded = () => {
+            for (const store of stores) request.result.createObjectStore(store, { keyPath:'id' });
+          };
+          request.onsuccess = () => resolve(request.result);
+          request.onerror = () => reject(request.error);
+        });
+        try {
+          if (seed) await new Promise<void>((resolve, reject) => {
+            const tx = db.transaction([...stores], 'readwrite');
+            for (const store of stores) tx.objectStore(store).put({
+              id: store === 'state' ? 'local' : 1,
+              text: '旧单机记录-' + store,
+              value: { periods:[{ id:'legacy', start:'2026-10-01', end:'2026-10-04' }],
+                days:{ '2026-10-02':{ date:'2026-10-02', flow:'medium', symptoms:['疲惫'] } },
+                settings:{ cycleLength:28, periodLength:5 } },
+            });
+            tx.oncomplete = () => resolve();
+            tx.onerror = () => reject(tx.error);
+            tx.onabort = () => reject(tx.error);
+          });
+          result[name] = await Promise.all([...stores].map(store => new Promise((resolve, reject) => {
+            const request = db.transaction(store).objectStore(store).getAll();
+            request.onsuccess = () => resolve([store, request.result]);
+            request.onerror = () => reject(request.error);
+          })));
+        } finally { db.close(); }
+      }
+      return result;
+    }, seed);
+  }
+  try {
+    await f.install(context);
+    await page.goto('/');
+    const before = await legacy(true);
+    await join(page, 0, f.invitations[0].code);
+    expect(await legacy()).toEqual(before);
+    await page.reload();
+    await expect(page.getByRole('button', { name:'打开应用设置' })).toBeVisible();
+    expect(await legacy()).toEqual(before);
+    await go(page, '待办');
+    await expect(page.getByText('旧单机记录-todos', { exact:true })).toHaveCount(0);
+  } finally { await f.db.close(); }
+});
+
 const kick = (page: Page) => page.evaluate(() => window.dispatchEvent(new Event('focus')));
 const detail = (page: Page, name: string) => page.getByRole('button', { name:'查看详情：' + name });
 async function anniversary(page: Page, name: string, previous?: string) {

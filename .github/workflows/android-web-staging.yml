@@ -1,0 +1,102 @@
+name: Signed CloudBase web staging
+
+on:
+  push:
+    branches: [release/android-cloudbase-staging]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cloudbase-web-staging
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    if: github.repository == 'yez780055-cell/cozy-days-app' && github.ref == 'refs/heads/release/android-cloudbase-staging'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Existing local-mode regressions
+        run: |
+          npm run build
+          npm run build:pages
+          npm run build:android
+          npm run test:e2e -- --reporter=line
+          npm run test:pages -- --reporter=line
+          npx playwright test --config playwright.android.config.ts --reporter=line
+      - name: CloudBase registration, sharing, conflicts and offline regressions
+        run: npm run test:cloudbase -- --reporter=line
+      - name: Build CloudBase resources for the existing shell
+        run: npm run build:android
+        env:
+          VITE_CLOUDBASE_ENABLED: 'true'
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          name: cloudbase-tested-android-web
+          path: dist-android/
+          if-no-files-found: error
+          retention-days: 7
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        if: failure()
+        with:
+          name: cloudbase-staging-failures
+          path: |
+            test-results/
+            artifacts/cloudbase-test-results/
+
+  sign-web:
+    needs: verify
+    runs-on: ubuntu-24.04
+    environment: android-release
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131
+        with:
+          name: cloudbase-tested-android-web
+          path: dist-android
+      - name: Sign only web revision 6 for formal shell 2
+        shell: bash
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+          umask 077
+          export ANDROID_KEYSTORE_PATH="$RUNNER_TEMP/cozy-web-signer.jks"
+          trap 'rm -f -- "$ANDROID_KEYSTORE_PATH"' EXIT
+          printf '%s' "$ANDROID_KEYSTORE_BASE64" | base64 --decode > "$ANDROID_KEYSTORE_PATH"
+          unset ANDROID_KEYSTORE_BASE64
+          java scripts/PackAndroidWeb.java dist-android 2 6 artifacts/Cozy-Days-Web-2-6.cozyupdate artifacts/release
+          cp artifacts/release/shell-2/latest.json artifacts/latest.json
+          sha256sum artifacts/Cozy-Days-Web-2-6.cozyupdate > artifacts/SHA256SUMS.txt
+          printf 'source=%s\nshell=2\nweb=6\ncloudbase=true\n' "$GITHUB_SHA" > artifacts/provenance.txt
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          name: cloudbase-signed-web-shell-2-web-6
+          path: |
+            artifacts/Cozy-Days-Web-2-6.cozyupdate
+            artifacts/latest.json
+            artifacts/SHA256SUMS.txt
+            artifacts/provenance.txt
+          if-no-files-found: error
+          retention-days: 30

@@ -6,10 +6,14 @@ on:
       version_code:
         description: Android candidate versionCode
         required: true
-        default: '2'
+        default: '3'
         type: string
       sign_qa_fixtures:
         description: Include signed fixture bundles for isolated device QA
+        default: false
+        type: boolean
+      full_regression:
+        description: Explicitly opt in to full regression; default validates builds, update paths and smoke only
         default: false
         type: boolean
 
@@ -17,6 +21,8 @@ permissions:
   contents: read
 
 jobs:
+  native-delta:
+    uses: ./.github/workflows/android-delta-tests.yml
   web-regression:
     if: github.repository == 'yez780055-cell/cozy-days-app' && startsWith(github.ref, 'refs/heads/release/android-')
     runs-on: ubuntu-24.04
@@ -31,14 +37,26 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npx playwright install --with-deps chromium
+      - name: Necessary build, smoke and Android update checks
+        if: ${{ !inputs.full_regression }}
+        run: |
+          npm run build
+          npm run test:smoke -- --reporter=line
+          VITE_CLOUDBASE_ENABLED=false npm run build:android
+          PLAYWRIGHT_JSON_OUTPUT_FILE=artifacts/android-web-e2e.json npx playwright test --config playwright.android.config.ts web-update.spec.ts --reporter=line,json
+          npm run build:android
+          npx playwright test --config playwright.cloudbase.android.config.ts --grep 'unified Android' --reporter=line
       - run: VITE_CLOUDBASE_ENABLED=false npm run build && VITE_CLOUDBASE_ENABLED=false npm run build:pages && VITE_CLOUDBASE_ENABLED=false npm run build:android
+        if: inputs.full_regression
       - name: Full Web E2E and Android UI tests
+        if: inputs.full_regression
         run: |
           export PLAYWRIGHT_REVIEW_EVIDENCE_DIR=artifacts/review-evidence
           PLAYWRIGHT_JSON_OUTPUT_FILE=artifacts/web-e2e.json npm run test:e2e -- --reporter=line,json
           PLAYWRIGHT_JSON_OUTPUT_FILE=artifacts/android-web-e2e.json npx playwright test --config playwright.android.config.ts --reporter=line,json
           PLAYWRIGHT_JSON_OUTPUT_FILE=artifacts/pages-e2e.json npm run test:pages -- --reporter=line,json
       - name: Verify unified login, sync and Android update integration
+        if: inputs.full_regression
         run: |
           npm run test:cloudbase -- --reporter=line
           npm run build:android
@@ -113,13 +131,14 @@ jobs:
 
   signed-apk:
     if: github.repository == 'yez780055-cell/cozy-days-app' && startsWith(github.ref, 'refs/heads/release/android-')
-    needs: [web-regression, verify-signing]
+    needs: [web-regression, verify-signing, native-delta]
     runs-on: ubuntu-24.04
     environment: android-release
     timeout-minutes: 35
     env:
       ANDROID_VERSION_CODE: ${{ inputs.version_code }}
       SIGN_QA_FIXTURES: ${{ inputs.sign_qa_fixtures }}
+      APK_VALIDATION: ${{ inputs.full_regression && 'full' || 'focused' }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
@@ -154,12 +173,16 @@ jobs:
           trap 'rm -f -- "$ANDROID_KEYSTORE_PATH"' EXIT
           printf '%s' "$ANDROID_KEYSTORE_BASE64" | base64 --decode > "$ANDROID_KEYSTORE_PATH"
           unset ANDROID_KEYSTORE_BASE64 COZY_ANDROID_WEB_UPDATE_ROOT COZY_ANDROID_WEB_UPDATE_QA_CA
-          bash android/gradlew -p android --no-daemon --console=plain :app:assembleRelease
+          bash android/gradlew -p android --no-daemon --console=plain :app:assembleRelease :app:assembleReleaseAndroidTest
           mkdir -p artifacts/formal-apk artifacts/formal-fixtures
-          cp android/app/build/outputs/apk/release/app-release.apk "artifacts/formal-apk/Cozy-Days-Android-0.2.2-${ANDROID_VERSION_CODE}.apk"
+          cp android/app/build/outputs/apk/release/app-release.apk "artifacts/formal-apk/Cozy-Days-Android-0.2.3-${ANDROID_VERSION_CODE}.apk"
+          cp android/app/build/outputs/apk/androidTest/release/app-release-androidTest.apk artifacts/formal-fixtures/
           if [[ "$SIGN_QA_FIXTURES" != true ]]; then exit 0; fi
+          cp -a dist-android "$RUNNER_TEMP/fixture-web"
           for revision in 2 3; do
-            java scripts/PackAndroidWeb.java dist-android "$ANDROID_VERSION_CODE" "$revision" \
+            cp dist-android/index.html "$RUNNER_TEMP/fixture-web/index.html"
+            printf '\n<!-- isolated delta QA revision %s -->\n' "$revision" >> "$RUNNER_TEMP/fixture-web/index.html"
+            java scripts/PackAndroidWeb.java "$RUNNER_TEMP/fixture-web" "$ANDROID_VERSION_CODE" "$revision" \
               "artifacts/formal-fixtures/Cozy-Days-Web-${ANDROID_VERSION_CODE}-${revision}.cozyupdate" artifacts/formal-fixtures/releases
           done
           mkdir -p "$RUNNER_TEMP/unready"/{assets,icons}
@@ -168,7 +191,7 @@ jobs:
           java scripts/PackAndroidWeb.java dist-android "$ANDROID_VERSION_CODE" 5 artifacts/formal-fixtures/local-web-5.cozyupdate
       - name: Verify formal certificate, offline bundle, package and checksum
         run: |
-          python3 scripts/android-verify-apk.py "artifacts/formal-apk/Cozy-Days-Android-0.2.2-${ANDROID_VERSION_CODE}.apk" --output artifacts/formal-apk
+          python3 scripts/android-verify-apk.py "artifacts/formal-apk/Cozy-Days-Android-0.2.3-${ANDROID_VERSION_CODE}.apk" --output artifacts/formal-apk
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
         with:
           name: formal-apk
@@ -180,7 +203,15 @@ jobs:
         with:
           name: formal-device-fixtures
           path: |
-            artifacts/formal-fixtures/releases/shell-*/web-*/*.cozyupdate
+            artifacts/formal-fixtures/releases/
             artifacts/formal-fixtures/local-web-*.cozyupdate
+            artifacts/formal-fixtures/app-release-androidTest.apk
+          if-no-files-found: error
+          retention-days: 1
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        if: inputs.sign_qa_fixtures
+        with:
+          name: formal-device-test-apk
+          path: artifacts/formal-fixtures/app-release-androidTest.apk
           if-no-files-found: error
           retention-days: 1

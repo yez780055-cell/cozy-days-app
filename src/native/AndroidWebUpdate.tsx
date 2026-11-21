@@ -30,7 +30,7 @@ const size = (bytes: number) => bytes < 1024 * 1024
   ? `${(bytes / 1024).toFixed(1)} KB` : `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 
 export function AndroidWebUpdatePrompt() {
-  const { prompt, release, status, error, received, version } = useWebUpdate();
+  const { prompt, release, status, error, received, total, version } = useWebUpdate();
   const active = isOnlineUpdateBusy(status);
   const card = useRef<HTMLElement>(null);
   useEffect(() => { void checkWebUpdate(true); }, []);
@@ -49,9 +49,10 @@ export function AndroidWebUpdatePrompt() {
   if (!prompt) return null;
   const checking = status === 'checking';
   const title = status === 'available' ? '发现新版本，是否立即更新？' : statusText[status];
-  const downloaded = Math.max(0, Math.min(received, release?.bytes ?? 0));
-  const percent = release ? Math.floor(100 * downloaded / release.bytes) : 0;
-  const progress = status === 'downloading' && release;
+  const downloadTotal = total ?? release?.bytes ?? 0;
+  const downloaded = Math.max(0, Math.min(received, downloadTotal));
+  const percent = downloadTotal > 0 ? Math.floor(100 * downloaded / downloadTotal) : 0;
+  const progress = status === 'downloading' && release && downloadTotal > 0;
   const canClose = !active && !checking;
 
   return <div className={`android-update-frame${active ? ' android-update-frame--active' : ''}`}>
@@ -62,9 +63,9 @@ export function AndroidWebUpdatePrompt() {
     <h2 id="android-update-title" aria-live="polite">{title}</h2>
     {status === 'available' && release && <p>网页版本 {release.web} · {size(release.bytes)}</p>}
     {progress && <div className="android-update-download">
-      <progress max={progress.bytes} value={downloaded} aria-label="网页包下载进度"
-        aria-valuetext={`${percent}%，${size(downloaded)} / ${size(progress.bytes)}`} />
-      <span>{percent}%</span><span>{size(downloaded)} / {size(progress.bytes)}</span>
+      <progress max={downloadTotal} value={downloaded} aria-label="网页包下载进度"
+        aria-valuetext={`${percent}%，${size(downloaded)} / ${size(downloadTotal)}`} />
+      <span>{percent}%</span><span>{size(downloaded)} / {size(downloadTotal)}</span>
     </div>}
     {(checking || status === 'verifying' || status === 'installing') && <div className="android-update-wait" aria-hidden="true" />}
     {(status === 'installed' || status === 'rolledBack') && version && <p>当前网页版本 {version.web}</p>}

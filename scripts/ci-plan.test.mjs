@@ -38,8 +38,10 @@ test('unknown profiles cannot silently disable the formal gate', () => {
   assert.throws(() => planTests([], { tier: 'quick-release' }), /Unknown validation tier/);
 });
 
-test('native signature loader changes are critical while invitation scripts remain scoped', () => {
-  assert.equal(planTests(['android/app/src/main/java/com/littledays/app/OnlineWebUpdates.java']).full, true);
+test('native update changes run focused checks; final formal releases retain the full gate', () => {
+  const native = planTests(['android/app/src/main/java/com/littledays/app/OnlineWebUpdates.java']);
+  assert.equal(native.full, false); assert.equal(native.nativeDelta, true); assert.equal(native.android, true);
+  assert.equal(planTests(['android/app/src/main/java/com/littledays/app/OnlineWebUpdates.java'], { tier: 'formal' }).full, true);
   const p = planTests(['cloudbase/issue_invitations.sql']);
   assert.equal(p.cloud, true); assert.equal(p.full, false);
 });

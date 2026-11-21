@@ -1,6 +1,31 @@
 # 小饱日常 Android 网页更新发布流程
 
-## 当前唯一正式发布线（网页修订 9 起）
+## 外壳 3：文件级更新（0.2.3）
+
+外壳 3 保留完整内置网页、原证书、`https://localhost` 源站、IndexedDB、手动导入和恢复内置网页。新能力需要同签名 APK 覆盖安装。网页版本仍按 `shell == APK versionCode` 匹配；外壳 2 的已安装网页不会直接作为外壳 3 的激活版本，外壳 3 首次启动使用 APK 内置网页。
+
+发布端使用同一次已验证构建生成两条安装通道：原 COZ1 `.cozyupdate` 和文件级制品。`latest.json` 继续为原有 `schema=1`，字段和整包命名保持兼容。独立文件协议同样从自己的 `schema=1` 开始，不替换旧目录协议。
+
+同一不可变 Release 必须上传以下资产：
+
+- 原 `latest.json`、`Cozy-Days-Web-<shell>-<web>.cozyupdate`。
+- `web-manifest.json`，含 `schema`、`shell`、`web`、`packageBytes`、`packageSha256` 和 `files[{path,bytes,sha256}]`。
+- `web-manifest.sig`，使用原正式 APK 证书对应私钥对 manifest 原始 UTF-8 字节执行 `SHA256withRSA`，客户端不重新序列化 JSON。
+- manifest 中每个唯一 SHA-256 对应的 `file-<sha256>` 原始文件资产。文件 URL 由原生层固定拼接，不接受 manifest 内任意远程 URL。
+
+打包器从已签名 ZIP 的同一份内容生成 manifest 和文件资产。必须完整上传到 Draft 并核验后再公开；不要覆盖已发布版本的资产。缺失或不匹配的增量制品会自动退回整包。
+
+客户端点击「立即更新」后先验证 manifest 签名、外壳/网页版本及整包身份，再比较当前本地文件清单。未变化文件复制到新暂存目录，新增或 hash 改变的文件才下载，删除文件不进入目标目录。旧版本无本地清单时可扫描其本地完整目录；无法可靠读取时直接回退整包。APK 内置清单由 `build:android` 生成并受 APK 签名保护。
+
+组装后重新校验全部目标文件，包括复制的文件。验证完成才重命名为完整版本目录并提交待确认状态，继续原有 15 秒启动握手和启动中断回滚。增量准备任一步失败都先清理暂存，再对同一修订尝试一次原整包流程；整包仍保留长度、SHA-256、RSA、外壳/网页版本及解包校验。两者均失败不更改当前稳定版本。激活后的启动失败使用原回滚，避免重复安装同一问题版本。
+
+启动仍只静默检查，不自动下载；文件下载进度使用原生实际字节总量，回退整包时重置下载任务进度。所有激活目录均拥有完整文件，不依赖网络、不依赖其他版本目录。元数据上限 512 KiB、最多 1,999 个运行文件（兼容整包 2,000 条 ZIP 记录限制）、总运行文件上限 96 MiB；目录与文件名沿用 `index.html`、`assets/**`、`icons/**` 白名单。
+
+开发验证：`npm run test:android:delta`（设置 `ANDROID_HOME`、`JAVA_HOME`、隔离模拟器 `ANDROID_SERIAL`）、Android 网页更新 Playwright、Android 构建和必要 smoke。原生测试在 Android ART 上运行实际 Java，包含本机 HTTPS 故障源并核对请求日志，确认未变化字体/HTML 不发生下载。开发和本次正式候选均按用户指定的必要验证范围执行：构建、更新相关用例、smoke、签名及实际 APK 覆盖安装、回滚、离线验收。完整回归仅在显式选择 full_regression=true 时运行。
+
+网页发布工作流新增 `shell_code`（2 或 3）。外壳 3 正常发布 `android-web-shell-3-web-<递增修订>`；外壳 2 如需继续接收网页更新，继续签发独立匹配 shell=2 的原完整包。两者共享正式通道，不引入用户通道开关。下文「外壳 2」流程保留为历史及旧客户端维护依据。
+
+## 外壳 2 正式发布线（网页修订 9 起，保留兼容）
 
 - 使用现有正式 APK `com.littledays.app`、外壳 2 和原证书；不增加 APK 或原生更新协议。主线默认包含邮箱注册/登录、双人共享空间、CloudBase 同步和账号范围的 IndexedDB 离线缓存。
 - 只发布一个正式网页包，标签 `android-web-shell-2-web-<递增修订>`，设为普通 Release 和 Latest。设置不再提供预发布开关，网页始终以 `prerelease:false` 调用现有原生检查接口，忽略遗留偏好。

@@ -6,7 +6,7 @@ type Release = NonNullable<Awaited<ReturnType<typeof AndroidShell.checkOnlineUpd
 type Status = 'idle' | 'checking' | 'unconfigured' | 'current' | 'available' | 'offline' | 'checkFailed'
   | 'importing' | 'restoring' | 'nativeFailed' | 'installed' | 'rolledBack' | 'onlineFailed' | WebUpdateProgress['stage'];
 
-let state: { status: Status; version?: Version; release?: Release; prompt: boolean; feedback: boolean; error?: string; received: number } = {
+let state: { status: Status; version?: Version; release?: Release; prompt: boolean; feedback: boolean; error?: string; received: number; total?: number } = {
   status: 'idle', prompt: false, feedback: false, received: 0,
 };
 // Automatic checks run once per document lifetime, even after dismissal.
@@ -62,10 +62,10 @@ export function dismissWebUpdate() {
 export async function installOnlineWebUpdate() {
   const release = state.release;
   if (!release || isUpdateBusy(state.status)) return;
-  setState({ status: 'downloading', feedback: true, received: 0, error: undefined, prompt: true });
+  setState({ status: 'downloading', feedback: true, received: 0, total: undefined, error: undefined, prompt: true });
   try {
     const listener = await AndroidShell.addListener('webUpdateProgress', progress => {
-      setState({ status: progress.stage, received: progress.received });
+      setState({ status: progress.stage, received: progress.received, total: progress.total });
     });
     try {
       await AndroidShell.installOnlineUpdate({ web: release.web });

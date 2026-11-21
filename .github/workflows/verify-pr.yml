@@ -9,6 +9,8 @@ concurrency:
   group: pr-validation-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 jobs:
+  native-delta:
+    uses: ./.github/workflows/android-delta-tests.yml
   verify:
     name: verify
     runs-on: ubuntu-latest

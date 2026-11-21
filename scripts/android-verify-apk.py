@@ -86,6 +86,7 @@ def main():
         "permissions": permissions, "nativeAbis": native_abis,
         "buildTools": "35.0.0", "githubRunId": os.environ.get("GITHUB_RUN_ID"),
         "deviceSmokeTest": "not performed",
+        "validation": os.environ.get("APK_VALIDATION", "focused"),
     }, indent=2) + "\n", encoding="utf-8")
     print(f"Verified {args.apk.name}: {package[1]} {package[3]} ({code}), source {source}")
 

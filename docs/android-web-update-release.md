@@ -21,7 +21,7 @@
 
 启动仍只静默检查，不自动下载；文件下载进度使用原生实际字节总量，回退整包时重置下载任务进度。所有激活目录均拥有完整文件，不依赖网络、不依赖其他版本目录。元数据上限 512 KiB、最多 1,999 个运行文件（兼容整包 2,000 条 ZIP 记录限制）、总运行文件上限 96 MiB；目录与文件名沿用 `index.html`、`assets/**`、`icons/**` 白名单。
 
-开发验证：`npm run test:android:delta`（设置 `ANDROID_HOME`、`JAVA_HOME`、隔离模拟器 `ANDROID_SERIAL`）、Android 网页更新 Playwright、Android 构建和必要 smoke。原生测试在 Android ART 上运行实际 Java，包含本机 HTTPS 故障源并核对请求日志，确认未变化字体/HTML 不发生下载。开发 PR 不自动全量；最终正式候选 APK 运行一次完整发布门禁，并对正式 APK 做覆盖安装、更新、回滚及离线验收。
+开发验证：`npm run test:android:delta`（设置 `ANDROID_HOME`、`JAVA_HOME`、隔离模拟器 `ANDROID_SERIAL`）、Android 网页更新 Playwright、Android 构建和必要 smoke。原生测试在 Android ART 上运行实际 Java，包含本机 HTTPS 故障源并核对请求日志，确认未变化字体/HTML 不发生下载。开发和本次正式候选均按用户指定的必要验证范围执行：构建、更新相关用例、smoke、签名及实际 APK 覆盖安装、回滚、离线验收。完整回归仅在显式选择 full_regression=true 时运行。
 
 网页发布工作流新增 `shell_code`（2 或 3）。外壳 3 正常发布 `android-web-shell-3-web-<递增修订>`；外壳 2 如需继续接收网页更新，继续签发独立匹配 shell=2 的原完整包。两者共享正式通道，不引入用户通道开关。下文「外壳 2」流程保留为历史及旧客户端维护依据。
 

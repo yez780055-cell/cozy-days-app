@@ -12,6 +12,10 @@ on:
         description: Include signed fixture bundles for isolated device QA
         default: false
         type: boolean
+      full_regression:
+        description: Explicitly opt in to full regression; default validates builds, update paths and smoke only
+        default: false
+        type: boolean
 
 permissions:
   contents: read
@@ -33,14 +37,26 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npx playwright install --with-deps chromium
+      - name: Necessary build, smoke and Android update checks
+        if: ${{ !inputs.full_regression }}
+        run: |
+          npm run build
+          npm run test:smoke -- --reporter=line
+          VITE_CLOUDBASE_ENABLED=false npm run build:android
+          PLAYWRIGHT_JSON_OUTPUT_FILE=artifacts/android-web-e2e.json npx playwright test --config playwright.android.config.ts web-update.spec.ts --reporter=line,json
+          npm run build:android
+          npx playwright test --config playwright.cloudbase.android.config.ts --grep 'unified Android' --reporter=line
       - run: VITE_CLOUDBASE_ENABLED=false npm run build && VITE_CLOUDBASE_ENABLED=false npm run build:pages && VITE_CLOUDBASE_ENABLED=false npm run build:android
+        if: inputs.full_regression
       - name: Full Web E2E and Android UI tests
+        if: inputs.full_regression
         run: |
           export PLAYWRIGHT_REVIEW_EVIDENCE_DIR=artifacts/review-evidence
           PLAYWRIGHT_JSON_OUTPUT_FILE=artifacts/web-e2e.json npm run test:e2e -- --reporter=line,json
           PLAYWRIGHT_JSON_OUTPUT_FILE=artifacts/android-web-e2e.json npx playwright test --config playwright.android.config.ts --reporter=line,json
           PLAYWRIGHT_JSON_OUTPUT_FILE=artifacts/pages-e2e.json npm run test:pages -- --reporter=line,json
       - name: Verify unified login, sync and Android update integration
+        if: inputs.full_regression
         run: |
           npm run test:cloudbase -- --reporter=line
           npm run build:android
@@ -122,6 +138,7 @@ jobs:
     env:
       ANDROID_VERSION_CODE: ${{ inputs.version_code }}
       SIGN_QA_FIXTURES: ${{ inputs.sign_qa_fixtures }}
+      APK_VALIDATION: ${{ inputs.full_regression && 'full' || 'focused' }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:

@@ -11,8 +11,8 @@ concurrency:
 jobs:
   native-delta:
     uses: ./.github/workflows/android-delta-tests.yml
-  verify:
-    name: verify
+  validation:
+    name: affected checks
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
@@ -55,3 +55,20 @@ jobs:
             artifacts/cloudbase-android-test-results/
             artifacts/android-web-http/
           if-no-files-found: warn
+
+  verify:
+    name: verify
+    if: always()
+    needs: [validation, native-delta]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require every applicable validation job to succeed
+        env:
+          VALIDATION_RESULT: ${{ needs.validation.result }}
+          NATIVE_RESULT: ${{ needs.native-delta.result }}
+        run: |
+          node --input-type=module <<'JS'
+          import assert from 'node:assert/strict';
+          assert.equal(process.env.VALIDATION_RESULT, 'success', 'Affected checks did not succeed');
+          assert.equal(process.env.NATIVE_RESULT, 'success', 'Native scope and applicable ART checks did not succeed');
+          JS

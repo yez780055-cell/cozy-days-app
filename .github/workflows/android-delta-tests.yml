@@ -12,13 +12,15 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           fetch-depth: 0
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version: '22'
       - id: scope
+        name: Plan ART scope from the shared dependency policy
         env:
-          BASE_SHA: ${{ github.event.pull_request.base.sha }}
-        run: |
-          if [[ -z "$BASE_SHA" ]] || git diff --name-only "$BASE_SHA" HEAD | grep -Eq '^(android/|scripts/(PackAndroidWeb|test-android|write-web-inventory)|tests-android/|\.github/workflows/android-delta)'; then
-            echo 'native=true' >> "$GITHUB_OUTPUT"
-          fi
+          CI_TEST_TIER: pr
+          CI_FULL: ${{ github.event_name != 'pull_request' && 'true' || 'false' }}
+        run: node scripts/ci-plan.mjs
   delta:
     needs: scope
     if: needs.scope.outputs.native == 'true'
@@ -45,3 +47,22 @@ jobs:
           adb wait-for-device
           timeout 180 bash -c 'until [[ "$(adb shell getprop sys.boot_completed | tr -d "\r")" == 1 ]]; do sleep 2; done'
           npm run test:android:delta
+
+  result:
+    if: always()
+    needs: [scope, delta]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fail closed on invalid scope or missing applicable ART result
+        env:
+          SCOPE_RESULT: ${{ needs.scope.result }}
+          NATIVE_REQUIRED: ${{ needs.scope.outputs.native }}
+          DELTA_RESULT: ${{ needs.delta.result }}
+        run: |
+          node --input-type=module <<'JS'
+          import assert from 'node:assert/strict';
+          assert.equal(process.env.SCOPE_RESULT, 'success', 'Native scope did not succeed');
+          assert.ok(['true', 'false'].includes(process.env.NATIVE_REQUIRED), 'Native scope is missing or invalid');
+          assert.equal(process.env.DELTA_RESULT, process.env.NATIVE_REQUIRED === 'true' ? 'success' : 'skipped',
+            'Applicable ART tests must succeed; only explicitly inapplicable tests may skip');
+          JS

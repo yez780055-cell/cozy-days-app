@@ -2,7 +2,8 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { CalendarDays, ChevronDown, ChevronLeft, ChevronRight, Plus } from 'lucide-react';
 import { Button } from '../../components/Button';
 import { Modal } from '../../components/Modal';
-import type { Todo } from '../../data/database';
+import { todoBaseline, type Todo } from '../../data/database';
+import { equalValue } from '../../data/cloudTypes';
 import { UndoToast } from './UndoToast';
 import { CalendarPicker } from './CalendarPicker';
 import { formatDate, isDateKey, shiftDate, todayKey, weekday } from './dates';
@@ -14,7 +15,7 @@ import { DEFAULT_CATEGORY, defaultCategories } from '../../data/categories';
 import { TodoWeek } from './TodoWeek';
 import './todo.css';
 
-export type TodoStore = ReturnType<typeof useTodos>;
+export type TodoStore = Omit<ReturnType<typeof useTodos>, 'saveError'> & { saveError?: string };
 export type InitialDialog = 'add' | 'edit' | 'delete' | 'undo' | undefined;
 type UndoRecord = { token: number; snapshot: Todo; label: string; kind: 'toggle'|'delete'; expiresAt: number; undone?: boolean };
 
@@ -39,6 +40,9 @@ export function TodoView({ store, initialDialog, initialAll=false }: { store: To
   const confirmDelete = useRef<(() => Promise<boolean>) | null>(null);
   const undoRef = useRef(undos);
   const history = useRef<UndoRecord[]>([...undos]);
+  // Undo compares against our own last result, never a later refreshed view.
+  const undoExpected = useRef(new Map<number, Todo | null>(undos.flatMap(record =>
+    record.snapshot.id === undefined ? [] : [[record.snapshot.id, {...record.snapshot, completed: !record.snapshot.completed}] as const])));
   const sequence = useRef(0), undoBusy = useRef(new Set<number>()), alive = useRef(true);
   const scopedTodos=useMemo(()=>store.todos.filter(todo=>categoryId==='all'||(todo.categoryId??DEFAULT_CATEGORY)===categoryId),[store.todos,categoryId]);
   const dateTodos = useMemo(() => scopedTodos.filter(todo => todo.date === date), [scopedTodos, date]);
@@ -60,16 +64,22 @@ export function TodoView({ store, initialDialog, initialAll=false }: { store: To
   }
   async function toggle(todo: Todo) {
     if (todo.id === undefined) return false;
-    const snapshot=structuredClone(todo);
-    const success = await store.complete(todo.id, !todo.completed);
-    if (success) remember(snapshot,todo.completed ? '已恢复待办' : '已完成待办','toggle');
+    const snapshot=todoBaseline(todo);
+    const success = await store.complete(todo.id, !todo.completed, snapshot);
+    if (success) {
+      undoExpected.current.set(todo.id, {...snapshot, completed: !todo.completed});
+      remember(snapshot,todo.completed ? '已恢复待办' : '已完成待办','toggle');
+    }
     return success;
   }
   async function remove(todo: Todo) {
     if (todo.id === undefined) return false;
-    const snapshot=structuredClone(todo);
-    const success=await store.remove(todo.id);
-    if (success) remember(snapshot,'已删除待办','delete');
+    const snapshot=todoBaseline(todo);
+    const success=await store.remove(todo.id, snapshot);
+    if (success) {
+      undoExpected.current.set(todo.id, null);
+      remember(snapshot,'已删除待办','delete');
+    }
     return success;
   }
   function expire(token:number) {
@@ -77,7 +87,10 @@ export function TodoView({ store, initialDialog, initialAll=false }: { store: To
     setUndos(undoRef.current);
     // Expired operations remain committed while another undo for the task is live.
     const liveIds=new Set(undoRef.current.map(record=>record.snapshot.id));
-    if(!undoBusy.current.size) history.current=history.current.filter(record=>liveIds.has(record.snapshot.id));
+    if(!undoBusy.current.size) {
+      history.current=history.current.filter(record=>liveIds.has(record.snapshot.id));
+      for (const id of undoExpected.current.keys()) if (!liveIds.has(id)) undoExpected.current.delete(id);
+    }
   }
   async function undoOperation(token:number) {
     const record=undoRef.current.find(record=>record.token===token);
@@ -91,12 +104,28 @@ export function TodoView({ store, initialDialog, initialAll=false }: { store: To
       if(item.undone || item.token===token) continue;
       target=item.kind==='delete'?null:{...item.snapshot,completed:!item.snapshot.completed};
     }
-    const current=store.todos.find(todo=>todo.id===record.snapshot.id);
-    const success=target===null ? (!current || await store.remove(current.id!))
-      : current ? await store.complete(current.id!,target.completed)
-      : await store.restore({...record.snapshot,completed:target.completed});
-    if(success) {record.undone=true;expire(token);}
+    const id=record.snapshot.id!;
+    if (!undoExpected.current.has(id)) { undoBusy.current.delete(token); return; }
+    const expected=undoExpected.current.get(id)!;
+    let restored: Todo | undefined;
+    const success=target===null ? (expected === null || await store.remove(id, expected))
+      : expected !== null ? await store.complete(id,target.completed,expected)
+      : await store.restore({...record.snapshot,completed:target.completed}, row => { restored = row; });
+    if(success) {
+      if (target === null) undoExpected.current.set(id, null);
+      else if (expected !== null) undoExpected.current.set(id, {...expected, completed: target.completed});
+      else if (restored) undoExpected.current.set(id, restored);
+      else undoExpected.current.delete(id); // A preview store supplied no committed row.
+      record.undone=true;expire(token);
+    }
     undoBusy.current.delete(token);
+  }
+  function reassignedCategories(changes: { before: Todo; after: Todo }[]) {
+    for (const {before, after} of changes) {
+      if (before.id === undefined) continue;
+      const expected = undoExpected.current.get(before.id);
+      if (expected && equalValue(expected, before)) undoExpected.current.set(before.id, after);
+    }
   }
   function openEdit(todo: Todo) { setEditing(todo); setDialog('edit'); }
   function openDelete(todo: Todo, confirm: () => Promise<boolean>) {
@@ -180,8 +209,8 @@ export function TodoView({ store, initialDialog, initialAll=false }: { store: To
       </div>
       <div className="undo-stack" aria-label="操作撤销" data-count={undos.length}>{undos.map(record=><UndoToast key={record.token} label={record.label} task={record.snapshot.text} expiresAt={record.expiresAt} onUndo={()=>void undoOperation(record.token)} onExpire={()=>expire(record.token)}/>)}</div>
     </section>
-    {(dialog === 'add' || dialog === 'edit') && <TodoForm todo={dialog === 'edit' ? editing : null} date={date} categories={store.categories} defaultCategoryId={categoryId==='all'?DEFAULT_CATEGORY:categoryId} onSave={store.save} onClose={() => setDialog(null)}/>}
-    {dialog==='categories'&&<CategoryManager categories={store.categories} onSave={store.saveCategory} onRemove={store.removeCategory} onClose={()=>setDialog(null)}/>}
+    {(dialog === 'add' || dialog === 'edit') && <TodoForm todo={dialog === 'edit' ? editing : null} date={date} categories={store.categories} defaultCategoryId={categoryId==='all'?DEFAULT_CATEGORY:categoryId} onSave={store.save} saveError={store.saveError} onClose={() => setDialog(null)}/>}
+    {dialog==='categories'&&<CategoryManager categories={store.categories} onSave={store.saveCategory} onRemove={id => store.removeCategory(id, reassignedCategories)} onClose={()=>setDialog(null)}/>}
     {dialog === 'calendar' && <CalendarPicker value={date} onSelect={selectDate} onClose={() => setDialog(null)}/>}
     {dialog === 'delete' && editing && <Modal title="删除这件待办？" layout="confirm" canClose={() => !deleting} onClose={closeDelete}>
       <p className="todo-delete-preview">「{editing.text}」将从列表移除。删除后可在提示栏撤销。</p>

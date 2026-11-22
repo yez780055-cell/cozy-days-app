@@ -6,6 +6,8 @@ on:
     # Publisher-only maintenance must not create a new signed web revision.
     # Any other changed path still runs the normal deployment and update release.
     paths-ignore:
+      - AGENTS.md
+      - docs/architecture/**
       - .github/workflows/deploy-pages.yml
       - .github/workflows/android-web-auto.yml
       - .github/workflows/android-web-publish-retry.yml

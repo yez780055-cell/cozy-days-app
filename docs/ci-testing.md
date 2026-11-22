@@ -20,6 +20,10 @@
 
 scripts/ci-plan.mjs 根据 PR base SHA 到当前提交的 diff 选择测试，输出 ci-test-plan.json 和 Actions Summary；候选包默认比较最新已发布网页 tag，也可指定 changed_base。SQL 迁移和 IndexedDB 结构改动由路径和 schema diff 检测。重大架构/关键功能由维护者添加完整检查标签，标签变化会重新验证。
 
+PR 只要求一个最终 `verify` 检查。`affected checks` 与可复用的原生 ART 工作流分别执行，最终 `verify` 使用 `always()` 汇总，二者必须成功；失败、取消或被跳过都不能通过。ART 工作流与浏览器测试共用 `ci-plan.mjs` 的依赖映射；范围判断必须成功并明确输出 true/false，只有 false 时才允许 ART 执行任务跳过。原生生产代码、夹具、打包/增量脚本与门禁策略变更运行 ART，完整验收也运行 ART。APK 等非 PR 调用始终要求 ART。
+
+所有 `src/data/` 改动增加 CloudBase、统一 Android 的同步回归及待办并发保护回归，包含 `cloudStore`、`cloudSync`；纪念日模型改动明确包含公历、农历与累计节点测试。待办并发回归区分本机分类删除成功事务的关联迁移、云端或其他标签的外部修改，并检查恢复归一化后的连续撤销。基础及纪念日、生理期专用 Playwright 配置共用本地服务器工厂，显式设置 `VITE_CLOUDBASE_ENABLED=false`；云与 Android 配置继续使用各自环境，不能复用不同模式的构建作为发布制品。
+
 scripts/ci-run.mjs 是各工作流共用的执行入口。测试老数据/旧交互时仅使用隔离构建；正式产物始终按 CloudBase 默认开启重新构建，并在实际待签名 Android 资源上验证。测试中的隔离构建不会成为交付的另一条产品线。
 
 本地使用 npm run test:ci:policy 验证策略。npm run test:ci 执行所选测试。可用 CI_TEST_TIER=full 显式完整验证，或 CI_DRY_RUN=true 预览命令；CI 环境禁止使用 dry run 充当质量门禁。

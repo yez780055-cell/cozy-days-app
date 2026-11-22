@@ -2,14 +2,15 @@ import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { CalendarDays, ChevronDown, Clock, Star } from 'lucide-react';
 import { Modal } from '../../components/Modal';
 import { Button } from '../../components/Button';
-import type { Todo } from '../../data/database';
+import { todoBaseline, type Todo } from '../../data/database';
 import { createSeed, decorationIdentity, resolveDecoration, reviseDecoration, type TaskDecoration } from './decorations';
 import { canonicalTime, DEFAULT_CATEGORY, defaultCategories, type Category } from '../../data/categories';
 import { isDateKey } from './dates';
 import { CalendarPanel } from './CalendarPicker';
-export function TodoForm({ todo, date, categories=defaultCategories, defaultCategoryId=DEFAULT_CATEGORY, onSave, onClose }: {
-  todo: Todo | null; date: string; categories?:Category[];defaultCategoryId?:string; onSave: (text: string, date: string, id?: number, decoration?: TaskDecoration, favorite?: boolean, categoryId?:string,time?:string) => Promise<boolean>; onClose: () => void;
+export function TodoForm({ todo, date, categories=defaultCategories, defaultCategoryId=DEFAULT_CATEGORY, onSave, onClose, saveError }: {
+  todo: Todo | null; date: string; categories?:Category[];defaultCategoryId?:string; onSave: (text: string, date: string, id?: number, decoration?: TaskDecoration, favorite?: boolean, categoryId?:string,time?:string,baseline?:Todo) => Promise<boolean>; onClose: () => void; saveError?: string;
 }) {
+  const [baseline] = useState(() => todo ? todoBaseline(todo) : undefined);
   const [text, setText] = useState(todo?.text ?? '');
   const [formDate, setFormDate] = useState(todo?.date ?? date);
   const [categoryId,setCategoryId]=useState(()=>categories.some(c=>c.id===(todo?.categoryId??defaultCategoryId)) ? (todo?.categoryId??defaultCategoryId) : (categories.find(c=>c.key==='生活')??categories[0])?.id??DEFAULT_CATEGORY);
@@ -19,6 +20,7 @@ export function TodoForm({ todo, date, categories=defaultCategories, defaultCate
   const [minute,setMinute]=useState(canonicalTime(todo?.time).slice(3)||'00');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  const [saveFailed, setSaveFailed] = useState(false);
   const [favorite, setFavorite] = useState(todo?.favorite === true);
   const initial = useRef({text, formDate, categoryId, time, favorite});
   const dirty = text !== initial.current.text || formDate !== initial.current.formDate || categoryId !== initial.current.categoryId || time !== initial.current.time || favorite !== initial.current.favorite;
@@ -40,13 +42,15 @@ export function TodoForm({ todo, date, categories=defaultCategories, defaultCate
   const submit = async (event: FormEvent) => {
     event.preventDefault();
     if (!text.trim() || !formDate || busy) return;
+    setSaveFailed(false);
+    setError('');
     if(!isDateKey(formDate)){setError('请从日历选择有效日期，或填写 YYYY-MM-DD。');return;}
     if(time&&!canonicalTime(time)){setError('时间请填写为 00:00–23:59，或从面板选择。');return;}
     setBusy(true);
-    const saved = await onSave(text.trim(), formDate, todo?.id, reviseDecoration(text.trim(), decoration), favorite,categoryId,time);
+    const saved = await onSave(text.trim(), formDate, todo?.id, reviseDecoration(text.trim(), decoration), favorite,categoryId,time,baseline);
     setBusy(false);
     if (saved) onClose();
-    else setError('保存失败，请重试。输入内容仍保留在这里。');
+    else setSaveFailed(true);
   };
   return <Modal title={todo ? '编辑待办' : '新建待办'} className="todo-editor" onClose={onClose} dirty={dirty} canClose={() => !busy}
     onAndroidBack={() => { if (!panel) return false; setPanel(null); return true; }}
@@ -60,7 +64,7 @@ export function TodoForm({ todo, date, categories=defaultCategories, defaultCate
     {panel==='category'&&<div id="form-category-panel" className="todo-panel category-options" role="group" aria-label="选择所属分类">{categories.map(category=><button type="button" className="button button--soft todo-option" key={category.id} aria-pressed={category.id===categoryId} onClick={()=>{setCategoryId(category.id);setPanel(null);}}>{category.name}</button>)}</div>}
     {panel==='time'&&<div id="form-time-panel" className="todo-panel" role="group" aria-label="选择计划时间"><div className="time-columns">{(['时','分'] as const).map((label,column)=><div key={label}><strong>{label}</strong><div className="time-options" role="group" aria-label={label}>{Array.from({length:column===0?24:60},(_,i)=>String(i).padStart(2,'0')).map(value=><button className="button button--soft todo-option" key={value} type="button" aria-pressed={(column===0?hour:minute)===value} onClick={()=>column===0?setHour(value):setMinute(value)}>{value}</button>)}</div></div>)}</div><Button type="button" variant="soft" onClick={()=>{setTime(hour+':'+minute);setPanel(null);}}>确定时间</Button></div>}
     {time&&<button className="button button--ghost clear-time" type="button" onClick={()=>{setTime('');setPanel(null);}}>清除时间</button>}
-    {error && <p className="error-message" role="alert">{error}</p>}
+    {(saveFailed || error) && <p className="error-message" role="alert">{saveFailed ? `${saveError || '保存失败，请重试。'} 输入内容仍保留在这里。` : error}</p>}
     <footer className="modal-actions">
       <Button variant="soft" disabled={busy} onClick={requestClose}>取消</Button>
       <Button type="submit" disabled={!text.trim() || !formDate || busy}>{busy ? '正在保存…' : '保存'}</Button>

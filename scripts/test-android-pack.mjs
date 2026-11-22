@@ -3,6 +3,7 @@ import { spawnSync } from 'node:child_process';
 import { createHash, verify, X509Certificate } from 'node:crypto';
 import { mkdirSync, mkdtempSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
+import { verifyRelease } from './android-web-auto.mjs';
 
 const root = resolve('artifacts'); mkdirSync(root, { recursive: true });
 const temp = mkdtempSync(join(root, 'delta-pack-'));
@@ -42,6 +43,20 @@ for (const web of [2, 3]) {
   const bytes = readFileSync(join(version, 'web-manifest.json'));
   assert.ok(verify('RSA-SHA256', bytes, publicKey, readFileSync(join(version, 'web-manifest.sig'))));
   const manifest = JSON.parse(bytes);
+  // Exercise the production release verifier using an isolated, explicitly trusted test certificate.
+  writeFileSync(join(version, 'latest.json'), JSON.stringify(catalog));
+  const plan = { schema: 1, shell: 3, web, tag: `android-web-shell-3-web-${web}`, source: process.env.GITHUB_SHA || 'a'.repeat(40) };
+  const certBytes = readFileSync(cert), pinned = hash(new X509Certificate(certBytes).raw);
+  assert.doesNotThrow(() => verifyRelease(version, certBytes, plan, pinned));
+  assert.throws(() => verifyRelease(version, certBytes, plan), /Original APK/);
+  const sigPath = join(version, 'web-manifest.sig'), signature = readFileSync(sigPath);
+  writeFileSync(sigPath, Buffer.alloc(signature.length));
+  assert.throws(() => verifyRelease(version, certBytes, plan, pinned), /manifest signature/);
+  writeFileSync(sigPath, signature);
+  const objectPath = join(version, `file-${manifest.files[0].sha256}`), original = readFileSync(objectPath);
+  writeFileSync(objectPath, 'tampered');
+  assert.throws(() => verifyRelease(version, certBytes, plan, pinned));
+  writeFileSync(objectPath, original);
   assert.equal(manifest.shell, 3); assert.equal(manifest.web, web); assert.equal(manifest.schema, 1);
   assert.equal(manifest.packageSha256, catalog.sha256); assert.equal(manifest.packageBytes, catalog.bytes);
   assert.equal(manifest.files.length, 3);

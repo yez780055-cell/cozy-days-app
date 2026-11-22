@@ -20,6 +20,7 @@
     "test:ci:policy": "node --test scripts/ci-plan.test.mjs",
     "test:android:delta": "node scripts/test-android-delta.mjs",
     "test:android:pack": "node scripts/test-android-pack.mjs",
+    "test:android:auto": "node --test scripts/android-web-auto.test.mjs",
     "test:smoke": "playwright test --config playwright.smoke.config.ts"
   },
   "dependencies": {

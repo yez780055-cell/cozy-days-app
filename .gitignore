@@ -34,3 +34,4 @@ android/local.properties
 android/**/build/
 android/.idea/
 /ci-test-plan.json
+/android-web-auto-plan.json

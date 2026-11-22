@@ -1,19 +1,22 @@
 # 小饱日常开发约定
 
-## 分支与交付
-- `main` 是正式稳定分支，只由经过批准的 Pull Request 更新；任何情况下都不要直接推送 `main` 或自动合并。
-- 每项功能或视觉任务使用独立的 `feature/*` 分支，并以 `main` 为 PR 目标。纯视觉修改（字体、颜色、插画、间距、装饰、按钮外观）运行必要的快速检查和构建，不默认运行完整 E2E，也不默认生成三档截图、录屏或完整 Review 证据；完成后仅暂存本轮明确修改的文件，提交并推送对应 feature 分支，创建或更新 PR，以 Cloudflare Preview 供手机验收。
+## 开发与交付
+- 按用户 2026-11-22 的决定，唯一应用开发目录为当前 `cozy-days-app`，直接在本地 `main` 开发和提交，不创建或切换本地功能分支，不新建 worktree，也不恢复并行开发目录。每轮修改完成后自动创建一次性远端 PR 分支并推送本轮提交，以远端 `main` 为 PR 目标；本地始终保持单一开发目录。历史分支和归档仅用于追溯。
+- 开始工作先检查 `git status`、当前分支及未完成改动。切换或同步前先保全本地工作；同步远端采用普通快进，不使用强制切换、reset、清理或覆盖代码。
+- 纯视觉修改（字体、颜色、插画、间距、装饰、按钮外观）运行必要的快速检查和构建，不默认运行完整 E2E，也不默认生成三档截图、录屏或完整 Review 证据。已完成且验证通过的改动按功能整理为本地提交；未完成工作保留并明确说明。
 - 修改业务交互时，只运行受影响的测试；涉及任务状态、持久化、撤销等核心逻辑时运行相关 E2E。发布 APK 或进行重大功能重构前运行完整 `npm run test:e2e`、`npm run build`、`npm run build:pages` 和 `npm run test:pages`。
-- GitHub PR 默认按 diff 运行构建、相关模块测试与基础 smoke；CloudBase 改动增加对应测试。候选网页包增加 Android 更新链路，不默认全量。仅正式 Release、重大架构、数据库迁移或关键功能合并执行完整回归；重大/关键 PR 标记 `ci:full`，数据库迁移自动升级。完整验证也可通过 `workflow_dispatch` 显式触发，详见 `docs/ci-testing.md`。
+- GitHub PR 默认按 diff 运行构建、相关模块测试与基础 smoke；CloudBase 改动增加对应测试。候选及自动发布网页包增加 Android 更新链路，不默认全量。仅显式完整 Release 验收、重大架构、数据库迁移或关键功能合并执行完整回归；重大/关键 PR 标记 `ci:full`，数据库迁移自动升级。完整验证也可通过 `workflow_dispatch` 显式触发，详见 `docs/ci-testing.md`。
 - 禁止强制推送。提交前检查 `git status` 和 staged diff；发现非本轮改动时，保护并保留其原状态，不得混入提交、清理或覆盖。
-- 不自动合并。合并前确认 PR 检查成功、没有冲突且 SHA 是最新；只有用户在 ChatGPT 明确批准后，才能通过已连接 GitHub 的 ChatGPT 执行合并。
-- 每轮结束告知 PR 编号和链接、在线验收地址、测试结果、修改摘要和遗留问题。Cloudflare Pages 连接完成后，将 PR 独立 HTTPS Preview 的 `/review/` 地址作为验收地址；GitHub Pages 只部署 main 正式版。
+- 正常流程已获得用户持续授权，无需逐次询问：本轮必要针对性测试、GitHub `verify` 及其他本轮适用检查全部通过后，确认 PR 无冲突且待合并 SHA 是已验证的最新提交，自动合并本轮 PR 到远端 `main`；通过普通快进同步本地 `main`，由合并推送触发现有 Pages 部署及后续 Android 网页增量发布。禁止直接推送远端 `main`、绕过仓库保护或自动合并历史 PR。
+- 只有测试失败、合并冲突、发布异常或涉及高风险操作时，暂停流程并报告原因、当前提交和已完成步骤；高风险操作须取得明确授权。不得将失败检查视为通过或擅自降低门禁。
+- Android 网页自动发布仅使用外壳 3；`main` 成功部署后自动生成签名 Manifest、增量文件和整包回退制品，核验后公开。沿用现有环境 Secrets 管理签名私钥，保留签名校验、失败回滚、离线启动和数据保护机制。普通网页更新不重新构建 APK，不要求 Codex 手动签发或上传 Release，详见 `docs/android-web-update-release.md`。
+- 每轮结束告知开发目录、分支、提交、PR 链接、测试与部署/增量发布结果、工作区是否干净及遗留内容。只有实际创建 PR 或部署预览时才提供相应链接；本地提交或 PR 合并不等同于已成功发布。
 
 ## 数据与 Android 安全
 - 不编辑 `D:\index.html`，不删除或重置已有待办数据、IndexedDB、滑动/撤销机制、分类系统或现有 Android 工程配置。
-- 不发布密钥、环境变量、私密数据、本机数据库或无关文件。PR 代码的浏览器验证使用全新临时浏览器上下文和合成数据。
-- GitHub Pages 只部署 `main`。PR 使用独立 HTTPS Preview 源站；不要把未审查的 PR 部署到正式 Pages 同源，以免访问正式站点的本地存储。
-- 首次连接 Cloudflare Pages/GitHub App 或其他外部服务前，先向用户说明并取得明确授权。Cloudflare 的 `main` 自动生产部署须关闭，feature/PR 只生成独立 Preview；正式版继续使用 GitHub Pages。
+- 不发布密钥、环境变量、私密数据、本机数据库或无关文件。浏览器验证使用全新临时浏览器上下文和合成数据。
+- GitHub Pages 只部署已验证且获准发布的 `main`。开发验收使用本地服务或独立 Preview 源站，以免访问正式站点的本地存储。
+- 首次连接 Cloudflare Pages/GitHub App 或其他外部服务前，先向用户说明并取得明确授权。Cloudflare 的 `main` 自动生产部署须关闭；正式版继续使用 GitHub Pages。
 
 ## 在线验收与检查
 - 保持 `/review/` 为纯静态页面；使用相对资源路径，以兼容 GitHub Pages 子路径、Cloudflare Pages 和 Capacitor。

@@ -4,6 +4,15 @@ const port = Number(process.env.COZY_E2E_PORT ?? '5173');
 if (!Number.isInteger(port) || port < 1 || port > 65535) throw new Error('Invalid COZY_E2E_PORT');
 const baseURL = `http://127.0.0.1:${port}`;
 
+export function localWebServer(port: number) {
+  return {
+    command: `npm run dev -- --host 127.0.0.1 --port ${port} --strictPort`,
+    env: { COZY_E2E_NO_WATCH: '1', VITE_CLOUDBASE_ENABLED: 'false' },
+    url: `http://127.0.0.1:${port}`,
+    reuseExistingServer: false,
+  };
+}
+
 export default defineConfig({
   testDir: './tests',
   testIgnore: ['pages.spec.ts', 'pwa.spec.ts', 'cloudbase.spec.ts', 'ci-smoke.spec.ts'],
@@ -16,12 +25,7 @@ export default defineConfig({
     trace: 'retain-on-failure',
     launchOptions: process.env.PLAYWRIGHT_CHANNEL ? { channel: process.env.PLAYWRIGHT_CHANNEL } : {},
   },
-  webServer: {
-    command: `npm run dev -- --host 127.0.0.1 --port ${port} --strictPort`,
-    env: { COZY_E2E_NO_WATCH: '1', VITE_CLOUDBASE_ENABLED: 'false' },
-    url: baseURL,
-    reuseExistingServer: false,
-  },
+  webServer: localWebServer(port),
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
 });
 

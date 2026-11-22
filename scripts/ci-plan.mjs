@@ -19,10 +19,10 @@ export function planTests(paths, { tier = 'pr', fullRequested = false, schemaCha
     if (/^src\/components\/(?:Modal|Sheet|DatePicker|Confirm)/.test(p)) add('shared-interaction', 'todo', 'anniversary-modal-guard');
     if (/^(?:vite|capacitor)\.config/.test(p)) android = true;
     if (/^src\/features\/todo\/|^tests\/(?:todo|swipe|categories-time)\./.test(p))
-      add('todo', 'todo', 'categories-time', 'swipe');
+      add('todo', 'todo', 'todo-concurrency', 'categories-time', 'swipe');
     if (/^src\/features\/anniversary\/|^tests\/anniversary/.test(p)) {
       add('anniversary', 'anniversary', 'anniversary-storage');
-      if (/date|timing/i.test(p)) add('anniversary', 'anniversary-dates', 'anniversary-timing-list');
+      if (/date|timing|model\.ts$/i.test(p)) add('anniversary', 'anniversary-dates', 'anniversary-calendar', 'anniversary-timing-list');
       if (/photo|backup/i.test(p)) add('anniversary', 'anniversary-photo-backup');
     }
     if (/^src\/features\/period\/|^tests\/period/.test(p)) {
@@ -33,11 +33,12 @@ export function planTests(paths, { tier = 'pr', fullRequested = false, schemaCha
     if (/^src\/(?:components|styles|assets)\/|^public\/assets\//.test(p))
       add('appearance', 'apricot-foundation', 'decorations');
     if (/font/i.test(p) && /^src\//.test(p)) add('appearance', 'font-switcher');
-    if (/^src\/data\/cloud|^src\/features\/cloud\/|^cloudbase\/|^tests\/cloudbase|^playwright\.cloudbase/.test(p)) {
+    if (/^src\/data\/|^src\/features\/cloud\/|^cloudbase\/|^tests\/cloudbase|^playwright\.cloudbase/.test(p)) {
       cloud = true; modules.add('cloudbase');
     }
+    if (/^src\/data\//.test(p)) add('data-concurrency', 'todo-concurrency');
     if (/^src\/data\//.test(p) && !/^src\/data\/cloud/.test(p)
-      || /^src\/features\/settings\/Backup/.test(p)) add('data', 'data-safety');
+      || /^src\/features\/settings\/Backup/.test(p)) add('data', 'data-safety', 'todo-concurrency');
     if (/^src\/features\/settings\//.test(p) && !/Backup/.test(p)) add('settings', 'font-switcher', 'data-safety');
     if (/^src\/native\/|^tests-android\/|^android\//.test(p)) { android = true; modules.add('android'); }
     if (/^src\/native\/(?:back|window)|^tests-android\/interaction/.test(p)) nativeInteraction = true;
@@ -54,7 +55,8 @@ export function planTests(paths, { tier = 'pr', fullRequested = false, schemaCha
     ...(fullRequested ? ['critical change / architecture label'] : []),
     ...(migrations || schemaChanged ? ['database migration / schema change'] : []),
   ];
-  const nativeDelta = criticalNative || changed.some(p => /(?:WebFileManifest|DeltaWebUpdates|DeltaUpdateProbe|test-android-delta|write-web-inventory)/.test(p));
+  // Shared by the PR gate and the reusable ART workflow, including gate changes.
+  const nativeDelta = full || changed.some(p => /^android\/|^tests-android\/|^scripts\/(?:PackAndroidWeb|VerifyAndroidWeb|test-android|write-web-inventory)|^scripts\/ci-(?:plan|run)(?:\.test)?\.mjs$|^\.github\/workflows\/(?:verify-pr|android-delta-tests)\.yml$/.test(p));
   return { tier, full, reasons, modules: [...modules].sort(), smoke: true, cloud, android, pages, nativeDelta,
     webTests: [...web].sort(), androidInteraction: nativeInteraction || full,
     androidCloudSuite: full || cloud };
@@ -85,6 +87,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const plan = collectPlan();
   writeFileSync('ci-test-plan.json', JSON.stringify(plan, null, 2) + '\n');
   console.log(JSON.stringify(plan, null, 2));
+  if (process.env.GITHUB_OUTPUT) appendFileSync(process.env.GITHUB_OUTPUT, `native=${plan.nativeDelta}\n`);
   if (process.env.GITHUB_STEP_SUMMARY) appendFileSync(process.env.GITHUB_STEP_SUMMARY,
     '## Validation plan\n\nTier: **' + (plan.full ? 'full' : plan.tier) + '**\n\nModules: '
     + (plan.modules.join(', ') || 'build and smoke only') + '\n\nFull gate: '

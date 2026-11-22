@@ -4,8 +4,17 @@ import { CategoryError, canonicalTime, categoryKey, cleanCategoryName, type Cate
 import { categoryFor, cloudScope, database, fallbackCategory, newCloudRecordId, type Todo } from './localDatabase';
 import { withDataAccess } from './storageAccess';
 import { trackCloudChanges } from './cloudStore';
-import type { CloudKind } from './cloudTypes';
+import { equalValue, type CloudKind } from './cloudTypes';
 export type { Todo } from './localDatabase';
+// Display rows may have a fallback category. Keep the stored row as the baseline.
+const todoBaselines = new WeakMap<Todo, Todo>();
+export function todoBaseline(todo: Todo): Todo { return structuredClone(todoBaselines.get(todo) ?? todo); }
+export class TodoConflictError extends Error {
+  constructor() { super('这条待办已发生变化或被删除，本次操作未应用；查看最新记录后重试。'); }
+}
+function assertTodoBaseline(current: Todo | undefined, baseline?: Todo) {
+  if (!current || (baseline && !equalValue(current, baseline))) throw new TodoConflictError();
+}
 
 const write = <T>(kinds: readonly CloudKind[], action: () => Promise<T>) =>
   withDataAccess(() => trackCloudChanges(kinds, action));
@@ -47,9 +56,17 @@ export const categoryRepository = {
   remove: (id:string) => write(['category', 'todo'], () => database.transaction('rw',database.categories,database.todos,async()=>{
     const row=await database.categories.get(id);
     if(!row) throw new CategoryError('这个分类已不存在。');
+    const before = await database.todos.where('categoryId').equals(id).toArray();
     await database.categories.delete(id);
     const fallback=await fallbackCategory(database.categories,id);
     await database.todos.where('categoryId').equals(id).modify({categoryId:fallback});
+    // Return only the rows written in this transaction; callers may use these
+    // as evidence after the surrounding outbox transaction has committed.
+    return Promise.all(before.map(async previous => {
+      const after = await database.todos.get(previous.id!);
+      if (!after) throw new Error('Category migration lost a task');
+      return { before: previous, after };
+    }));
   })),
 };
 
@@ -60,7 +77,11 @@ export const todoRepository = {
       const categories = await database.categories.orderBy('createdAt').toArray();
       const fallback = categories.find(row => row.key === categoryKey('生活')) ?? categories[0];
       const ids = new Set(categories.map(row => row.id));
-      return todos.map(todo => ({ ...todo, categoryId: todo.categoryId && ids.has(todo.categoryId) ? todo.categoryId : fallback?.id }));
+      return todos.map(todo => {
+        const view = { ...todo, categoryId: todo.categoryId && ids.has(todo.categoryId) ? todo.categoryId : fallback?.id };
+        todoBaselines.set(view, structuredClone(todo));
+        return view;
+      });
     }
     for (const todo of todos) {
       const decoration = resolveDecoration(todo.text, todo.decoration, decorationIdentity(todo));
@@ -70,6 +91,7 @@ export const todoRepository = {
         todo.decoration = decoration; todo.categoryId=categoryId;
       }
     }
+    for (const todo of todos) todoBaselines.set(todo, structuredClone(todo));
     return todos;
   })),
   add: (todo: Todo) => write(['todo', 'category'], () => database.transaction('rw',database.todos,database.categories,async()=>{
@@ -77,9 +99,12 @@ export const todoRepository = {
     return database.todos.add({ ...todo,id: todo.id ?? newCloudRecordId(),categoryId,time:canonicalTime(todo.time)||undefined,
       decoration: reviseDecoration(todo.text, todo.decoration ?? { seed: createSeed() }) });
   })),
-  update: (id: number, changes: Partial<Omit<Todo, 'id'>>) => write(['todo', 'category'], () => database.transaction('rw', database.todos,database.categories, async () => {
+  update: (id: number, changes: Partial<Omit<Todo, 'id'>>, baseline?: Todo) => write(['todo', 'category'], () => database.transaction('rw', database.todos,database.categories, async () => {
     const current = await database.todos.get(id);
-    if (!current) throw new Error('Todo no longer exists');
+    assertTodoBaseline(current, baseline);
+    if (!current) throw new TodoConflictError();
+    // A completion toggle only changes completion; preserve the stored row exactly otherwise.
+    if (Object.keys(changes).every(key => key === 'completed')) return database.todos.update(id, changes);
     const text = changes.text ?? current.text;
     const decoration = changes.text !== undefined
       ? reviseDecoration(text, changes.decoration ?? current.decoration, decorationIdentity(current))
@@ -87,11 +112,16 @@ export const todoRepository = {
     const categoryId=await categoryFor({...current,...changes},database.categories);
     return database.todos.update(id, { ...changes, decoration,categoryId });
   })),
-  remove: (id: number) => write(['todo'], () => database.todos.delete(id)),
+  remove: (id: number, baseline?: Todo) => write(['todo'], () => database.transaction('rw', database.todos, async () => {
+    assertTodoBaseline(await database.todos.get(id), baseline);
+    await database.todos.delete(id);
+  })),
   restore: (snapshot: Todo) => write(['todo', 'category'], () => database.transaction('rw',database.todos,database.categories,async()=>{
     if(snapshot.id===undefined) throw new Error('Undo needs the original task ID');
+    if (await database.todos.get(snapshot.id)) throw new TodoConflictError();
     const restored=structuredClone(snapshot);
     restored.categoryId=await categoryFor(restored,database.categories);
-    return database.todos.put(restored);
+    await database.todos.put(restored);
+    return restored;
   })),
 };

@@ -3,6 +3,7 @@ import { resolve, extname, sep } from 'node:path';
 import { PGlite } from '@electric-sql/pglite';
 import { expect, test, type BrowserContext, type Page } from '@playwright/test';
 import { openPeriod, recordClosedPeriod } from './period-actions';
+import { chooseDate } from './anniversary-actions';
 
 import { mockShell, type Fixture } from '../tests-android/support/shell-fixture';
 
@@ -270,7 +271,7 @@ async function anniversary(page: Page, name: string, previous?: string) {
   } else await page.getByRole('button', { name:'新增纪念日', exact:true }).click();
   const form = page.getByRole('dialog');
   await form.getByLabel('纪念日名称').fill(name);
-  await form.getByLabel('日期', { exact:true }).fill('2026-11-21');
+  await chooseDate(form, '2026-11-21');
   await form.getByRole('button', { name:'保存纪念日' }).click();
   await expect(form).toHaveCount(0);
 }

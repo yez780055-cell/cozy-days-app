@@ -30,6 +30,14 @@ jobs:
       - run: npm run test:ci:policy
       - name: Check Android release Secret wiring and fail-closed preflight
         run: npm run test:android:auto
+      - name: Test anonymous HTTP handling and collect runner-specific diagnostics for publisher changes
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          node --test scripts/android-web-http.test.mjs
+          if ! git diff --quiet "$BASE_SHA" HEAD -- scripts/android-web-http.mjs scripts/android-web-auto.mjs; then
+            node scripts/android-web-http.mjs probe android-web-shell-3-web-3
+          fi
       - run: npx playwright install --with-deps chromium
       - name: Plan tests from the PR diff and critical-change labels
         run: node scripts/ci-plan.mjs
@@ -45,4 +53,5 @@ jobs:
             artifacts/ci-smoke-results/
             artifacts/cloudbase-test-results/
             artifacts/cloudbase-android-test-results/
+            artifacts/android-web-http/
           if-no-files-found: warn

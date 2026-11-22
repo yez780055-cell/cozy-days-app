@@ -1,0 +1,76 @@
+name: Retry Android web publish verification
+run-name: Verify existing signed assets from run ${{ inputs.source_run }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_run:
+        description: Failed publish run with a successful original sign job (no rebuilding or signing)
+        required: true
+        default: '44990551368'
+        type: string
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: android-web-release
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: github.repository == 'yez780055-cell/cozy-days-app' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version: '22'
+      - name: Authenticate only the original workflow/artifact provenance (not public Release checks)
+        id: source
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SOURCE_RUN: ${{ inputs.source_run }}
+        run: |
+          node --input-type=module <<'JS'
+          import assert from 'node:assert/strict';
+          import { execFileSync } from 'node:child_process';
+          import { appendFileSync } from 'node:fs';
+          const id = process.env.SOURCE_RUN;
+          assert.match(id, /^[1-9][0-9]{0,11}$/);
+          const base = 'repos/yez780055-cell/cozy-days-app/actions/runs/' + id;
+          const run = JSON.parse(execFileSync('gh', ['api', base], { encoding: 'utf8' }));
+          assert.equal(run.repository.full_name, 'yez780055-cell/cozy-days-app');
+          assert.equal(run.path, '.github/workflows/deploy-pages.yml');
+          assert.equal(run.event, 'push'); assert.equal(run.head_branch, 'main');
+          assert.equal(run.status, 'completed'); assert.equal(run.conclusion, 'failure');
+          assert.match(run.head_sha, /^[a-f0-9]{40}$/);
+          const pages = JSON.parse(execFileSync('gh', ['api', '--paginate', '--slurp', base + '/jobs?per_page=100'], { encoding: 'utf8' }));
+          const jobs = pages.flatMap(page => page.jobs);
+          for (const name of ['android-web / verify', 'android-web / sign'])
+            assert.ok(jobs.some(job => job.name === name && job.conclusion === 'success'));
+          assert.ok(jobs.some(job => job.name === 'android-web / publish' && job.conclusion === 'failure'));
+          appendFileSync(process.env.GITHUB_OUTPUT, 'sha=' + run.head_sha + '\n');
+          JS
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131
+        with:
+          name: deployed-signed-android-web
+          path: signed
+          run-id: ${{ inputs.source_run }}
+          github-token: ${{ github.token }}
+      - name: Verify existing release anonymously with the unchanged original signed artifact
+        env:
+          ORIGINAL_SOURCE: ${{ steps.source.outputs.sha }}
+        run: node scripts/android-web-auto.mjs verify-published signed "$ORIGINAL_SOURCE"
+      - name: Preserve complete anonymous HTTP diagnostics
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+        with:
+          name: android-publish-retry-http-diagnostics
+          path: artifacts/android-web-http/
+          if-no-files-found: warn
+          retention-days: 14

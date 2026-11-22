@@ -84,3 +84,5 @@
 - 恢复后结果：原失败categories-time用例1/1通过；相关41项全部通过（首轮未受影响categories7/data-safety6/swipe9共22项结果复用，最终todo-concurrency10/todo9共19项通过）。新增失败注入测试曾提前捕获未提交完成状态，Sol增加真实completed及撤销提示等待后通过，回滚断言保留。
 - 当前门禁：policy15通过；CloudBase4通过1平台跳过，包含更新日期操作后的双上下文断网/重试/冲突；其启动构建含TypeScript及正式云模式Web构建通过。anniversary/period两个专用配置分别用真实待办UI smoke各1项通过，显式local环境有效。publisher7项历史结果可复用（相关文件未修改）。T/S交叉审查及L基于统一执行证据的独立UX复核通过；无实机、公网、真实账号验收。
 - cloudStore/cloudSync依赖遗漏已补映射并由policy验证。没有重跑无关176项全量；本批无schema/数据库迁移，按用户最新指示运行影响集，后续仍需真实PR ART/verify和实际制品发布链。
+- 已提交76926f6并创建[PR33](https://github.com/yez780055-cell/cozy-days-app/pull/33)。[首次CI](https://github.com/yez780055-cell/cozy-days-app/actions/runs/45001978195)实际ART通过，受影响测试40通过1失败，最终verify正确阻止；Trace显示连续undo测试读取早于提交，Sol补存储及toast结束等待，不削减断言。普通失败按新规则自动修复，PR尚未合并、未发布；以PR最新head/Actions为权威。
+- CI等待问题修正仅涉及测试：原失败case连续3次通过，另2个受helper影响case通过；其余未受影响证据复用，L独立复核确认原断言/业务及timeout/retry未变。修正追加到同一PR，等待最新SHA真实检查，不将首次红色运行标绿。

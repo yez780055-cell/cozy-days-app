@@ -48,6 +48,16 @@ async function completeCommitted(page: Page, text: string) {
   await expect.poll(async () => (await storedTodos(page)).find((row: { text: string }) => row.text === text)?.completed).toBe(true);
   await expect(page.locator('.undo-toast').filter({ hasText: text })).toBeVisible();
 }
+async function undoCommitted(page: Page, text: string, expected: { completed: boolean; categoryId: string }) {
+  const toasts = page.locator('.undo-toast').filter({ hasText: text });
+  const previousCount = await toasts.count();
+  expect(previousCount).toBeGreaterThan(0);
+  await toasts.last().getByRole('button', { name: '撤销', exact: true }).click();
+  // An expanded completed card is already editable while undo is still saving.
+  await expect.poll(async () => (await storedTodos(page)).find((row: { text: string }) => row.text === text)).toMatchObject(expected);
+  // The toast is consumed after the expected baseline/history has been updated.
+  await expect(toasts).toHaveCount(previousCount - 1);
+}
 
 test('local category deletion before completion permits completion undo', async ({ page }) => {
   await page.goto('/'); await openTodos(page);
@@ -55,7 +65,7 @@ test('local category deletion before completion permits completion undo', async 
   await add(page, '本机分类迁移后完成', '临时分类');
   await deleteCategory(page, '临时分类');
   await completeCommitted(page, '本机分类迁移后完成');
-  await page.getByRole('button', { name: '撤销', exact: true }).click();
+  await undoCommitted(page, '本机分类迁移后完成', { completed: false, categoryId: 'life' });
   await expect(page.getByRole('button', { name: '编辑：本机分类迁移后完成', exact: true })).toBeVisible();
   expect((await storedTodos(page))[0]).toMatchObject({ completed: false, categoryId: 'life' });
 });
@@ -67,11 +77,13 @@ test('restoring a deleted task uses its normalized category for the next undo', 
   await completeCommitted(page, '连续撤销的任务');
   await page.getByRole('button', { name: '已完成 1', exact: true }).click();
   await taskAction(page, '连续撤销的任务', 'delete');
+  await expect.poll(() => storedTodos(page)).toEqual([]);
+  await expect(page.locator('.undo-toast').filter({ hasText: '已删除待办' })).toBeVisible();
   await deleteCategory(page, '临时分类');
-  await page.getByRole('button', { name: '撤销', exact: true }).last().click();
+  await undoCommitted(page, '连续撤销的任务', { completed: true, categoryId: 'life' });
   await expect.poll(async () => (await storedTodos(page))[0]?.categoryId).toBe('life');
   expect((await storedTodos(page))[0]).toMatchObject({ completed: true, categoryId: 'life' });
-  await page.getByRole('button', { name: '撤销', exact: true }).click();
+  await undoCommitted(page, '连续撤销的任务', { completed: false, categoryId: 'life' });
   await expect(page.getByRole('button', { name: '编辑：连续撤销的任务', exact: true })).toBeVisible();
   expect((await storedTodos(page))[0]).toMatchObject({ completed: false, categoryId: 'life' });
 });
@@ -99,7 +111,7 @@ test('failed category migration keeps the previous undo baseline and rolls back 
   await page.getByRole('button', { name: '取消', exact: true }).click();
   await expect(page.getByRole('button', { name: '修改分类：保留分类', exact: true })).toBeVisible();
   await closeManager(page);
-  await page.getByRole('button', { name: '撤销', exact: true }).click();
+  await undoCommitted(page, '失败后仍可撤销', { completed: false, categoryId: before[0].categoryId });
   await expect(page.getByRole('button', { name: '编辑：失败后仍可撤销', exact: true })).toBeVisible();
   expect((await storedTodos(page))[0]).toMatchObject({ completed: false, categoryId: before[0].categoryId });
 });

@@ -3,6 +3,15 @@ name: Publish deployed Android web
 # Only the successful Pages deployment may call this workflow. No PR/signing trigger.
 on:
   workflow_call:
+    secrets:
+      ANDROID_KEYSTORE_BASE64:
+        required: true
+      ANDROID_KEYSTORE_PASSWORD:
+        required: true
+      ANDROID_KEY_ALIAS:
+        required: true
+      ANDROID_KEY_PASSWORD:
+        required: true
 
 permissions:
   contents: read
@@ -71,6 +80,20 @@ jobs:
     environment: android-release
     timeout-minutes: 10
     steps:
+      - name: Require all four signing Secrets before accessing key material
+        if: needs.verify.outputs.published != 'true'
+        shell: bash
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          set +x
+          set -euo pipefail
+          for name in ANDROID_KEYSTORE_BASE64 ANDROID_KEYSTORE_PASSWORD ANDROID_KEY_ALIAS ANDROID_KEY_PASSWORD; do
+            test -n "${!name:-}" || { echo "Missing signing credential: $name" >&2; exit 1; }
+          done
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           persist-credentials: false
@@ -100,7 +123,7 @@ jobs:
         run: |
           set -euo pipefail
           for name in ANDROID_KEYSTORE_BASE64 ANDROID_KEYSTORE_PASSWORD ANDROID_KEY_ALIAS ANDROID_KEY_PASSWORD; do
-            test -n "${!name}" || { echo "Missing signing credential: $name" >&2; exit 1; }
+            test -n "${!name:-}" || { echo "Missing signing credential: $name" >&2; exit 1; }
           done
           umask 077
           keydir="$(mktemp -d)"

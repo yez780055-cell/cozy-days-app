@@ -3,6 +3,18 @@ name: Deploy GitHub Pages
 on:
   push:
     branches: [main]
+    # Publisher-only maintenance must not create a new signed web revision.
+    # Any other changed path still runs the normal deployment and update release.
+    paths-ignore:
+      - .github/workflows/deploy-pages.yml
+      - .github/workflows/android-web-auto.yml
+      - .github/workflows/android-web-publish-retry.yml
+      - .github/workflows/verify-pr.yml
+      - scripts/android-web-auto.mjs
+      - scripts/android-web-auto.test.mjs
+      - scripts/android-web-http.mjs
+      - scripts/android-web-http.test.mjs
+      - docs/android-web-update-release.md
   workflow_dispatch:
 
 permissions:

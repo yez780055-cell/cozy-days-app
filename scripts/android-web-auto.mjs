@@ -4,6 +4,7 @@ import { createHash, verify, X509Certificate } from 'node:crypto';
 import { appendFileSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
+import { anonymousGet } from './android-web-http.mjs';
 
 const repository = 'yez780055-cell/cozy-days-app';
 const certificate = 'c85fe70fff2425ad2b95d3dfa8f28ef7173027e744b03f57b721896fca40d3d8';
@@ -34,16 +35,16 @@ export function planRelease(releases, tags, source) {
   return { schema: 1, shell: 3, web, tag: prefix + web, source, base, published: same ? !same.draft : false };
 }
 
-function checkPlan(plan) {
+function checkPlan(plan, expectedSource = process.env.GITHUB_SHA) {
   assert.equal(plan.schema, 1); assert.equal(plan.shell, 3);
   assert.ok(Number.isInteger(plan.web) && plan.web >= 2 && plan.web <= 2147483647);
   assert.equal(plan.tag, prefix + plan.web);
   assert.match(plan.source, /^[a-f0-9]{40}$/);
-  if (process.env.GITHUB_SHA) assert.equal(plan.source, process.env.GITHUB_SHA, 'Artifact source differs from deployed commit');
+  if (expectedSource) assert.equal(plan.source, expectedSource, 'Artifact source differs from deployed commit');
 }
 
-export function verifyRelease(dir, certBytes, plan, pinned = certificate) {
-  checkPlan(plan);
+export function verifyRelease(dir, certBytes, plan, pinned = certificate, expectedSource = process.env.GITHUB_SHA) {
+  checkPlan(plan, expectedSource);
   const cert = new X509Certificate(certBytes);
   assert.equal(sha(cert.raw), pinned, 'Original APK signing certificate required');
   const manifestBytes = readFileSync(join(dir, 'web-manifest.json'));
@@ -156,33 +157,51 @@ async function publish(root) {
     }
     api(`releases/${release.id}`, { draft: false, prerelease: false, make_latest: 'true' }, 'PATCH');
   }
-  // Exercise the same public API and stable URLs the installed APK uses, with no token.
-  await retry(async () => {
-    const response = await fetch(`https://api.github.com/repos/${repository}/releases/tags/${plan.tag}`);
-    assert.equal(response.status, 200);
-    const published = await response.json();
-    assert.equal(published.draft, false); assert.equal(published.prerelease, false);
-    checkAssets(published.assets, expected);
-    for (const asset of published.assets) {
-      const url = `https://github.com/${repository}/releases/download/${plan.tag}/${asset.name}`;
-      assert.equal(asset.browser_download_url, url);
-      const download = await fetch(url);
-      assert.equal(download.status, 200, `Public download failed: ${asset.name}`);
-      assert.equal(sha(Buffer.from(await download.arrayBuffer())), sha(expected.get(asset.name)), `Public hash differs: ${asset.name}`);
-    }
-  });
+  await verifyPublicDownloads(plan, expected);
   const url = `https://github.com/${repository}/releases/tag/${plan.tag}`;
   if (process.env.GITHUB_STEP_SUMMARY) appendFileSync(process.env.GITHUB_STEP_SUMMARY,
     `## Android web published\n\n[Shell 3 / web ${plan.web}](${url})\n\nSource: ${plan.source}\n\nOriginal signer, manifest, full package and every file verified before and after publication.\n`);
   console.log(`Published and anonymously verified ${url}`);
 }
 
+async function verifyPublicDownloads(plan, expected) {
+  // A Release API error and an asset download error have distinct diagnostics/retry budgets.
+  const published = JSON.parse(await anonymousGet(`https://api.github.com/repos/${repository}/releases/tags/${plan.tag}`,
+    { kind: 'release-api' }));
+  assert.equal(published.draft, false); assert.equal(published.prerelease, false);
+  assert.equal(published.tag_name, plan.tag); assert.equal(published.target_commitish, plan.source);
+  checkAssets(published.assets, expected);
+  for (const asset of published.assets) {
+    const url = `https://github.com/${repository}/releases/download/${plan.tag}/${asset.name}`;
+    assert.equal(asset.browser_download_url, url);
+    const bytes = await anonymousGet(url, { kind: 'release-asset' });
+    assert.equal(sha(bytes), sha(expected.get(asset.name)), `Public hash differs: ${asset.name}`);
+    console.log(`PASS anonymous asset ${asset.name}: ${bytes.length} bytes sha256=${sha(bytes)}`);
+  }
+  console.log(`PASS anonymous Release API and ${expected.size} exact asset downloads; original certificate, Manifest and COZ1 signatures verified`);
+}
+
+// Recovery uses the original signed artifact and original run SHA, never the repair commit as its source.
+// This path contains no release mutation, asset upload, key access or signing operation.
+async function verifyPublished(root, expectedSource) {
+  assert.match(expectedSource || '', /^[a-f0-9]{40}$/);
+  const plan = json(join(root, 'android-web-auto-plan.json'));
+  checkPlan(plan, expectedSource);
+  const dir = resolve(root, 'shell-3', `web-${plan.web}`);
+  verifyRelease(dir, readFileSync(join(dir, 'signer.cer')), plan, certificate, expectedSource);
+  const provenance = json(join(dir, 'provenance.json'));
+  assert.equal(provenance.source, expectedSource); assert.equal(provenance.tag, plan.tag);
+  const expected = new Map(readdirSync(dir).sort().map(name => [name, readFileSync(join(dir, name))]));
+  await verifyPublicDownloads(plan, expected);
+  if (process.env.GITHUB_STEP_SUMMARY) appendFileSync(process.env.GITHUB_STEP_SUMMARY,
+    `## Existing release verified anonymously\n\nTag: ${plan.tag}\n\nOriginal source: ${expectedSource}\n\n${expected.size} assets matched the original signed artifact; Manifest and COZ1 signatures verified. No signing or release mutations.\n`);
+}
+
 async function restore(tested, root) {
   const plan = json(join(tested, 'android-web-auto-plan.json'));
   checkPlan(plan); assert.equal(plan.published, true);
-  const response = await fetch(`https://api.github.com/repos/${repository}/releases/tags/${plan.tag}`);
-  assert.equal(response.status, 200);
-  const release = await response.json();
+  const release = JSON.parse(await anonymousGet(`https://api.github.com/repos/${repository}/releases/tags/${plan.tag}`,
+    { kind: 'release-api' }));
   assert.equal(release.draft, false); assert.equal(release.prerelease, false);
   assert.equal(release.target_commitish, plan.source);
   const dir = join(root, 'shell-3', `web-${plan.web}`);
@@ -191,8 +210,7 @@ async function restore(tested, root) {
     assert.match(asset.name, /^[A-Za-z0-9][A-Za-z0-9._-]*$/);
     const url = `https://github.com/${repository}/releases/download/${plan.tag}/${asset.name}`;
     assert.equal(asset.browser_download_url, url);
-    const download = await fetch(url); assert.equal(download.status, 200);
-    writeFileSync(join(dir, asset.name), Buffer.from(await download.arrayBuffer()));
+    writeFileSync(join(dir, asset.name), await anonymousGet(url, { kind: 'release-asset' }));
   }
   verifyRelease(dir, readFileSync(join(dir, 'signer.cer')), plan);
   writeFileSync(join(root, 'android-web-auto-plan.json'), JSON.stringify(plan, null, 2) + '\n');
@@ -211,5 +229,6 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   } else if (command === 'seal') seal(root);
   else if (command === 'restore') await restore(root, process.argv[4]);
   else if (command === 'publish') await publish(root);
-  else throw new Error('Expected plan, seal or publish');
+  else if (command === 'verify-published') await verifyPublished(root, process.argv[4]);
+  else throw new Error('Expected plan, seal, publish or verify-published');
 }

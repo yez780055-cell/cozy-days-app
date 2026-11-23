@@ -1,30 +1,24 @@
-# 当前执行交接
+# 当前开发检查点
 
-更新时间：2026-11-22。当前检查点；长期任务/授权见ISSUE_LEDGER，架构见OVERVIEW。恢复先核对git与PR/Actions真实状态，不依赖聊天记忆。
+更新时间：2026-11-23。开发规则见 [AGENTS.md](../../AGENTS.md)，22 项问题、技术约束、历史证据和授权见 [ISSUE_LEDGER.md](ISSUE_LEDGER.md)。
 
-## 分支、权限与所有权
-- 唯一目录cozy-days-app，本地main，起点本地/远端78716f1ee5d4fa929274253ac1d3a3d612fdcd64；保留全部原未提交改动，无reset/覆盖。
-- 用户已授权恢复普通失败并自行修复；普通Bug/测试/可恢复构建错误不再逐次询问，失败期间不合并发布。反复失败或安全修法不确定集中报告；生产数据库、数据丢失风险、签名/更新协议异常、不可恢复、权限不足立即暂停相关操作待确认。
-- 实际代理：主集成/最终验收；GPT-6.1 Terra high业务数据；GPT-6.1 Sol medium测试工程；GPT-6 Luna high独立UX。用量恢复后实际续派并收到实现及交叉复核。
-- 当前代码/测试冻结：T独占database.ts、TodoForm/useTodos/TodoPage；S独占此前CI/配置/测试及ci-testing文档；主独占AGENTS与architecture三文档；L只读。转交前需主确认。
+## 当前真实 Git 状态
+- 唯一目录：`D:\Codex项目 - Codex Projects\Cozy Days\cozy-days-app`；分支 main。本轮文档提交前 HEAD 与本地 origin/main 引用均为 `a4a008a0f174b19cad4229125f7cd8236a1b6552`（PR #33 合并）；远端引用为本地快照，本轮未 fetch。
+- a4a008a 不含后续工作区修改。开始时 17 个已修改文件含本台账和交接；本轮只提交 AGENTS.md、ISSUE_LEDGER.md、AGENT_HANDOFF.md。提交后 main 增加文档提交，另 15 个已修改文件和 2 个未跟踪文件继续原样保留；实际提交 SHA 见 Git 和本轮交付报告。
+- 保留的修改：android-web-auto/android-web-release/deploy-pages 三个工作流；android-web-update-release/ci-testing 两个文档；android-web-auto、ci-plan 脚本及测试；App、CloudGate、HomePage、native/window；tests-android/support/shell-fixture.ts、tests/cloudbase.spec.ts。
+- 未跟踪：`src/native/startupReadiness.ts`、`tests/startup-readiness.spec.ts`。不执行 reset、clean、stash 或覆盖。本轮不推送、合并或发布。
 
-## 本批完成与验证
-- 范围P0-01、P1-05/06/07、P2-04及治理落盘。已提交76926f66860684b6dd5f2685a7038afce67b912d，PR[33](https://github.com/yez780055-cell/cozy-days-app/pull/33)，远端分支fix/todo-concurrency-governance-20261122；本地仍main，不标合并或发布。
-- P0：同事务原始行CAS、冲突保留输入；本机分类迁移commit后返回精确before/after，undoExpected完整匹配才推进；restore用实际存储row。外部变化继续拒绝；optional baseline旧API及ABA限制保留。
-- 原分类删除→撤销失败用例1/1通过。相关41项完成：categories7、data-safety6、swipe9复用本轮修复后早先22项通过；todo-concurrency10、todo9最终19项通过。故障注入测试一次提交等待race已修，没有降低回滚断言。
-- policy15、CloudBase4（1平台skip）、TypeScript/云Web构建通过；anniversary/period专用配置实际UI smoke各1通过；publisher7未改源码证据复用。T/S交叉审查、L按主控结果独立UX验收通过，不等于实机/公网/真实账号验收。
-- 未重复无关full176；原全量早停结果不是全通过证据。本批不涉及schema迁移，按最新指示使用影响集。远端适用ART/最终verify必须通过，不能用本地policy替代。
+## 已完成工作
+- P0-01、P1-05/06/07、P2-04 已由 [PR #33](https://github.com/yez780055-cell/cozy-days-app/pull/33) 合并；head 31071d5 的 [CI 45002593000](https://github.com/yez780055-cell/cozy-days-app/actions/runs/45002593000) 全绿，含真实 ART、云/统一 Android 和最终 verify。
+- [发布 45003040535](https://github.com/yez780055-cell/cozy-days-app/actions/runs/45003040535) 完成 Pages、签名内容公开与匿名复核；[shell3-web4](https://github.com/yez780055-cell/cozy-days-app/releases/tag/android-web-shell-3-web-4) 来源 a4a008a、46 资产。未构建 APK、未操作生产 DB、未做实机验收。
+- 本轮恢复单模型、按批次直接执行，三个治理文档单独提交。首批失败修复和验证证据保留在台账，不重复实施。
 
-## 下一步
-1. PR33首次CI为[45001978195](https://github.com/yez780055-cell/cozy-days-app/actions/runs/45001978195)：实际ART通过、受影响测试40通过1失败，最终verify正确拒绝。Trace证实连续undo测试在“正在保存”时读库，已完成卡片中的编辑按钮不能代表提交完成；Sol统一补真实存储与对应toast结束等待，不改断言或业务。先针对该例/相关测试重测，再追加本地main提交推同一远端PR分支；复核最新head/基线/ART/最终verify。
-2. merge commit合并后fetch/ff-only；同步前不开始下一轮提交。跟踪实际Pages→Android验证/签名/公开/匿名复核各状态，不能把合并当发布。普通内容不构建APK。
-3. 下一工程批P1-08/P2-05先有只读设计，待本批合并快进后实施：正常发布核来源/主线顺序及并发；按目标公开Release选择基线；原字节只读复核保留。
-4. 数据批P1-01/03尚未实现，需设计服务端完整农历换算验证、全入口入站隔离及引用一致性，先本地隔离验证。生产SQL/备份未知且操作需确认，不能猜测上线。
+## 当前未完成与下一批
+- 指定模型：当前 GPT-6 单模型。下一批先收尾已有本地 P1-04（显式启动就绪）、P1-08（拒绝过时发布）、P2-05（按目标公开基线选测试）修改：检查 Diff、运行影响集、自行修复普通失败，再按既有 Git/PR 规范提交交付。本轮不实施。
+- 三项仍待本批有效验证、提交、PR 和发布；技术约束见台账“下一批已有实现的技术约束”。首批真实设备验收仍待完成。
+- 后续 P1-01/03：先本地隔离验证服务端农历契约、全入口入站隔离和引用一致性；生产 SQL、异常数据、备份与恢复能力未知。其余项目按台账依赖推进。
 
-## 证据与状态恢复
-- 首次失败原件保存在artifacts/governance-first-batch/failure；新增fixture race原件保存在resume-fixture-race；原始测试patch/哈希也在同目录。后续测试不要把旧失败证据重新标成当前通过。
-- PR33第一次CI完整制品已下载至同目录pr33-attempt1；该失败未被忽略，没有合并/发布。current-delivery.json存本地运行索引，远端状态仍须查询真实PR/Actions。
-- CI等待修正仅改测试及记录，业务blob未变；原失败例repeat-each=3全部通过，另两个helper影响例2/2通过，L独立复核等待条件/断言通过。向同一PR追加提交后必须核对最新head及新CI，不复用旧SHA的最终verify状态。
-- 新验证在基准HEAD+未提交改动上运行；提交后以文件哈希/树身份确认复用范围，不能只标基准干净SHA。专用配置输出在anniversary-config-results、period-config-results。
-- 基准公开shell3-web3来源0826d70221bcfd3f9e5d73e49be0bafc28913277；原run44990551368失败、复核运行44992183427成功。本批发布版本必须重新核对。
-- 当前没有生产DB操作、APK构建或真实设备验收。PR/合并/Pages/内容/匿名复核状态随实际运行更新；发生高风险暂停写SHA、日志、现场、证据范围与安全恢复步骤。
+## 必要风险与恢复
+- 普通 Bug/测试失败自行修复重测；数据丢失、生产 DB、签名/协议异常、不可恢复、权限不足或越权时暂停相关操作并准备恢复方案。具体共享导入/替换/冲突及实际回退目标仍需确认。
+- `artifacts/governance-first-batch/` 保留 patch、SHA256、失败 trace、修复验证和 `current-delivery.json`；新批验证绑定新源码/制品，修订4不能证明未提交实现正确。
+- 不升 Dexie 物理版本不等于旧端可安全联网回滚。迁移保留备份/失败恢复/旧端兼容；禁止卸载清库。shell2 冻结未退休、shell3 当前维护；账号隔离、outbox 原子性、历史字段/ID/草稿/冲突/待发队列及签名/更新/回滚边界依 AGENTS 和台账保留。

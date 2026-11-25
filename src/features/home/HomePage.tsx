@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useState } from 'react';
 import { BookImage, ChevronRight, Droplet, Plus, SlidersHorizontal } from 'lucide-react';
 import { Asset } from '../../components/Asset';
 import { Button } from '../../components/Button';
@@ -9,7 +9,8 @@ import { todayKey, weekday } from '../todo/dates';
 import './home.css';
 
 type Destination = 'todo' | 'period' | 'anniversary';
-export function HomePage({onNavigate,onSettings}:{onNavigate:(page:Destination,add?:boolean,all?:boolean)=>void;onSettings:()=>void}) {
+export type HomeStartup = Promise<[Todo[], Anniversary[]]>;
+export function HomePage({onNavigate,onSettings,startup,onInitialReady}:{onNavigate:(page:Destination,add?:boolean,all?:boolean)=>void;onSettings:()=>void;startup?:HomeStartup;onInitialReady?:(ready:boolean)=>void}) {
   const [todos,setTodos]=useState<Todo[]>([]);
   const [anniversaries,setAnniversaries]=useState<Anniversary[]>([]);
   const [loaded,setLoaded]=useState(false);
@@ -17,18 +18,26 @@ export function HomePage({onNavigate,onSettings}:{onNavigate:(page:Destination,a
   const [today,setToday]=useState(todayKey);
   useEffect(()=>{
     let alive=true;
-    const read = () => {
-      void Promise.all([todoRepository.all(),anniversaryRepository.all()]).then(([tasks,dates])=>{
-        if(alive){setTodos(tasks);setAnniversaries(dates);setLoaded(true);setError(false);}
-      }).catch(()=>{if(alive)setError(true);});
+    let sequence=0;
+    const read = (initial?: HomeStartup) => {
+      const attempt=++sequence;
+      void (initial ?? Promise.all([todoRepository.all(),anniversaryRepository.all()])).then(([tasks,dates])=>{
+        if(alive && attempt===sequence){setTodos(tasks);setAnniversaries(dates);setLoaded(true);setError(false);}
+      }).catch(()=>{if(alive && attempt===sequence)setError(true);});
     };
-    read();
+    read(startup);
     const refresh=()=>setToday(todayKey());
     const timer=window.setInterval(refresh,30000);
     window.addEventListener('focus',refresh);
-    window.addEventListener(cloudChanged,read);
-    return ()=>{alive=false;clearInterval(timer);window.removeEventListener('focus',refresh);window.removeEventListener(cloudChanged,read);};
-  },[]);
+    const changed=()=>read();
+    window.addEventListener(cloudChanged,changed);
+    return ()=>{alive=false;clearInterval(timer);window.removeEventListener('focus',refresh);window.removeEventListener(cloudChanged,changed);};
+  },[startup]);
+  useLayoutEffect(()=>{
+    if (!loaded || error || !onInitialReady) return;
+    onInitialReady(true);
+    return ()=>onInitialReady(false);
+  },[loaded,error,onInitialReady]);
   const tasks=todos.filter(item=>item.date===today);
   const done=tasks.filter(item=>item.completed).length;
   const overdue=todos.filter(item=>!item.completed && item.date<today).length;

@@ -71,6 +71,7 @@ jobs:
     if: github.repository == 'yez780055-cell/cozy-days-app' && github.ref == 'refs/heads/main'
     permissions:
       contents: write
+      deployments: read
     uses: ./.github/workflows/android-web-auto.yml
     secrets:
       ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}

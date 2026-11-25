@@ -8,10 +8,12 @@
 
 - 验证：以最近公开的外壳 3 网页标签为 diff 基线，运行构建、smoke、相关模块、Android 更新界面和实际统一 Android 资源的更新/离线 smoke。签名打包与发布策略另有小型测试。默认不跑完整回归；数据库迁移和既有关键改动规则仍升级检查。
 - 版本：在 `android-web-release` 并发组中串行执行，与手动签发互斥。扫描全部 Release（含 Draft）及标签后自动分配更高网页修订，标签固定为 `android-web-shell-3-web-N`，指向成功部署的同一提交。
+- 源码门禁：新发布及 Draft 恢复在规划、Draft 写入前、公开前重新读取当前成功的 `github-pages` 部署；来源必须匹配正式 Pages 的部署 SHA，同时不可变公开网页 tag 必须匹配其记录的来源 SHA，源码相对该公开基线只能 identical/ahead。更高修订号本身不能使旧源码合法。最新部署的最新状态为 pending/failure 不替换仍成功的站点；已 inactive 的历史成功不能充当当前部署。API、来源或 ancestry 不明时停止新发布，不触及已公开资产。main 可以因发布器或治理文档更新而领先部署，不要求部署 SHA 等于 main。计划/provenance 保留部署 ID 与来源证据；公开前重新取证，不能仅信规划时快照。普通入口不负责将旧内容发布为更高修订的显式回退。
 - 密钥：复用 `android-release` 环境已有的四项 `ANDROID_*` Secrets 和原 APK 证书；不新增个人 Token，不将私钥写入代码、日志或制品。只有隔离的签名 job 可访问密钥，临时 keystore 使用 `umask 077` 和退出清理；签名前打包器核对固定正式证书，签名后再次独立验证 COZ1 和 Manifest RSA 签名。
 - Secrets 传递：调用处逐项显式传递四项签名 Secrets，`workflow_call.secrets` 对四项均声明 `required: true`，不使用 `secrets: inherit`。签名 job 继续绑定 `android-release`，第一步在检出代码、下载制品和解码 keystore 前检查实际值非空；失败只报告缺失项名称并终止。PR 的 `verify` 检查覆盖映射、声明及空值拦截，测试仅使用合成值。
 - 制品：同一份已验证 `dist-android` 生成整包、`latest.json`、`web-manifest.json`、`web-manifest.sig`、全部 `file-<sha256>`，附公开证书、SHA256SUMS、测试计划及来源记录。Manifest 和文件来自整包内的相同字节。
 - 发布：仅发布 job 获得 `contents: write`，通过本次运行的 `GITHUB_TOKEN` 创建 Draft，上传全部资产并逐项下载核对 SHA-256 后公开为普通 Release / Latest，再匿名核验公开 API 和全部固定下载地址。APK 继续使用原检查入口，无新增渠道。
+- 部署读取：调用方、验证及发布 job 仅增加 `deployments: read` 用于上述源码核验；签名 job 不读取部署、仍只接触已验证制品。已公开原字节的 `verify-published` 恢复入口不执行新发布源码门禁，继续独立只读复核。
 - 重试：验证/签名失败不发布；上传中断保留不可见 Draft，重跑同一提交可恢复该 Draft。已经公开的同一提交只下载和复核原制品，不重新签发、不覆盖公开资产，也不会将 Latest 移回较旧版本。公开后网络复核失败会将 Actions 标红，重跑恢复复核。
 
 客户端代码、原签名信任、文件级与整包回退、15 秒启动确认、失败回滚、离线完整目录及 IndexedDB 数据兼容机制保持现有实现。启动仍只检查，用户点击「立即更新」后才下载。

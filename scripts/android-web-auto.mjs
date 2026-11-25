@@ -5,6 +5,7 @@ import { appendFileSync, mkdirSync, readFileSync, readdirSync, writeFileSync } f
 import { join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { anonymousGet } from './android-web-http.mjs';
+import { selectPublishedWebBaseline } from './ci-plan.mjs';
 
 const repository = 'yez780055-cell/cozy-days-app';
 const certificate = 'c85fe70fff2425ad2b95d3dfa8f28ef7173027e744b03f57b721896fca40d3d8';
@@ -15,8 +16,60 @@ const gh = args => execFileSync('gh', args, { maxBuffer: 128 * 1024 * 1024 });
 const api = (path, fields = {}, method = 'POST') => JSON.parse(execFileSync('gh',
   ['api', '--method', method, `repos/${repository}/${path}`, '--input', '-'],
   { input: JSON.stringify(fields), maxBuffer: 128 * 1024 * 1024 }).toString());
-const list = path => JSON.parse(gh(['api', '--paginate', '--slurp', `repos/${repository}/${path}?per_page=100`]).toString()).flat();
+const list = path => JSON.parse(gh(['api', '--paginate', '--slurp', `repos/${repository}/${path}${path.includes('?') ? '&' : '?'}per_page=100`]).toString()).flat();
 const revision = tag => /^android-web-shell-3-web-([1-9][0-9]*)$/.exec(tag)?.[1] * 1 || 0;
+
+export function assertNormalReleaseSource({ source, currentPagesSha, latestPublishedSource, relation }) {
+  for (const value of [source, currentPagesSha, latestPublishedSource]) assert.match(value || '', /^[a-f0-9]{40}$/);
+  assert.equal(source, currentPagesSha, 'Source is not the current successful Pages deployment');
+  assert.ok(['identical', 'ahead'].includes(relation), 'Normal release cannot move behind or diverge from published source');
+  if (relation === 'identical') assert.equal(source, latestPublishedSource, 'Identical source comparison is inconsistent');
+}
+export function assertNoNewerPublicRevision(releases, web) {
+  assert.ok(!releases.some(release => !release.draft && !release.prerelease && revision(release.tag_name) > web),
+    'A newer web release is already public; cannot move Latest backwards');
+}
+
+// Use the latest status, never an earlier success later superseded by inactive/failure.
+// Pending/failed newer deployments do not replace the current successful site.
+export function selectCurrentPagesDeployment(deployments) {
+  const candidates = deployments.filter(deployment => deployment.environment === 'github-pages'
+    && deployment.ref === 'main' && deployment.latestStatus?.state === 'success')
+    .sort((a, b) => Number(b.id) - Number(a.id));
+  const current = candidates[0];
+  assert.ok(current, 'No current successful Pages deployment');
+  assert.ok(Number.isSafeInteger(current.id) && current.id > 0, 'Invalid deployment identity');
+  assert.match(current.sha || '', /^[a-f0-9]{40}$/);
+  assert.equal(current.latestStatus.environment_url, 'https://yez780055-cell.github.io/cozy-days-app/', 'Unexpected Pages deployment URL');
+  return current;
+}
+
+export function releaseSourceEvidence(source, releases,
+  read = path => JSON.parse(gh(['api', `repos/${repository}/${path}`]).toString()), paginate = list) {
+  const published = selectPublishedWebBaseline(releases, 3);
+  // Resolve the immutable tag as well as checking the recorded source SHA.
+  const latestPublishedSource = published.target_commitish;
+  assert.match(latestPublishedSource || '', /^[a-f0-9]{40}$/, 'Published baseline must record a source SHA');
+  const tagged = read(`commits/${encodeURIComponent(published.tag_name)}`);
+  assert.equal(tagged.sha, latestPublishedSource, 'Published tag differs from its recorded source');
+  const deployments = paginate('deployments?environment=github-pages')
+    .filter(deployment => deployment.environment === 'github-pages' && deployment.ref === 'main')
+    .sort((a, b) => Number(b.id) - Number(a.id));
+  let current;
+  for (const deployment of deployments) {
+    const latestStatus = paginate(`deployments/${deployment.id}/statuses`)[0];
+    if (latestStatus?.state === 'success') {
+      current = selectCurrentPagesDeployment([{ ...deployment, latestStatus }]);
+      break;
+    }
+  }
+  assert.ok(current, 'No current successful Pages deployment');
+  const comparison = read(`compare/${latestPublishedSource}...${source}`);
+  assert.equal(comparison.base_commit?.sha, latestPublishedSource, 'Comparison baseline differs');
+  assertNormalReleaseSource({ source, currentPagesSha: current.sha, latestPublishedSource, relation: comparison.status });
+  return { deploymentId: current.id, deploymentSource: current.sha, baselineTag: published.tag_name,
+    baselineSource: latestPublishedSource, relation: comparison.status };
+}
 
 // Include drafts AND tags so a partial run or a manually reserved revision is never reused.
 export function planRelease(releases, tags, source) {
@@ -130,9 +183,9 @@ async function publish(root) {
   assert.equal(provenance.source, plan.source); assert.equal(provenance.tag, plan.tag);
   const expected = new Map(readdirSync(dir).sort().map(name => [name, readFileSync(join(dir, name))]));
   const releases = list('releases');
-  assert.ok(!releases.some(r => !r.draft && !r.prerelease && revision(r.tag_name) > plan.web),
-    'A newer web release is already public; cannot move Latest backwards');
+  assertNoNewerPublicRevision(releases, plan.web);
   let release = releases.find(r => r.tag_name === plan.tag);
+  if (!release || release.draft) releaseSourceEvidence(plan.source, releases);
   if (release) {
     assert.equal(release.target_commitish, plan.source, 'Existing release points at another source');
     assert.equal(release.prerelease, false);
@@ -155,6 +208,10 @@ async function publish(root) {
       const bytes = await retry(() => gh(['api', '-H', 'Accept: application/octet-stream', `repos/${repository}/releases/assets/${asset.id}`]));
       assert.equal(sha(bytes), sha(expected.get(asset.name)), `Draft download hash differs: ${asset.name}`);
     }
+    // Deployment or public baseline may have changed during validation/upload.
+    const freshReleases = list('releases');
+    assertNoNewerPublicRevision(freshReleases, plan.web);
+    releaseSourceEvidence(plan.source, freshReleases);
     api(`releases/${release.id}`, { draft: false, prerelease: false, make_latest: 'true' }, 'PATCH');
   }
   await verifyPublicDownloads(plan, expected);
@@ -222,7 +279,9 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   if (command === 'plan') {
     assert.equal(process.env.GITHUB_REPOSITORY, repository);
     assert.equal(process.env.GITHUB_REF, 'refs/heads/main');
-    const plan = planRelease(list('releases'), list('tags'), process.env.GITHUB_SHA);
+    const releases = list('releases');
+    const plan = planRelease(releases, list('tags'), process.env.GITHUB_SHA);
+    if (!plan.published) plan.sourceEvidence = releaseSourceEvidence(plan.source, releases);
     writeFileSync('android-web-auto-plan.json', JSON.stringify(plan, null, 2) + '\n');
     if (process.env.GITHUB_OUTPUT) appendFileSync(process.env.GITHUB_OUTPUT, `web=${plan.web}\nbase=${plan.base}\npublished=${plan.published}\n`);
     console.log(JSON.stringify(plan));

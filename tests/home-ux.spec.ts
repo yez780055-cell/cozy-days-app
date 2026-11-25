@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { chooseDate } from './anniversary-actions';
 test.use({ timezoneId:'Asia/Shanghai' });
 test.beforeEach(async ({page})=>{
  await page.clock.setFixedTime(new Date('2026-11-19T12:00:00+08:00'));
@@ -60,7 +61,7 @@ test('首页逾期入口保留跨日清单，最近纪念日入口进入收藏',
  await page.getByRole('button',{name:'新增纪念日',exact:true}).click();
  dialog=page.getByRole('dialog');
  await dialog.getByLabel('纪念日名称').fill('下一次纪念');
- await dialog.getByLabel('日期',{exact:true}).fill('2026-11-27');
+ await chooseDate(dialog, '2026-11-27');
  await dialog.getByRole('button',{name:'保存纪念日'}).click();
  await expect(dialog).toHaveCount(0);
  await nav.getByRole('button',{name:'首页',exact:true}).click();

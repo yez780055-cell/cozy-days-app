@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, type FormEvent, type ReactNode } from 'react';
 import { Asset } from '../../components/Asset';
 import { Button } from '../../components/Button';
 import { authenticate, CloudError, forgetSession, lookupSpace, sendEmailCode, session, verifyEmailCode, watchSession } from '../../data/cloudbase';
@@ -10,6 +10,7 @@ import type { CloudScope } from '../../data/cloudTypes';
 import { setPeriodRecoveryScope } from '../period/recovery';
 import { AccountContext } from './CloudAccount';
 import './cloud.css';
+import { publishStartupSurface } from '../../native/startupReadiness';
 
 type Page = 'loading' | 'welcome' | 'signin' | 'signup' | 'invite' | 'ready' | 'retry' | 'exiting';
 type Setup = { invitation?: string; retryPage?: 'signup' | 'invite' };
@@ -49,6 +50,7 @@ function message(error: unknown) {
 
 export function CloudGate({ children }: { children: ReactNode }) {
   const [page, setPage] = useState<Page>('loading');
+  const entrySurface = useRef<HTMLElement>(null);
   const [email, setEmail] = useState('');
   const [verification, setVerification] = useState('');
   const [code, setCode] = useState('');
@@ -191,6 +193,12 @@ export function CloudGate({ children }: { children: ReactNode }) {
     }
   }
 
+  useLayoutEffect(() => {
+    if (!window.isSecureContext || busy || error || !entrySurface.current ||
+        !['welcome', 'signin', 'signup', 'invite'].includes(page)) return;
+    return publishStartupSurface(entrySurface.current);
+  }, [page, busy, error]);
+
   const registering = page === 'signup';
   const signedUp = registering && emailVerified;
   const inviteField = <label>邀请码<input type="password" autoComplete="off" required
@@ -205,7 +213,7 @@ export function CloudGate({ children }: { children: ReactNode }) {
     email, scope, status, signOut, retry: () => engine.current?.retry(),
   }}>{children}</AccountContext.Provider>;
 
-  return <div className="app-shell"><main className="phone cloud-gate">
+  return <div className="app-shell"><main ref={entrySurface} className="phone cloud-gate">
     <div className="cloud-gate-content">
       <Asset name="cat" className="cloud-gate-art"/>
       <h1>小饱日常</h1>

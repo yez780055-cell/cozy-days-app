@@ -47,9 +47,9 @@ async function fixture() {
   let failSignup = false;
   const registered = new Set<string>();
   const requests = { verify: 0, signup: 0, signin: 0, signout: 0 };
-  async function install(context: BrowserContext) {
+  async function install(context: BrowserContext, shellOptions: Parameters<typeof mockShell>[1] = {}) {
     if (test.info().project.metadata.androidShell) {
-      for (const page of context.pages()) await mockShell(page, { current: true }, false);
+      for (const page of context.pages()) await mockShell(page, { current: true, ...shellOptions }, false);
       // Model the APK asset server: bundled resources remain available without a network.
       await context.route('http://127.0.0.1:4193/**', async route => {
         const url = new URL(route.request().url());
@@ -378,5 +378,65 @@ test('unified Android retains formal update checks through login and offline rel
     await page.reload();
     await expect(page.getByRole('button', { name: '打开应用设置' })).toBeVisible();
     await expect(page.locator('.android-update-frame')).toHaveCount(0);
+    await expect.poll(() => page.evaluate(() => (window as unknown as { fixture: Fixture }).fixture.readyAcknowledged)).toBe(1);
+    expect(await page.evaluate(() => (window as unknown as { fixture: Fixture }).fixture.readyCalls)).toHaveLength(1);
   } finally { await context.setOffline(false).catch(() => {}); await f.db.close(); }
+});
+
+test('unified Android does not confirm a signed-in loading placeholder or failed account cache', async ({ page, context }, info) => {
+  test.skip(!info.project.metadata.androidShell, 'Android startup bridge integration');
+  const f = await fixture();
+  let releasePull: (() => void) | undefined;
+  try {
+    await f.install(context);
+    await join(page, 0, f.invitations[0].code);
+    await page.route('**/startup-empty', route => route.fulfill({ contentType: 'text/html', body: '<!doctype html><title>Isolated startup fixture</title>' }));
+    await page.goto('/startup-empty');
+    // Only the synthetic account created by this test is reset; historical stores are untouched.
+    await page.evaluate(name => new Promise<void>((resolve, reject) => {
+      const request = indexedDB.deleteDatabase(name);
+      request.onsuccess = () => resolve(); request.onerror = () => reject(request.error);
+      request.onblocked = () => reject(new Error('Synthetic cache is still open'));
+    }), `little-days-cloud-${room}-${users[0]}`);
+    const held = new Promise<void>(resolve => { releasePull = resolve; });
+    let pulled = false;
+    await page.route(gateway, async route => {
+      if (new URL(route.request().url()).pathname.endsWith('cozy_days_pull')) { pulled = true; await held; }
+      await route.fallback();
+    });
+    await page.goto('/');
+    await expect.poll(() => pulled).toBe(true);
+    await expect(page.getByText('正在打开双人空间…', { exact: true })).toBeVisible();
+    await page.evaluate(() => new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(() => requestAnimationFrame(() => resolve())))));
+    expect(await page.evaluate(() => (window as unknown as { fixture: Fixture }).fixture.readyCalls)).toEqual([]);
+    releasePull?.();
+    await expect(page.getByRole('button', { name: '打开应用设置' })).toBeVisible();
+    await expect.poll(() => page.evaluate(() => (window as unknown as { fixture: Fixture }).fixture.readyAcknowledged)).toBe(1);
+    await page.addInitScript(name => {
+      const open = IDBFactory.prototype.open;
+      IDBFactory.prototype.open = function(database, version) {
+        if (database === name) throw new Error('Synthetic account cache open failure');
+        return version === undefined ? open.call(this, database) : open.call(this, database, version);
+      };
+    }, `little-days-cloud-${room}-${users[0]}`);
+    await page.reload();
+    await expect(page.getByRole('button', { name: '重试连接', exact: true })).toBeVisible();
+    await page.evaluate(() => new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(() => requestAnimationFrame(() => resolve())))));
+    expect(await page.evaluate(() => (window as unknown as { fixture: Fixture }).fixture.readyCalls)).toEqual([]);
+    expect(await page.evaluate(() => (window as unknown as { fixture: Fixture }).fixture.checks)).toEqual([]);
+  } finally { releasePull?.(); await f.db.close(); }
+});
+
+test('unified Android ready rejection preserves trial protection and blocks automatic update checks', async ({ page, context }, info) => {
+  test.skip(!info.project.metadata.androidShell, 'Android startup ACK integration');
+  const f = await fixture();
+  try {
+    await f.install(context, { readyError: true });
+    await page.goto('/');
+    await expect(page.getByRole('heading', { name: '欢迎来到双人空间' })).toBeVisible();
+    await expect.poll(() => page.evaluate(() => (window as unknown as { fixture: Fixture }).fixture.readyCalls.length)).toBe(1);
+    await page.evaluate(() => new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(() => requestAnimationFrame(() => resolve())))));
+    expect(await page.evaluate(() => (window as unknown as { fixture: Fixture }).fixture.readyAcknowledged)).toBe(0);
+    expect(await page.evaluate(() => (window as unknown as { fixture: Fixture }).fixture.checks)).toEqual([]);
+  } finally { await f.db.close(); }
 });

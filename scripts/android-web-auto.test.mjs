@@ -4,7 +4,7 @@ import { createHash } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import { join } from 'node:path';
-import { planRelease, checkAssets } from './android-web-auto.mjs';
+import { planRelease, checkAssets, assertNormalReleaseSource, assertNoNewerPublicRevision, selectCurrentPagesDeployment, releaseSourceEvidence } from './android-web-auto.mjs';
 
 const source = 'a'.repeat(40), old = 'b'.repeat(40);
 const release = (web, extra = {}) => ({ tag_name: `android-web-shell-3-web-${web}`,
@@ -25,6 +25,96 @@ test('obsolete deployments, unknown baselines and overflow fail closed', () => {
   assert.throws(() => planRelease([], [], source), /baseline/);
   assert.throws(() => planRelease([release(2147483647)], [], source), /exhausted/);
   assert.throws(() => planRelease([release(2)], [], 'main'));
+});
+
+const deployment = (id, sha, state = 'success', extra = {}) => ({ id, sha, ref: 'main', environment: 'github-pages',
+  latestStatus: { state, environment_url: 'https://yez780055-cell.github.io/cozy-days-app/' }, ...extra });
+test('normal release requires current Pages identity and forward published ancestry', () => {
+  assert.doesNotThrow(() => assertNormalReleaseSource({ source, currentPagesSha: source, latestPublishedSource: old, relation: 'ahead' }));
+  assert.doesNotThrow(() => assertNormalReleaseSource({ source, currentPagesSha: source, latestPublishedSource: source, relation: 'identical' }));
+  // An unpublished old source can get a new revision, but cannot pass this source gate.
+  assert.equal(planRelease([release(7)], [], source).web, 8);
+  assert.throws(() => assertNormalReleaseSource({ source, currentPagesSha: old, latestPublishedSource: old, relation: 'ahead' }), /current successful Pages/);
+  for (const relation of ['behind', 'diverged', '', undefined])
+    assert.throws(() => assertNormalReleaseSource({ source, currentPagesSha: source, latestPublishedSource: old, relation }));
+  assert.throws(() => assertNormalReleaseSource({ source, currentPagesSha: source, latestPublishedSource: old, relation: 'identical' }), /inconsistent/);
+});
+test('Pages selection ignores failed/pending replacements and superseded success statuses', () => {
+  const active = deployment(2, source);
+  assert.equal(selectCurrentPagesDeployment([deployment(5, old, 'failure'), deployment(4, old, 'pending'),
+    deployment(3, old, 'inactive'), active, deployment(1, old)]).id, 2);
+  assert.equal(selectCurrentPagesDeployment([active, deployment(6, old)]).sha, old);
+  assert.throws(() => selectCurrentPagesDeployment([deployment(1, old, 'inactive')]), /No current/);
+  assert.throws(() => selectCurrentPagesDeployment([deployment(1, source, 'success', {
+    latestStatus: { state: 'success', environment_url: 'https://example.test/' },
+  })]), /URL/);
+});
+test('a higher public revision blocks an older upload even when both have the same source', () => {
+  assert.doesNotThrow(() => assertNoNewerPublicRevision([release(3), release(4, { draft: true })], 3));
+  assert.throws(() => assertNoNewerPublicRevision([release(3, { target_commitish: source }),
+    release(4, { target_commitish: source })], 3), /newer web release/);
+  assert.doesNotThrow(() => assertNoNewerPublicRevision([release(3)], 3));
+});
+test('source evidence is reread and rejects a newer deployment or unresolvable baseline', () => {
+  let currentSha = source;
+  const paths = [];
+  const paginate = path => {
+    paths.push(path);
+    if (path === 'deployments?environment=github-pages') return [deployment(10, currentSha)];
+    if (path === 'deployments/10/statuses') return [deployment(10, currentSha).latestStatus];
+    throw new Error('Unexpected path ' + path);
+  };
+  const read = path => {
+    if (path.startsWith('commits/')) return { sha: old };
+    if (path === `compare/${old}...${source}`) return { status: 'ahead', base_commit: { sha: old } };
+    throw new Error('Unexpected path ' + path);
+  };
+  const evidence = releaseSourceEvidence(source, [release(3)], read, paginate);
+  assert.equal(evidence.deploymentId, 10); assert.equal(evidence.baselineSource, old);
+  currentSha = old;
+  assert.throws(() => releaseSourceEvidence(source, [release(3)], read, paginate), /current successful Pages/);
+  assert.equal(paths.filter(path => path.endsWith('/statuses')).length, 2);
+  assert.throws(() => releaseSourceEvidence(source, [release(3, { target_commitish: 'main' })], read, paginate), /source SHA/);
+  assert.throws(() => releaseSourceEvidence(source, [release(3)], () => { throw new Error('API unavailable'); }, paginate), /API unavailable/);
+  assert.throws(() => releaseSourceEvidence(source, [release(3)], () => ({ sha: source }), paginate), /tag differs/);
+});
+test('guards run before draft mutation and public transition, while read-only recovery stays independent', () => {
+  const script = readFileSync('scripts/android-web-auto.mjs', 'utf8');
+  const publishing = script.split('async function publish(root) {')[1].split('async function verifyPublicDownloads')[0];
+  assert.ok(publishing.indexOf('releaseSourceEvidence') < publishing.indexOf("api('releases'"));
+  assert.ok(publishing.lastIndexOf('releaseSourceEvidence') < publishing.indexOf('make_latest:'));
+  assert.ok(publishing.lastIndexOf('releaseSourceEvidence') > publishing.indexOf('Draft download hash differs'));
+  assert.match(publishing, /const freshReleases = list\('releases'\);\s+assertNoNewerPublicRevision\(freshReleases, plan.web\);\s+releaseSourceEvidence\(plan.source, freshReleases\)/);
+  const recovery = script.split('async function verifyPublished(')[1].split('async function restore(')[0];
+  assert.doesNotMatch(recovery, /releaseSourceEvidence|assertNormalReleaseSource/);
+  const workflow = readFileSync('.github/workflows/android-web-auto.yml', 'utf8');
+  assert.equal((workflow.match(/deployments: read/g) ?? []).length, 2);
+  assert.match(readFileSync('.github/workflows/deploy-pages.yml', 'utf8'), /android-web:[\s\S]*deployments: read/);
+});
+
+test('queued retries and concurrent publication recheck live evidence rather than a saved plan', () => {
+  let releases = [release(4)];
+  let deployed = source;
+  const read = path => path.startsWith('commits/') ? { sha: old }
+    : { status: 'ahead', base_commit: { sha: old } };
+  const paginate = path => path.endsWith('/statuses') ? [deployment(10, deployed).latestStatus]
+    : [deployment(10, deployed)];
+  const plan = planRelease(releases, [], source);
+  releaseSourceEvidence(plan.source, releases, read, paginate);
+  // Upload was interrupted; the saved draft still has the same source/revision.
+  releases = [...releases, release(plan.web, { draft: true, target_commitish: source })];
+  assert.deepEqual(planRelease(releases, [], source), plan);
+  deployed = 'c'.repeat(40);
+  assert.throws(() => releaseSourceEvidence(plan.source, releases, read, paginate), /current successful Pages/);
+  // Even if Pages has the same bytes/source, a concurrent higher public revision
+  // must block this run from moving Latest backwards at the public transition.
+  deployed = source;
+  releases.push(release(plan.web + 1, { target_commitish: source }));
+  assert.throws(() => assertNoNewerPublicRevision(releases, plan.web), /newer web release/);
+  for (const workflow of ['android-web-auto', 'android-web-release', 'android-web-publish-retry']) {
+    const text = readFileSync(`.github/workflows/${workflow}.yml`, 'utf8');
+    assert.match(text, /concurrency:\s+group: android-web-release\s+cancel-in-progress: false/);
+  }
 });
 test('draft asset gate rejects missing, extra, incomplete and altered uploads', () => {
   const bytes = Buffer.from('signed file');

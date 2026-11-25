@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
-import { planTests } from './ci-plan.mjs';
+import { planTests, selectPublishedWebBaseline, collectPlan } from './ci-plan.mjs';
 
 test('ordinary UI changes use related tests and smoke without full or CloudBase', () => {
   const p = planTests(['src/styles/global.css']);
@@ -13,7 +13,54 @@ test('ordinary UI changes use related tests and smoke without full or CloudBase'
 test('candidate packages include Android update verification without full regression', () => {
   const p = planTests(['src/features/home/HomePage.tsx'], { tier: 'candidate' });
   assert.equal(p.full, false); assert.equal(p.android, true); assert.equal(p.cloud, false);
-  assert.deepEqual(p.webTests, ['tests/home-ux.spec.ts']);
+  assert.deepEqual(p.webTests, ['tests/home-ux.spec.ts', 'tests/startup-readiness.spec.ts']);
+});
+
+test('candidate baseline uses only public releases for the selected shell', () => {
+  const release = (shell, web, extra = {}) => ({ tag_name: `android-web-shell-${shell}-web-${web}`, draft: false, prerelease: false, ...extra });
+  const releases = [release(2, 9), release(3, 3), release(3, 15, { draft: true }),
+    release(3, 14, { prerelease: true }), release(3, 4), release(4, 99),
+    { tag_name: 'android-web-shell-3-web-20' }];
+  assert.equal(selectPublishedWebBaseline(releases).tag_name, 'android-web-shell-3-web-4');
+  assert.equal(selectPublishedWebBaseline(releases, 2).tag_name, 'android-web-shell-2-web-9');
+  assert.throws(() => selectPublishedWebBaseline([release(2, 9)], 3), /baseline/);
+  assert.throws(() => selectPublishedWebBaseline(releases, 4), /Unsupported/);
+  assert.throws(() => selectPublishedWebBaseline([release(3, '01'), release(3, '2147483648')]), /baseline/);
+});
+
+test('formal and explicit full collection stays complete without a release lookup', () => {
+  for (const env of [{ CI_TEST_TIER: 'formal' }, { CI_TEST_TIER: 'full' }, { CI_FULL: 'true' }]) {
+    const plan = collectPlan(env);
+    assert.equal(plan.full, true);
+    assert.equal(plan.cloud, true); assert.equal(plan.android, true); assert.equal(plan.pages, true);
+    assert.equal(plan.base, plan.source);
+  }
+  const explicit = collectPlan({ CI_TEST_TIER: 'formal', CI_CHANGE_BASE: 'HEAD' });
+  assert.equal(explicit.full, true);
+});
+
+test('collection resolves the selected public target and fails closed before planning without one', () => {
+  const releases = [
+    { tag_name: 'android-web-shell-2-web-9', draft: false, prerelease: false },
+    { tag_name: 'android-web-shell-3-web-4', draft: false, prerelease: false },
+    { tag_name: 'android-web-shell-3-web-99', draft: true, prerelease: false },
+  ];
+  for (const shell of [2, 3]) {
+    const tag = releases[shell - 2].tag_name;
+    const expected = spawnSync('git', ['rev-parse', tag + '^{commit}'], { encoding: 'utf8' });
+    assert.equal(expected.status, 0);
+    const plan = collectPlan({ CI_TEST_TIER: 'candidate', CI_TARGET_SHELL: String(shell) }, () => releases);
+    assert.equal(plan.base, expected.stdout.trim());
+    assert.equal(plan.targetShell, shell);
+    assert.equal(plan.full, false);
+  }
+  assert.throws(() => collectPlan({ CI_TEST_TIER: 'candidate' }, () => releases.slice(0, 1)), /baseline/);
+  assert.throws(() => collectPlan({ CI_TEST_TIER: 'candidate' }, () => { throw new Error('API unavailable'); }), /API unavailable/);
+  const noLookup = () => { throw new Error('Unexpected release lookup'); };
+  for (const env of [{ CI_TEST_TIER: 'formal' }, { CI_TEST_TIER: 'full' }, { CI_FULL: 'true' }])
+    assert.equal(collectPlan(env, noLookup).full, true);
+  assert.equal(collectPlan({ CI_TEST_TIER: 'candidate', CI_CHANGE_BASE: 'HEAD' }, noLookup).base,
+    collectPlan({ CI_TEST_TIER: 'formal' }, noLookup).source);
 });
 test('CloudBase logic adds corresponding checks without automatically running full', () => {
   const p = planTests(['src/data/cloudSync.ts']);
@@ -68,6 +115,11 @@ test('anniversary model selects calendar, date and cumulative-node contracts', (
   for (const name of ['anniversary-dates', 'anniversary-calendar', 'anniversary-timing-list'])
     assert.ok(plan.webTests.includes(`tests/${name}.spec.ts`), name);
   assert.equal(plan.full, false);
+});
+
+test('startup health owners select the readiness contract tests', () => {
+  for (const path of ['src/native/window.ts', 'src/native/startupReadiness.ts', 'src/app/App.tsx', 'src/features/home/HomePage.tsx'])
+    assert.ok(planTests([path]).webTests.includes('tests/startup-readiness.spec.ts'), path);
 });
 
 test('ART scope covers production updater, fixtures and the policy that controls its gate', () => {

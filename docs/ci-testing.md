@@ -20,6 +20,8 @@
 
 scripts/ci-plan.mjs 根据 PR base SHA 到当前提交的 diff 选择测试，输出 ci-test-plan.json 和 Actions Summary；候选包默认比较最新已发布网页 tag，也可指定 changed_base。SQL 迁移和 IndexedDB 结构改动由路径和 schema diff 检测。重大架构/关键功能由维护者添加完整检查标签，标签变化会重新验证。
 
+候选包的默认基线通过 GitHub Releases API 分页读取，仅选择目标 `CI_TARGET_SHELL`（默认 3）下 `draft=false`、`prerelease=false` 的最高有效修订，不以本地 tag、Draft 或保留修订代替公开发布。手动工作流显式传入 `shell_code`；缺失目标公开基线或 API 不可用时失败，不退回外壳 2 或 `HEAD^`。本地候选计划需要已登录的 `gh`（或只读 `GH_TOKEN`），也可显式提供 `CI_CHANGE_BASE`。显式 full/formal 在无指定基线时以 HEAD 记录来源并执行全部测试，不能用该基线缩小范围。
+
 PR 只要求一个最终 `verify` 检查。`affected checks` 与可复用的原生 ART 工作流分别执行，最终 `verify` 使用 `always()` 汇总，二者必须成功；失败、取消或被跳过都不能通过。ART 工作流与浏览器测试共用 `ci-plan.mjs` 的依赖映射；范围判断必须成功并明确输出 true/false，只有 false 时才允许 ART 执行任务跳过。原生生产代码、夹具、打包/增量脚本与门禁策略变更运行 ART，完整验收也运行 ART。APK 等非 PR 调用始终要求 ART。
 
 所有 `src/data/` 改动增加 CloudBase、统一 Android 的同步回归及待办并发保护回归，包含 `cloudStore`、`cloudSync`；纪念日模型改动明确包含公历、农历与累计节点测试。待办并发回归区分本机分类删除成功事务的关联迁移、云端或其他标签的外部修改，并检查恢复归一化后的连续撤销。基础及纪念日、生理期专用 Playwright 配置共用本地服务器工厂，显式设置 `VITE_CLOUDBASE_ENABLED=false`；云与 Android 配置继续使用各自环境，不能复用不同模式的构建作为发布制品。

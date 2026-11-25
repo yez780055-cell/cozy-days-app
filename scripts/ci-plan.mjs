@@ -2,6 +2,22 @@ import { execFileSync } from 'node:child_process';
 import { readFileSync, writeFileSync, appendFileSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 
+export function selectPublishedWebBaseline(releases, shell = 3) {
+  if (![2, 3].includes(shell)) throw new Error('Unsupported target shell');
+  const pattern = new RegExp(`^android-web-shell-${shell}-web-([1-9][0-9]*)$`);
+  const published = releases.filter(release => release.draft === false && release.prerelease === false)
+    .map(release => ({ release, revision: Number(pattern.exec(release.tag_name)?.[1] ?? 0) }))
+    .filter(entry => Number.isSafeInteger(entry.revision) && entry.revision > 0 && entry.revision <= 2147483647)
+    .sort((a, b) => b.revision - a.revision);
+  if (!published.length) throw new Error(`A published shell ${shell} baseline is required`);
+  return published[0].release;
+}
+
+function publishedReleases() {
+  return JSON.parse(execFileSync('gh', ['api', '--paginate', '--slurp',
+    'repos/yez780055-cell/cozy-days-app/releases?per_page=100'], { encoding: 'utf8', maxBuffer: 128 * 1024 * 1024 })).flat();
+}
+
 export function planTests(paths, { tier = 'pr', fullRequested = false, schemaChanged = false } = {}) {
   if (!['pr', 'candidate', 'formal', 'full'].includes(tier)) throw new Error('Unknown validation tier');
   const changed = [...new Set(paths)];
@@ -16,6 +32,8 @@ export function planTests(paths, { tier = 'pr', fullRequested = false, schemaCha
   for (const p of changed) {
     if (/^src\/app\//.test(p)) add('app', 'home-ux', 'todo');
     if (/^src\/main\.tsx$/.test(p)) { cloud = true; modules.add('cloudbase'); }
+    if (/^src\/(?:native\/(?:window|startupReadiness)|app\/App\.tsx|features\/home\/HomePage\.tsx|main\.tsx)|^tests\/startup-readiness/.test(p))
+      add('startup', 'startup-readiness');
     if (/^src\/components\/(?:Modal|Sheet|DatePicker|Confirm)/.test(p)) add('shared-interaction', 'todo', 'anniversary-modal-guard');
     if (/^(?:vite|capacitor)\.config/.test(p)) android = true;
     if (/^src\/features\/todo\/|^tests\/(?:todo|swipe|categories-time)\./.test(p))
@@ -63,15 +81,17 @@ export function planTests(paths, { tier = 'pr', fullRequested = false, schemaCha
 }
 
 function git(...args) { return execFileSync('git', args, { encoding: 'utf8' }).trim(); }
-export function collectPlan(env = process.env) {
+export function collectPlan(env = process.env, readReleases = publishedReleases) {
   const event = env.GITHUB_EVENT_PATH ? JSON.parse(readFileSync(env.GITHUB_EVENT_PATH, 'utf8')) : {};
   const labels = (event.pull_request?.labels ?? []).map(label => label.name);
+  const fullRequested = env.CI_FULL === 'true' || labels.some(label => ['ci:full', 'critical-change', 'architecture'].includes(label));
+  const shell = Number(env.CI_TARGET_SHELL ?? 3);
+  if (![2, 3].includes(shell)) throw new Error('Unsupported target shell');
   let base = env.CI_CHANGE_BASE || event.pull_request?.base?.sha;
   if (!base) {
-    const releases = git('tag', '--list', 'android-web-shell-2-web-*').split('\n')
-      .filter(tag => /^android-web-shell-2-web-\d+$/.test(tag))
-      .sort((a, b) => Number(b.split('-').at(-1)) - Number(a.split('-').at(-1)));
-    base = releases[0] || 'HEAD^';
+    // Explicit full validation needs no release baseline and never narrows its tests.
+    base = ['formal', 'full'].includes(env.CI_TEST_TIER) || fullRequested
+      ? 'HEAD' : selectPublishedWebBaseline(readReleases(), shell).tag_name;
   }
   const baseSha = git('rev-parse', '--verify', '--end-of-options', base + '^{commit}');
   const paths = git('diff', '--name-only', '-z', baseSha, 'HEAD', '--').split('\0').filter(Boolean);
@@ -80,8 +100,8 @@ export function collectPlan(env = process.env) {
   const schemaChanged = schemaDiff.split('\n').some(line => /^[+-](?![+-])/.test(line)
     && /(?:\.version\s*\(|\.stores\s*\(|\.upgrade\s*\(|\b(?:DATABASE_VERSION|SCHEMA_VERSION)\b|\b(?:CREATE|ALTER|DROP)\s+(?:TABLE|SCHEMA|COLUMN)\b)/i.test(line));
   const plan = planTests(paths, { tier: env.CI_TEST_TIER || 'pr', schemaChanged,
-    fullRequested: env.CI_FULL === 'true' || labels.some(label => ['ci:full', 'critical-change', 'architecture'].includes(label)) });
-  return { ...plan, base: baseSha, source: git('rev-parse', 'HEAD'), changedFiles: paths };
+    fullRequested });
+  return { ...plan, targetShell: shell, base: baseSha, source: git('rev-parse', 'HEAD'), changedFiles: paths };
 }
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const plan = collectPlan();

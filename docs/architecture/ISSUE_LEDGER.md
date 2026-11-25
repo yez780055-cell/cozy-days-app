@@ -1,8 +1,8 @@
 # 架构整改台账
 
-基准：`78716f1ee5d4fa929274253ac1d3a3d612fdcd64`；来源：2026-11-22《Cozy Days 完整架构、业务逻辑与代码审计报告》。用户已批准完整方案与第6项授权边界，正常阶段连续实施、异常暂停。
+审计基准：`78716f1ee5d4fa929274253ac1d3a3d612fdcd64`；来源：2026-11-22《Cozy Days 完整架构、业务逻辑与代码审计报告》。已合并基准：`a4a008a0f174b19cad4229125f7cd8236a1b6552`（PR #33）；该基准不包含后续批次实现。状态核对：2026-11-25。
 
-角色：主=架构/集成/最终验收；T=Terra核心；S=Sol工程；L=Luna体验。每项均须主最终验收。状态区分实施、验证、合并、发布、匿名复核、线上/设备验收；代码完成不等于问题关闭。
+当前单模型按批次直接推进。状态分别记录实施、验证、合并、发布、匿名复核和真实设备验收；已完成实现不重复实施，未完成验收单独保留。授权边界见下文。
 
 ## 路线与依赖
 0. 建立治理、线上版本/设备/备份能力盘点；未知生产事实不假定成立。
@@ -13,42 +13,42 @@
 5. P1-02/11及历史工作流退休。设备等待不阻塞独立任务。
 6. P2-06/07/08、P3-01/02。先归档证据，再精简和统一表达。
 
-共享核心串行修改；独立分析可并行但文件所有权不重叠。按可验收风险单元交付，不为阶段数制造PR。
+上述路线表示依赖顺序，不要求重做已完成项目。当前收尾 P1-04/P1-08/P2-05 的验证与交付；本轮不实施 P1-01/03，不操作生产数据库。
 
 ## 全部22项
-路径相对仓库；符号证据绑定上述基准，实施时追加实际diff、命令、结果、PR和发布来源。
+路径相对仓库；问题表中的原始符号证据绑定审计基准 78716f1，修复结果绑定下方实际提交和发布来源，不能把原问题描述当作当前实现。
 
-| 编号 | 状态 | 主责/复核 | 证据与预计模块 | 验收与依赖 |
+| 编号 | 状态 | 优先级 | 证据与预计模块 | 验收与依赖 |
 |---|---|---|---|---|
-| P0-01 | 本地验证通过，待PR | T/S+L | TodoForm初始状态；database.update无基线；TodoForm/useTodos/TodoPage/database.ts | 同事务比较原始基线；旧表单、远端删除、完成/撤销、离线及事务失败；输入保留 |
-| P1-01 | 待实施 | T/S+L | 001_shared_space.sql validate_record、cloudStore materialize | 递进迁移；农历/公历一致、闰月、旧字段、异常原文隔离、cursor不漏数；线上SQL/备份先核实 |
-| P1-02 | 待实施 | T/L+S | shell2-web9历史model无农历、当前新字段校验 | 依赖P1-01；混合旧修订、失败队列保留、升级入口、实际设备确认 |
-| P1-03 | 待实施 | T/S+L | database.all视图fallback；cloudStore分类删除无协调 | 乱序/分页/离线新增/分类重建；存储一致且可备份；不错误覆盖待发记录 |
-| P1-04 | 待实施 | T/L+S | window.ts两帧ready；MainActivity确认试运行 | 显式本地就绪、坏缓存、欢迎页、离线、中断、原生回滚；保留token/超时 |
-| P1-05 | 本地验证通过，待PR | S/T | verify-pr.yml并列任务；线上仅必需verify | 最终verify汇总；规划失败、适用任务失败/取消/意外跳过均阻塞；统一native scope |
-| P1-06 | 本地验证通过，待PR | S/T+L | cloudbase.spec旧日期输入操作 | 滚轮helper；保留断网/重试/冲突全部断言；Web/Android云覆盖 |
-| P1-07 | 本地验证通过，待PR | S/T | ci-plan普通数据不选cloud、model漏日期 | 显式依赖映射及策略测试；仓储/日期/helper；纯UI不全量 |
-| P1-08 | 待实施 | S/T | auto计划只对同源已有Release检查过时 | 未发布旧SHA、并发、排队重试拒绝；公开前核来源；显式回退独立 |
-| P1-09 | 待实施 | T/L+S | CloudGate门禁、历史库与账号库分离 | 登录前只读发现/预览/导出；重复导入/换号；共享导入确认；源库保留 |
-| P1-10 | 待实施 | T/S+L | backupModel20MiB、replace前encodeBackup | 分卷/附件、大图片、字节/内存/配额/中断恢复；v1导入保留 |
-| P1-11 | 待实施 | T/S+L | GitHubWebReleases单页100条/2MiB | 旧APK明确下载升级入口；未来APK分页/限额/发现失败；原生变更受控发布 |
-| P2-01 | 待实施 | T/S | cloudStore前后capture、period/repository | 依赖正确性；按ID原子outbox，批量恢复及desired/attempt/seen保留 |
-| P2-02 | 待实施 | T/S+L | backupModel全局scope、物理版本4/1 | 逻辑格式分离、显式上下文、52-bit ID、v1、业务备份/恢复归档分开 |
-| P2-03 | 待实施 | T/L+S | period/recovery槽与冲突累计 | 空槽安全回收；冲突先导出/确认；多标签/账户/配额降级；不TTL删草稿 |
-| P2-04 | 本地验证通过，待PR | S/T | anniversary/period专用webServer丢env | 共用服务器环境；local/cloud明确；默认专用命令可用 |
-| P2-05 | 待实施 | S/T | collectPlan默认shell2 tag | 按目标公开基线；草稿不算；无基线fail closed/全量；formal不缩小 |
-| P2-06 | 待实施 | S/L | public/review187文件约50.8MB、Vite复制 | 先SHA/哈希/稳定链接归档，再减少制品；保留静态相对索引 |
-| P2-07 | 待实施 | S/T+L | 不可达Doodle/artwork、Java模板、App键盘分支 | 引用/资源核查；真实测试不删；Keyboard单独平台验收 |
-| P2-08 | 待实施 | S/T | lock CLI→rimraf→glob→minimatch历史公告 | 重查权威公告；兼容上游升级；安装/Capacitor/原生工具验证；不force fix |
-| P3-01 | 待实施 | L/S+T | package0.2.1、APK0.2.3/3、网页/外壳UI | Android0.2.3(构建3)·内容修订N；来源可查；协议/标签/历史字段不改 |
-| P3-02 | 待实施 | S/L+T | README无账号/旧dist、period纯本地说明 | 当前运行准确；历史标适用SHA/版本；一份当前操作入口 |
+| P0-01 | 已合并/已发布/匿名复核通过；实机未验 | P0 | TodoForm初始状态；database.update无基线；TodoForm/useTodos/TodoPage/database.ts | 同事务比较原始基线；旧表单、远端删除、完成/撤销、离线及事务失败；输入保留 |
+| P1-01 | 待实施 | P1 | 001_shared_space.sql validate_record、cloudStore materialize | 递进迁移；农历/公历一致、闰月、旧字段、异常原文隔离、cursor不漏数；线上SQL/备份先核实 |
+| P1-02 | 待实施 | P1 | shell2-web9历史model无农历、当前新字段校验 | 依赖P1-01；混合旧修订、失败队列保留、升级入口、实际设备确认 |
+| P1-03 | 待实施 | P1 | database.all视图fallback；cloudStore分类删除无协调 | 乱序/分页/离线新增/分类重建；存储一致且可备份；不错误覆盖待发记录 |
+| P1-04 | 本地实现及影响集通过；待本批PR/发布/实机 | P1 | window.ts两帧ready；MainActivity确认试运行 | 显式本地就绪、坏缓存、欢迎页、离线、中断、原生回滚；保留token/超时 |
+| P1-05 | 已合并/已发布/匿名复核通过；实机未验 | P1 | verify-pr.yml并列任务；线上仅必需verify | 最终verify汇总；规划失败、适用任务失败/取消/意外跳过均阻塞；统一native scope |
+| P1-06 | 已合并/已发布/匿名复核通过；实机未验 | P1 | cloudbase.spec旧日期输入操作 | 滚轮helper；保留断网/重试/冲突全部断言；Web/Android云覆盖 |
+| P1-07 | 已合并/已发布/匿名复核通过；实机未验 | P1 | ci-plan普通数据不选cloud、model漏日期 | 显式依赖映射及策略测试；仓储/日期/helper；纯UI不全量 |
+| P1-08 | 本地实现及影响集通过；待本批PR/发布/实机 | P1 | auto计划只对同源已有Release检查过时 | 未发布旧SHA、并发、排队重试拒绝；公开前核来源；显式回退独立 |
+| P1-09 | 待实施 | P1 | CloudGate门禁、历史库与账号库分离 | 登录前只读发现/预览/导出；重复导入/换号；共享导入确认；源库保留 |
+| P1-10 | 待实施 | P1 | backupModel20MiB、replace前encodeBackup | 分卷/附件、大图片、字节/内存/配额/中断恢复；v1导入保留 |
+| P1-11 | 待实施 | P1 | GitHubWebReleases单页100条/2MiB | 旧APK明确下载升级入口；未来APK分页/限额/发现失败；原生变更受控发布 |
+| P2-01 | 待实施 | P2 | cloudStore前后capture、period/repository | 依赖正确性；按ID原子outbox，批量恢复及desired/attempt/seen保留 |
+| P2-02 | 待实施 | P2 | backupModel全局scope、物理版本4/1 | 逻辑格式分离、显式上下文、52-bit ID、v1、业务备份/恢复归档分开 |
+| P2-03 | 待实施 | P2 | period/recovery槽与冲突累计 | 空槽安全回收；冲突先导出/确认；多标签/账户/配额降级；不TTL删草稿 |
+| P2-04 | 已合并/已发布/匿名复核通过；实机未验 | P2 | anniversary/period专用webServer丢env | 共用服务器环境；local/cloud明确；默认专用命令可用 |
+| P2-05 | 本地实现及影响集通过；待本批PR/发布/实机 | P2 | collectPlan默认shell2 tag | 按目标公开基线；草稿不算；无基线fail closed/全量；formal不缩小 |
+| P2-06 | 待实施 | P2 | public/review187文件约50.8MB、Vite复制 | 先SHA/哈希/稳定链接归档，再减少制品；保留静态相对索引 |
+| P2-07 | 待实施 | P2 | 不可达Doodle/artwork、Java模板、App键盘分支 | 引用/资源核查；真实测试不删；Keyboard单独平台验收 |
+| P2-08 | 待实施 | P2 | lock CLI→rimraf→glob→minimatch历史公告 | 重查权威公告；兼容上游升级；安装/Capacitor/原生工具验证；不force fix |
+| P3-01 | 待实施 | P3 | package0.2.1、APK0.2.3/3、网页/外壳UI | Android0.2.3(构建3)·内容修订N；来源可查；协议/标签/历史字段不改 |
+| P3-02 | 待实施 | P3 | README无账号/旧dist、period纯本地说明 | 当前运行准确；历史标适用SHA/版本；一份当前操作入口 |
 
 ## 验证、回退与授权
-- 普通UI针对性检查/构建；交互增加对应E2E；核心覆盖多标签/双设备、权限、离线、幂等、冲突、未知字段及原子性；迁移/重大架构/正式APK按AGENTS完整验证。
+- 只验证本次影响范围；核心按涉及风险覆盖多标签/双设备、权限、离线、幂等、冲突、未知字段和原子性。迁移/重大架构及 APK 按 AGENTS 和现有测试策略执行，不默认全量回归。
 - 数据修复保留原内容和待发队列，不批量清洗。SQL先盘点/备份/恢复演练，兼容递进迁移；失败不以接受坏数据作为默认回退。
 - Dexie版本不假定可逆；先证明旧代码兼容或导出恢复。新备份格式先兼容读取，保留旧解码器。
 - 更新保留稳定目录/试运行/完整包；公开资产不覆盖；已公开制品优先原字节复核。显式回退使用更高修订并留内容来源。
-- 普通测试/实现Bug/可恢复构建失败自行定位修复、受影响重测；失败期间禁止合并/发布。同一问题反复失败或安全修法不确定时暂停集中报告；数据丢失风险、生产数据库操作、签名/更新协议异常、不可恢复状态、权限不足立即暂停相关操作待确认。保存命令/SHA/日志，不盲重试、不降门禁，未受影响证据复用。
+- 普通测试/实现 Bug/可恢复构建失败由当前模型自行定位修复并运行受影响重测，不因失败次数增加自动暂停；失败期间禁止合并/发布。遇到数据丢失风险、生产数据库操作、签名/更新协议异常、不可恢复状态、权限不足或超出授权时，立即暂停相关操作待确认。保存命令/SHA/日志，不盲重试、不降门禁，未受影响证据复用。
 
 用户于2026-11-22确认下列有条件授权：
 1. 生产SQL仅新增兼容迁移；真实版本、异常数据、可验证备份和恢复能力确认后执行；禁止删/清洗/改权限。
@@ -64,25 +64,40 @@
 
 ## 长期收敛
 - shell2保留下载、恢复、整包、签名和必要紧急维护；按两位成员所有已知设备code/修订/备份盘点，不用下载量推断活跃。shell3旧修订也属于混合兼容范围。
-- 原生ART、完整回归、只读发布复核、COZ1能力保留；历史workflow须无当前调用、制品/哈希/证书/来源长期留存、恢复责任明确才退役。
+- 原生 ART、按需完整回归、只读发布复核、COZ1 能力保留；历史workflow须无当前调用、制品/哈希/证书/来源长期留存、恢复责任明确才退役。
 - 测试身份含源码/合并树、锁文件、配置、平台/base、云模式、计划和制品哈希；签名只签已测字节；PR merge SHA与最终main分开。
 - 预估16–28有效工程日，线上/设备观察另计；用风险覆盖、CI耗时、制品大小和写入成本衡量，不追求删代码/PR/文档数。
 
-## 解决记录
-- 2026-11-22：用户批准；治理落盘、首批P0/测试边界实现已写入工作区，未提交、未合并、未发布。
-- 首批静态/快速验证：`npm run test:ci:policy` 15通过；`npm run build`（含TypeScript）通过；`npm run test:android:auto` 7通过；CloudBase 4通过、1按Android平台范围跳过。测试均使用隔离/合成数据，没有线上/设备验收。
-- **历史失败（已恢复修复）：** `npm run test:e2e -- --max-failures=1 --reporter=line` 共176项，45通过、1失败、130未运行。失败为 `tests/categories-time.spec.ts:43`，line54在合法删除分类后撤销完成，任务未恢复可见。新全量基线保护把本地分类迁移误判为并发冲突；P0-01不能验收或合并。保留原断言，恢复实施后先修实现。
-- 当前证据在忽略目录 `artifacts/governance-first-batch/`（冻结文件SHA256、工作区patch及失败trace/context）；运行时HEAD仍是基准，不能将未提交改动证据标为基准干净代码测试。完整交接见AGENT_HANDOFF。
-- 未验证边界：缺省baseline仍是兼容旧API，不能称CAS；无持久revision无法检测同值ABA/删除重建再删；恢复分类归一化后的undoExpected现已使用真实事务结果。类别改名并发和完整旧端兼容尚待后续。
-- P1-07交叉审查另发现单改cloudStore/cloudSync时不选直接依赖它们的todo-concurrency；恢复实施后补映射及策略断言。当前测试失败后未继续修改。
+## 解决记录与历史证据
 
-每项关闭前追加完整证据；线上/设备未做不得省略。P1-05仍需真实PR最新SHA及ART/最终verify；上述项目尚未发布，不标关闭。
+以下按发生顺序保留证据；早期失败及当时“未提交/未发布”描述不代表当前状态。当前状态以表格和最终交付记录为准。
 
-- 恢复授权：用户明确允许在现有未提交main继续修复该实现回归，保留全部修改；普通失败自动修复，只有上述真实高风险/反复失败集中报告。当前P0-01恢复实施，由T为本机已提交分类迁移返回精确before/after凭证，仅匹配旧期望时推进undo基线；外部pull/其他标签不获得此凭证。S补区别本机迁移/外部并发回归；L独立审查。先失败用例及相关验证，再必要PR门禁，不重复无关全量。
+- 2026-11-22：用户批准完整整改方案及有条件授权。首批实现最初在审计基准 78716f1 加未提交修改上验证，不能视为该基准干净代码的测试。原始 patch、文件 SHA256 和失败 trace/context 保存在忽略目录 `artifacts/governance-first-batch/`。
+- 首轮：`npm run test:ci:policy` 15 通过；`npm run build`（含 TypeScript）通过；`npm run test:android:auto` 7 通过；CloudBase 4 通过、1 按 Android 平台范围跳过，均为隔离/合成数据。
+- 历史全量早停：`npm run test:e2e -- --max-failures=1 --reporter=line` 共 176 项，45 通过、1 失败、130 未运行。`tests/categories-time.spec.ts:43` 的 line54 分类删除后撤销未恢复可见：新基线保护误判本机分类迁移为外部并发；当时 P0-01 不可验收。失败原件在 `failure/`，保留原断言后修复实现，没有把早停结果标为全通过。
+- 用户恢复授权后，本机分类迁移成功提交才返回精确 before/after 凭证，旧期望完整匹配 before 才推进 undoExpected；外部 pull/其他标签不获该凭证，restore 使用实际存储行。原失败用例 1/1 通过；相关 41 项通过（categories7/data-safety6/swipe9 共 22 项未受影响证据复用，最终 todo-concurrency10/todo9 共 19 项通过）。新增故障注入测试曾提前读取未提交状态，补真实 completed 与撤销提示等待后通过，回滚断言保留；原件在 `resume-fixture-race/`。
+- 已知边界仍保留：optional baseline 缺省旧 API 不是 CAS；无持久 revision 不能检测同值 ABA/删除重建再删，未拉取云版本不由本地快照全面识别；分类改名并发和完整旧端兼容未完成。P1-07 曾漏选 cloudStore/cloudSync 的 todo-concurrency，已补依赖映射和策略断言。
+- 首批最终本地证据：policy15；CloudBase4/平台 skip1（含双上下文断网/重试/冲突、TypeScript/正式云 Web 构建）；anniversary/period 专用配置真实待办 UI smoke 各 1 项（显式 local）；publisher7 相关文件未改，复用旧证据。历史实现/交叉审查和独立 UX 复核通过，不等于真实账号或实机验收。未重跑无关 176 项全量；无 schema/数据库迁移。配置输出在 `anniversary-config-results/`、`period-config-results/`，后续文件哈希在 `resume-final/`。
+- 提交 `76926f66860684b6dd5f2685a7038afce67b912d` 创建 [PR #33](https://github.com/yez780055-cell/cozy-days-app/pull/33)。[首次 CI 45001978195](https://github.com/yez780055-cell/cozy-days-app/actions/runs/45001978195) 的 ART 通过、受影响测试 40 通过 1 失败，最终 verify 正确阻止合并。Trace 证实连续 undo 读库早于提交；仅修测试等待，保留业务、断言、timeout/retry。原失败例连续 3 次通过，另两个受 helper 影响例 2/2 通过；首次红色运行不标绿，完整制品在 `pr33-attempt1/`。
+- PR #33 最终 head `31071d5639c01dc95f915ccbd74a68d289b22487`，[CI 45002593000](https://github.com/yez780055-cell/cozy-days-app/actions/runs/45002593000) 全绿，包含真实 ART、云/统一 Android 及最终 verify。以 merge commit `a4a008a0f174b19cad4229125f7cd8236a1b6552` 合并，本地 main 随后 ff。2026-11-23 再次通过 GitHub PR 元数据核实 merged=true 和 merge SHA。
+- [发布 45003040535](https://github.com/yez780055-cell/cozy-days-app/actions/runs/45003040535) 的 Pages、内容验证、原证书签名、公开发布与匿名复核全部成功；[shell3 内容修订4](https://github.com/yez780055-cell/cozy-days-app/releases/tag/android-web-shell-3-web-4) 公开 46 资产，来源 a4a008a，完整包/每文件/签名及匿名下载验证通过。P0-01、P1-05/06/07、P2-04 的实现和交付已完成，不重复实施；真实设备验收未做，不宣称全部关闭。未构建物理 APK，未改历史资产或生产 DB。记录见 `current-delivery.json`。
+- 历史公开 shell3-web3 来源 `0826d70221bcfd3f9e5d73e49be0bafc28913277`；原运行 44990551368 失败、只读复核运行 44992183427 成功，不与修订4混用。
+- 后续 P1-04/P1-08/P2-05 已有本地未提交实现，尚未形成新批有效验证/合并/发布证据。P1-01/03 未实施；服务端/入站隔离设计仍需证明旧端降级与生产前提，即使不升 Dexie 物理版本也不能推定旧端可安全回滚联网。
 
+## 下一批已有实现的技术约束
 
-- 恢复后结果：原失败categories-time用例1/1通过；相关41项全部通过（首轮未受影响categories7/data-safety6/swipe9共22项结果复用，最终todo-concurrency10/todo9共19项通过）。新增失败注入测试曾提前捕获未提交完成状态，Sol增加真实completed及撤销提示等待后通过，回滚断言保留。
-- 当前门禁：policy15通过；CloudBase4通过1平台跳过，包含更新日期操作后的双上下文断网/重试/冲突；其启动构建含TypeScript及正式云模式Web构建通过。anniversary/period两个专用配置分别用真实待办UI smoke各1项通过，显式local环境有效。publisher7项历史结果可复用（相关文件未修改）。T/S交叉审查及L基于统一执行证据的独立UX复核通过；无实机、公网、真实账号验收。
-- cloudStore/cloudSync依赖遗漏已补映射并由policy验证。没有重跑无关176项全量；本批无schema/数据库迁移，按用户最新指示运行影响集，后续仍需真实PR ART/verify和实际制品发布链。
-- 已提交76926f6并创建[PR33](https://github.com/yez780055-cell/cozy-days-app/pull/33)。[首次CI](https://github.com/yez780055-cell/cozy-days-app/actions/runs/45001978195)实际ART通过，受影响测试40通过1失败，最终verify正确阻止；Trace显示连续undo测试读取早于提交，Sol补存储及toast结束等待，不削减断言。普通失败按新规则自动修复，PR尚未合并、未发布；以PR最新head/Actions为权威。
-- CI等待问题修正仅涉及测试：原失败case连续3次通过，另2个受helper影响case通过；其余未受影响证据复用，L独立复核确认原断言/业务及timeout/retry未变。修正追加到同一PR，等待最新SHA真实检查，不将首次红色运行标绿。
+### 本批验证（2026-11-25）
+
+- 从 f042e83 接管全部 15 个修改文件和 2 个未跟踪文件，逐项检查 Diff 后保留原实现。P1-04 的显式 surface、同账号 in-flight 首读、Home 返回 fresh read、token 和原生 ACK 已有；P1-08 的三次来源检查及 P2-05 的目标公开 Release 选择已存在，本轮主要补齐有效验证和普通测试修复。
+- 策略与发布保护 32/32；覆盖目标 shell2/shell3 的实际 tag 解析、Draft/预发布排除、无公开基线/API 失败停止、formal/full 不依赖基线且完整、过时未发布 SHA、公开前部署变化、并发高修订和排队 Draft 重试，以及共享发布并发组。formal 执行器 dry run 确认完整 Web/Pages/Android/云命令，未把 dry run 算成全量回归。
+- 启动 13/13、待办 9/9、首页 4/4、Android 交互/更新 17/17、统一 Android 云 7/7、Web 云 4/4（3 项 Android 专用按预期跳过）。覆盖延迟/坏 bridge token、撤销/脱离 surface、StrictMode、ACK 失败、首读失败、快速导航、晚到快照、欢迎/登录、离线重开、账号坏缓存。合成账号和隔离 PGlite/浏览器数据库，无生产数据操作。
+- 隔离 CozyDeltaQA 模拟器执行生产 Java ART：39 项断言通过，包含试运行中断离线回滚、失败修订保留、确认后离线启动；HTTPS 增量/整包兜底/双失败保全及请求日志通过。不等于真实设备或 MainActivity 整机 15 秒超时验收；未改 Java 状态机、未构建正式 APK。
+- TypeScript、local/unified Web、local/unified Android 构建通过。首次测试误用默认云 dist，启动夹具漏 React preamble，候选范围旧断言和首页旧日期 input 操作导致失败；纠正构建模式、夹具、预期和滚轮 helper 后相关重测通过，未降低门禁/删断言。失败 trace 保留在 artifacts/p1-batch-web-results/ 和 test-results/；汇总、文件哈希、提交身份见 artifacts/p1-batch-20261125/。
+- GitHub 只读核对当前 Pages 部署 7976181968 与公开 shell3-web4 均来源 a4a008a，来源门禁返回 identical；本地治理 HEAD 尚未推送导致 compare API 404，按预期 fail closed，但首次探针误期待具体错误文本而失败，此探针不算通过。后续用远端已知旧 SHA 重测，结果见本批证据。历史 PR #17 不操作。本批 PR/最终 verify/合并/发布/匿名复核单独记录，未完成前不标为已交付。
+
+- P1-04：保留 token/ready 字段和 Java 状态机；启动 Promise 只按同账号数据库共享 in-flight，settle 清理，首次 Home 复用、导航返回 fresh read。快速导航不依赖 Home 仍挂载，不禁用导航掩盖问题。ready 证明本地启动缓存与当前提交表面可用，不声称所有模块未来请求均成功；欢迎/登录/离线不要求联网成功，缓存失败不提前确认，保留原生超时与回滚。
+- P1-08/P2-05：计划及公开前核当前成功 Pages 部署与最新公开内容 ancestry；不要求 source 等于可能只维护推进的 main。按目标真实公开 Release 基线，Draft 不算；无基线 fail closed 或全量，formal 不缩小。拒绝未发布旧 SHA、并发及排队重试的过时发布；显式回退独立，原字节只读复核保留。此前部署 API 已只读核对，新流程尚待验证。
+
+## 本轮治理整理（2026-11-23）
+
+仅重写 AGENTS、更新本台账和精简交接；保留全部 22 项编号、优先级、依赖、审计证据及有效授权。检查文档一致性、完整 Diff、暂存范围和其他文件内容哈希后单独提交，不实施业务修复，不运行无关应用回归，不发布。当前交接及下一批见 [AGENT_HANDOFF.md](AGENT_HANDOFF.md)。

@@ -1,5 +1,13 @@
 # 当前开发检查点
 
+## 2026-11-26 CloudBase 代理 staging（待真实账号验收）
+- 接管本地 main、缓存 origin/main 及真实远端均为 Web 6 `e69c7797779f8dc615ff8477014fe37e0feaae84`，工作区干净。单模型实施，无子代理/新本地分支/worktree；没有 reset、clean、stash。
+- 新增 `workers/cloudbase-proxy/`，固定 CloudBase 上游、6 个认证端点及 3 个具名 RPC，单一 Pages Origin、严格头部白名单、1 MiB 入站、12 秒全程超时、无日志/Secret。仅部署 staging：`https://cozy-days-cloudbase-proxy-staging.yez780055.workers.dev`，最终 Worker version `e62a6d7d-e24a-4cb1-a47d-501d6da27e5e`；Secret 列表为空，无绑定，未配置 Git 自动部署。原 Cloudflare Pages 项目未修改。
+- 独立测试 63 项（含真实 workerd/合成上游）与 Wrangler dry-run 通过；真实 HTTPS 9 条预检 204、非授权/无 Origin 拒绝通过；无效登录 400、匿名空间 RPC 401 业务码与真实 CloudBase 直连一致。**这些拒绝探针不等于真实账号认证成功**。本地生产构建、2 项手机/桌面 smoke、CI 策略21、发布器13、匿名 HTTP6 通过。
+- Pages 公网 HTML/入口及懒加载脚本 200，build-info 仍为 e69c779；部署 `8076735885`、公开 `android-web-shell-3-web-6` 资产存在。`src/`、Android、根 package/锁、Vite、数据库/备份/离线/更新逻辑均未修改；未构建 APK，未发邮件或写生产数据库，手机登录未重测。
+- 用户明确测试邮箱和隔离空间“暂未准备”，故尚未做真实发送/校验/注册/登录/刷新/登出/已认证 RPC/双人同步/真机回归，前端环境变量选择与构建目标测试也按先后门禁尚未实施。**保持草稿 PR，不合并，不改 Pages 生产配置**；既有 Pages main 部署会自动发布 Shell 3 网页，不可误触发。
+- 详细契约、操作、缺口及 Web 6 回退边界见 [代理文档](../cloudbase-proxy.md)。本批提交/PR/适用 CI 以 Git 和本批后续交付证据为准；待测试资源就绪后继续真实验收，再最小接入 Pages，生产启用仍须具体授权。
+
 ## 2026-11-26 第三批恢复保护补充
 - 在 `dfe24d2` 上补充版本 2 业务备份：保留版本 1 读取，导出账号数据库的同步记录、冲突、cursor 和分类协调快照，以及已保存的恢复归档；无损 JSON 校验失败时拒绝导出。旧客户端会明确拒绝版本 2，不能假定它能读取新备份。
 - 导入保留不可自动重放的恢复材料；同账号同空间只在目标不存在时补回隔离/冲突和分类快照，不覆盖目标内容，不导入活动 cursor 或重放旧 outbox。旧版单条隔离导出没有账号来源，可单独导入为无来源归档并再次导出。导入若会更改尚未同步的目标记录则事务拒绝；云数据库原子提交，本地双库沿用恢复日志。跨账号/本地数据库仅保留来源材料，不能自动将其变为活动队列。

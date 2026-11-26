@@ -28,6 +28,14 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run test:ci:policy
+      - name: Validate the isolated CloudBase proxy (no credentials or deployment)
+        run: |
+          npm --prefix workers/cloudbase-proxy ci --ignore-scripts --no-audit --no-fund
+          npm --prefix workers/cloudbase-proxy test
+          npm --prefix workers/cloudbase-proxy run check
+        env:
+          WRANGLER_SEND_METRICS: 'false'
+          CLOUDFLARE_LOAD_DEV_VARS_FROM_DOT_ENV: 'false'
       - name: Check Android release Secret wiring and fail-closed preflight
         run: npm run test:android:auto
       - name: Test anonymous HTTP handling and collect runner-specific diagnostics for publisher changes

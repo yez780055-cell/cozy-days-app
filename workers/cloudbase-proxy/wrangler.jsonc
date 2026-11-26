@@ -1,0 +1,17 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "cozy-days-cloudbase-proxy",
+  "main": "src/index.js",
+  "compatibility_date": "2026-11-26",
+  "workers_dev": false,
+  "preview_urls": false,
+  "observability": { "enabled": false },
+  "env": {
+    "staging": {
+      "name": "cozy-days-cloudbase-proxy-staging",
+      "workers_dev": true,
+      "preview_urls": false,
+      "observability": { "enabled": false }
+    }
+  }
+}

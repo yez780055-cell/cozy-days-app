@@ -1,0 +1,16 @@
+{
+  "name": "cozy-days-cloudbase-proxy",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test test/*.test.mjs",
+    "check": "wrangler deploy --env staging --dry-run --outdir .wrangler/dry-run",
+    "deploy:staging": "wrangler deploy --env staging",
+    "whoami": "wrangler whoami",
+    "probe:live": "node scripts/probe-live.mjs"
+  },
+  "devDependencies": {
+    "miniflare": "5.20261123.1-beta",
+    "wrangler": "4.168.0"
+  }
+}

@@ -80,7 +80,7 @@ export function planTests(paths, { tier = 'pr', fullRequested = false, schemaCha
     androidCloudSuite: full || cloud };
 }
 
-function git(...args) { return execFileSync('git', args, { encoding: 'utf8' }).trim(); }
+function git(...args) { return execFileSync('git', args, { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 }).trim(); }
 export function collectPlan(env = process.env, readReleases = publishedReleases) {
   const event = env.GITHUB_EVENT_PATH ? JSON.parse(readFileSync(env.GITHUB_EVENT_PATH, 'utf8')) : {};
   const labels = (event.pull_request?.labels ?? []).map(label => label.name);
@@ -96,7 +96,10 @@ export function collectPlan(env = process.env, readReleases = publishedReleases)
   const baseSha = git('rev-parse', '--verify', '--end-of-options', base + '^{commit}');
   const paths = git('diff', '--name-only', '-z', baseSha, 'HEAD', '--').split('\0').filter(Boolean);
   const schemaDiff = git('diff', '--unified=0', baseSha, 'HEAD', '--',
-    'src/data/database.ts', 'src/data/localDatabase.ts', 'src/data/periodDatabase.ts', 'cloudbase');
+    'src/data/database.ts', 'src/data/localDatabase.ts', 'src/data/periodDatabase.ts', 'cloudbase',
+    // Numbered SQL migrations already force the full gate by path. Avoid loading
+    // their potentially large generated data into the schema-text detector.
+    ':(exclude)cloudbase/[0-9]*.sql');
   const schemaChanged = schemaDiff.split('\n').some(line => /^[+-](?![+-])/.test(line)
     && /(?:\.version\s*\(|\.stores\s*\(|\.upgrade\s*\(|\b(?:DATABASE_VERSION|SCHEMA_VERSION)\b|\b(?:CREATE|ALTER|DROP)\s+(?:TABLE|SCHEMA|COLUMN)\b)/i.test(line));
   const plan = planTests(paths, { tier: env.CI_TEST_TIER || 'pr', schemaChanged,

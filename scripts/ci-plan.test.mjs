@@ -52,7 +52,9 @@ test('collection resolves the selected public target and fails closed before pla
     const plan = collectPlan({ CI_TEST_TIER: 'candidate', CI_TARGET_SHELL: String(shell) }, () => releases);
     assert.equal(plan.base, expected.stdout.trim());
     assert.equal(plan.targetShell, shell);
-    assert.equal(plan.full, false);
+    // Both historical releases precede the lunar SQL migration in HEAD.
+    assert.equal(plan.full, true);
+    assert.ok(plan.reasons.includes('database migration / schema change'));
   }
   assert.throws(() => collectPlan({ CI_TEST_TIER: 'candidate' }, () => releases.slice(0, 1)), /baseline/);
   assert.throws(() => collectPlan({ CI_TEST_TIER: 'candidate' }, () => { throw new Error('API unavailable'); }), /API unavailable/);
@@ -69,6 +71,12 @@ test('CloudBase logic adds corresponding checks without automatically running fu
 test('SQL migrations and IndexedDB schema changes require the complete gate', () => {
   assert.equal(planTests(['cloudbase/003_changes.sql']).full, true);
   assert.equal(planTests(['src/data/database.ts'], { schemaChanged: true }).full, true);
+});
+
+test('generated lunar migration does not overflow collection and still requires the complete gate', () => {
+  const plan = collectPlan({ CI_CHANGE_BASE: '4969796', CI_TEST_TIER: 'pr' });
+  assert.equal(plan.full, true);
+  assert.ok(plan.changedFiles.includes('cloudbase/003_lunar_validation.sql'));
 });
 test('formal releases cannot weaken the complete gate with a small changed scope', () => {
   const p = planTests(['README.md'], { tier: 'formal' });

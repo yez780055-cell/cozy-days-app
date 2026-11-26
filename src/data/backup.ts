@@ -1,17 +1,24 @@
 import { version as appVersion } from '../../package.json';
-import { decodeBackup, encodeBackup, makeBackup, mergeBackup, type Backup, type RestoreMode } from './backupModel';
+import { decodeBackup, encodeBackup, makeBackup, mergeBackup, type Backup, type BackupRecords, type RestoreMode } from './backupModel';
 import { localId } from './localId';
 import { periodDatabase, readPeriod } from './periodDatabase';
-import { cloudScope } from './localDatabase';
+import { cloudScope, database } from './localDatabase';
 import { trackBackupChanges } from './cloudStore';
-import { cloudChanged } from './cloudTypes';
+import { readRecoveryEntries, saveRecoveryEntries, type RecoveryEntry } from './recoveryArchive';
+import { cloudChanged, equalValue, type CloudKind, type CloudValue } from './cloudTypes';
+import { emptyData, sortedPeriods } from '../features/period/model';
 import {
   canRestore, previousBackup, readPrimary, restoreJournal, restoreRevision, rollbackRestore,
   withDataAccess, writePrimary, type PrimaryRecords,
 } from './storageAccess';
 
 async function capture(): Promise<Backup> {
-  return makeBackup({ ...await readPrimary(), period: await readPeriod() }, appVersion);
+  const read = async () => makeBackup({ ...await readPrimary(), period: await readPeriod() }, appVersion, await readRecoveryEntries());
+  // Sync does not take the UI's Web Lock; read cloud business and recovery rows
+  // in one IndexedDB snapshot so an in-flight transaction cannot split them.
+  if (cloudScope) return database.transaction('r', [database.todos, database.categories, database.anniversaries,
+    database.state, database.syncRecords, database.syncConflicts], read);
+  return read();
 }
 
 export function exportBackup() {
@@ -30,25 +37,42 @@ export function exportPreviousBackup() {
   });
 }
 
+export function importRecoveryEvidence(entry: RecoveryEntry) {
+  if (!canRestore()) return Promise.reject(new Error('此环境无法安全恢复，请使用 HTTPS 正式版或支持 Web Locks 的浏览器。'));
+  if (entry.scope !== null) return Promise.reject(new Error('此入口仅接受无账号来源的隔离记录。'));
+  return withDataAccess(() => periodDatabase.transaction('rw', periodDatabase.state, () => saveRecoveryEntries([entry])));
+}
+
 export function restoreBackup(backup: Backup, mode: RestoreMode) {
   if (!canRestore()) return Promise.reject(new Error('此环境无法安全恢复，请使用 HTTPS 正式版或支持 Web Locks 的浏览器。'));
   return withDataAccess(async () => {
+    // Callers other than the UI must not bypass recovery-data validation.
+    backup = decodeBackup(encodeBackup(backup));
+    const { state } = periodDatabase;
+    if (cloudScope) {
+      let periodConflicts = 0;
+      await trackBackupChanges(async () => {
+        const before = await capture();
+        const merged = mode === 'merge' ? mergeBackup(before.records, backup.records)
+          : { records: backup.records, periodConflicts: 0 };
+        const { records } = merged;
+        periodConflicts = merged.periodConflicts;
+        await assertPendingUnchanged(before.records, records);
+        if (mode === 'replace') await state.put({ id: previousBackup, value: encodeBackup(before) });
+        await writePrimary(records);
+        if (records.period === null) await state.delete('local');
+        else await state.put({ id: 'local', value: records.period });
+        await saveRecoveryEntries(backup.recovery ?? []);
+      });
+      window.dispatchEvent(new Event(cloudChanged));
+      return { periodConflicts };
+    }
+
     const before = await capture();
     const { period: _period, ...primary } = before.records;
     const { records, periodConflicts } = mode === 'merge'
       ? mergeBackup(before.records, backup.records)
       : { records: backup.records, periodConflicts: 0 };
-    const { state } = periodDatabase;
-    if (cloudScope) {
-      await trackBackupChanges(async () => {
-        if (mode === 'replace') await state.put({ id: previousBackup, value: encodeBackup(before) });
-        await writePrimary(records);
-        if (records.period === null) await state.delete('local');
-        else await state.put({ id: 'local', value: records.period });
-      });
-      window.dispatchEvent(new Event(cloudChanged));
-      return { periodConflicts };
-    }
 
     // Stage the original primary rows before touching either module database.
     // The final period transaction commits the third module and clears the
@@ -75,6 +99,7 @@ export function restoreBackup(backup: Backup, mode: RestoreMode) {
       await periodDatabase.transaction('rw', state, async () => {
         if (records.period === null) await state.delete('local');
         else await state.put({ id: 'local', value: records.period });
+        await saveRecoveryEntries(backup.recovery ?? []);
         await state.put({ id: restoreRevision, value: localId() });
         await state.delete(restoreJournal);
       });
@@ -84,6 +109,24 @@ export function restoreBackup(backup: Backup, mode: RestoreMode) {
     }
     return { periodConflicts };
   });
+}
+
+function valueFor(records: BackupRecords, kind: CloudKind, id: string): CloudValue {
+  if (kind === 'todo') return records.todos.find(row => String(row.id) === id) ?? null;
+  if (kind === 'category') return records.categories.find(row => row.id === id) ?? null;
+  if (kind === 'anniversary') return records.anniversaries.find(row => String(row.id) === id) ?? null;
+  const period = records.period ?? emptyData();
+  if (kind === 'periods') return sortedPeriods(period.periods);
+  if (kind === 'cycle') return period.settings;
+  return period.days[id] ?? null;
+}
+
+async function assertPendingUnchanged(before: BackupRecords, after: BackupRecords) {
+  for (const row of await database.syncRecords.where('dirty').equals(1).toArray()) {
+    if (!equalValue(valueFor(before, row.kind, row.id), valueFor(after, row.kind, row.id))) {
+      throw new Error('备份会改动尚未同步的记录。请先完成同步或保留当前记录，原队列和备份均未更改。');
+    }
+  }
 }
 
 async function finishRollback(rollback: () => Promise<void>) {

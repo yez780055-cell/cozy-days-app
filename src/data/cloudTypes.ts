@@ -21,7 +21,7 @@ export type SyncConflict = {
   reason: string;
   at: number;
   remoteVersion?: number;
-  rawRecord?: CloudRecord;
+  rawRecord?: Partial<CloudRecord>;
   inFlight?: SyncAttempt;
 };
 export type PushResponse = Pick<CloudRecord, 'version' | 'value'> & (

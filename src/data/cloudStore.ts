@@ -55,7 +55,7 @@ export async function trackCloudChanges<T>(kinds: readonly CloudKind[], action: 
   if (!cloudScope) return action();
   let queued = false;
   const result = await database.transaction('rw', [
-    database.todos, database.categories, database.anniversaries, database.state, database.syncRecords,
+    database.todos, database.categories, database.anniversaries, database.state, database.syncRecords, database.syncConflicts,
   ], async () => {
     const before = await capture(kinds);
     const result = await action();
@@ -114,10 +114,14 @@ function invalidCalendar(record: CloudRecord) {
 async function quarantine(record: CloudRecord, previous: CloudValue) {
   const operation = `quarantine:${record.kind}:${record.id}:${record.version}`;
   if (await database.syncConflicts.get(operation)) return;
+  const rawRecord: Partial<CloudRecord> = { ...record };
+  if (rawRecord.value === undefined) delete rawRecord.value;
   await database.syncConflicts.put({
     operation,
-    kind: record.kind, recordId: record.id, remoteVersion: record.version, rawRecord: record,
-    attempted: record.value, latest: previous, reason: 'calendar', at: Date.now(),
+    kind: record.kind, recordId: record.id, remoteVersion: record.version, rawRecord,
+    // A missing JSON property cannot be encoded as undefined; rawRecord keeps
+    // the original envelope while attempted remains safely exportable.
+    attempted: record.value === undefined ? null : record.value, latest: previous, reason: 'calendar', at: Date.now(),
   });
 }
 

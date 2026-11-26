@@ -1,4 +1,5 @@
 import { openTodos } from './task-actions';
+import { chooseDate } from './anniversary-actions';
 import { test, expect } from '@playwright/test';
 
 test.use({ timezoneId: 'Asia/Shanghai' });
@@ -54,7 +55,7 @@ test('anniversary dates distinguish origin and next occurrence', async ({page}) 
   await page.goto('/'); await page.getByRole('button',{name:'纪念日',exact:true}).click();
   await page.getByRole('button',{name:'新增纪念日'}).click();
   await page.getByLabel('纪念日名称').fill('生日');
-  await page.getByLabel('日期',{exact:true}).fill('1990-11-08');
+  await chooseDate(page.getByRole('dialog', { name:'新增纪念日' }), '1990-11-08');
   await page.getByRole('button',{name:'保存纪念日'}).click();
   await page.getByRole('button',{name:'查看详情：生日'}).click();
   const details=page.getByRole('region',{name:'纪念日详情'});

@@ -155,7 +155,8 @@ test('rejects corrupted JSON, unsupported versions and invalid references before
   for (const [input, error] of [
     ['{"format":', '文件不是有效的 JSON'],
     [JSON.stringify({ ...baseline, databases: { littleDays: 5, period: 1 } }), '备份版本与当前应用不兼容'],
-    [JSON.stringify({ ...baseline, version: 2 }), '备份版本与当前应用不兼容'],
+    [JSON.stringify({ ...baseline, version: 3 }), '备份版本与当前应用不兼容'],
+    [JSON.stringify({ ...baseline, version: 2 }), '记录结构无效'],
     [JSON.stringify({ ...baseline, records: { ...baseline.records, categories: [] } }), '记录结构无效'],
     [JSON.stringify({ ...baseline, records: { ...baseline.records, todos: [{ ...baseline.records.todos[0], id: Number.MAX_SAFE_INTEGER }] } }), '记录结构无效'],
   ]) {

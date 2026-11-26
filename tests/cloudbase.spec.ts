@@ -30,6 +30,7 @@ async function fixture() {
   `);
   await db.exec(await readFile(new URL('../cloudbase/001_shared_space.sql', import.meta.url), 'utf8'));
   await db.exec(await readFile(new URL('../cloudbase/002_email_signup_identity.sql', import.meta.url), 'utf8'));
+  await db.exec(await readFile(new URL('../cloudbase/003_lunar_validation.sql', import.meta.url), 'utf8'));
   const { rows: invitations } = await db.query<{ code: string }>(
     await readFile(new URL('../cloudbase/issue_invitations.sql', import.meta.url), 'utf8'));
 
@@ -128,6 +129,15 @@ test('PostgreSQL enforces two verified members and isolates private records', as
       rpc(user, 'push', [user, room, kind, id, op.repeat(32), version, content]);
     const task = { id:42, text:'只给自己看', date:'2026-11-20', completed:false, createdAt:1 };
     expect(await push(a, 'todo', '42', 'a', 0, task)).toMatchObject({ status:'applied' });
+    const anniversary = { id:43, name:'合成纪念日', date:'2023-03-22', calendar:'lunar',
+      lunarDate:{year:2023,month:-2,day:1}, note:'', icon:'', theme:'生活', color:'pink', yearly:true, createdAt:1, updatedAt:1 };
+    const savedAnniversary = await push(a, 'anniversary', '43', '1', 0, anniversary);
+    expect(savedAnniversary).toMatchObject({ status:'applied' });
+    const oldClientEdit = { ...anniversary, date:'2023-03-23', unknown:'preserved' };
+    expect(await push(a, 'anniversary', '43', '2', savedAnniversary.version, oldClientEdit))
+      .toMatchObject({ status:'conflict', reason:'invalid', value:anniversary });
+    expect(await push(a, 'anniversary', '43', '2', savedAnniversary.version, oldClientEdit))
+      .toMatchObject({ status:'conflict', reason:'invalid', value:anniversary });
     expect(await rpc(b, 'pull', [b, room, 0])).not.toEqual(expect.arrayContaining([expect.objectContaining({ kind:'todo' })]));
     const day = { date:'2026-11-20', symptoms:['腰酸'] };
     const saved = await push(a, 'day', day.date, 'b', 0, day);
@@ -438,5 +448,44 @@ test('unified Android ready rejection preserves trial protection and blocks auto
     await page.evaluate(() => new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(() => requestAnimationFrame(() => resolve())))));
     expect(await page.evaluate(() => (window as unknown as { fixture: Fixture }).fixture.readyAcknowledged)).toBe(0);
     expect(await page.evaluate(() => (window as unknown as { fixture: Fixture }).fixture.checks)).toEqual([]);
+  } finally { await f.db.close(); }
+});
+
+test('initial synchronization quarantines malformed anniversaries and reads the next page', async ({ page, context }) => {
+  const f = await fixture();
+  try {
+    await f.rpc(users[0], 'space', [f.invitations[0].code]);
+    const good = {id:202,name:'next page',date:'2023-03-22',calendar:'lunar',lunarDate:{year:2023,month:-2,day:1},
+      note:'',icon:'',theme:'生活',color:'pink',yearly:true,createdAt:1,updatedAt:1};
+    const insert = (kind: string, id: string, version: number, value: unknown) => f.db.query(
+      'insert into cozy_days_private.record(space_id,owner,kind,record_id,version,value) values ($1,$2,$3,$4,$5,$6::jsonb)',
+      [room,'',kind,id,version,JSON.stringify(value)]);
+    // Simulate pre-existing bad data directly in the isolated database; the new RPC would reject it.
+    await insert('anniversary','201',5,{...good,id:201,date:'2023-03-23',unknown:'raw'});
+    await insert('anniversary','203',6,'raw scalar');
+    for (let i=1;i<=14;i++) {
+      const date=`2026-11-${String(i).padStart(2,'0')}`;
+      await insert('day',date,i+6,{date,symptoms:[]});
+    }
+    await insert('anniversary','202',21,good);
+    await f.db.query('update cozy_days_private.space set revision=21 where id=$1',[room]);
+    await f.install(context);
+    await join(page,0,f.invitations[0].code);
+    const snapshot = async () => page.evaluate(async ({room,user}) => {
+      const request=indexedDB.open(`little-days-cloud-${room}-${user}`);
+      const db=await new Promise<IDBDatabase>((resolve,reject)=>{request.onsuccess=()=>resolve(request.result);request.onerror=()=>reject(request.error);});
+      const tx=db.transaction(['state','syncConflicts','anniversaries'],'readonly');
+      const read=(req: IDBRequest) => new Promise<any>((resolve,reject)=>{req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error);});
+      const [cursor,conflicts,good]=await Promise.all([read(tx.objectStore('state').get('cloud:cursor')),
+        read(tx.objectStore('syncConflicts').getAll()),read(tx.objectStore('anniversaries').get(202))]);
+      db.close(); return {cursor:cursor?.value,conflicts,good};
+    }, {room,user:users[0]});
+    await expect.poll(async () => (await snapshot()).cursor).toBe(21);
+    const result = await snapshot();
+    expect(result.good).toMatchObject({id:202,name:'next page'});
+    expect(result.conflicts).toEqual(expect.arrayContaining([
+      expect.objectContaining({remoteVersion:5,attempted:expect.objectContaining({unknown:'raw'})}),
+      expect.objectContaining({remoteVersion:6,attempted:'raw scalar'}),
+    ]));
   } finally { await f.db.close(); }
 });

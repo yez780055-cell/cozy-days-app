@@ -18,6 +18,7 @@ const recordLabels = { todo: '待办', category: '待办分类', anniversary: '�
 const conflictLabels: Record<string, string> = {
   version: '另一设备已先保存这条记录。', category: '已有同名分类。请查看副本，再用其他名称新建。',
   period: '经期日期发生重叠。请查看副本，再到生理期页面调整。', invalid: '此副本未通过云端记录格式校验。',
+  calendar: '云端纪念日或日期字段无效，原始记录已隔离；请先导出副本并联系支持。',
 };
 
 export function CloudAccount({ onBack }: { onBack: () => void }) {
@@ -57,8 +58,11 @@ export function CloudAccount({ onBack }: { onBack: () => void }) {
           <p>冲突时的云端版本</p><pre>{describe(conflict.latest)}</pre>
         </details>
         <div className="cloud-actions">
+          {conflict.reason === 'calendar' ? <Button type="button" variant="soft" onClick={() => downloadConflict(conflict)}>导出隔离记录</Button> : <>
+          <Button type="button" variant="soft" onClick={() => downloadConflict(conflict)}>导出冲突副本</Button>
           <Button type="submit" disabled={!!busy} variant="soft">保留云端版本</Button>
           {conflict.reason === 'version' && <Button type="submit" value="reapply" disabled={!!busy}>重新应用我的修改</Button>}
+          </>}
         </div>
       </form>)}
     </section>}
@@ -69,6 +73,15 @@ export function CloudAccount({ onBack }: { onBack: () => void }) {
         <Button variant="danger" onClick={signOut}>确认退出</Button></div>
     </div> : <Button variant="ghost" onClick={() => setConfirmExit(true)}>退出登录</Button>}
   </section>;
+}
+
+function downloadConflict(conflict: SyncConflict) {
+  const url = URL.createObjectURL(new Blob([JSON.stringify(conflict, null, 2)], { type: 'application/json' }));
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `cozy-days-conflict-${conflict.remoteVersion ?? conflict.operation}.json`;
+  link.click();
+  URL.revokeObjectURL(url);
 }
 
 function describe(value: object | null) {

@@ -23,12 +23,13 @@ const unified = { VITE_CLOUDBASE_ENABLED: 'true' };
 const playwright = (...args) => ['exec', '--', 'playwright', 'test', ...args, '--reporter=line'];
 run(['run', 'build'], unified);
 run(playwright('--config', 'playwright.smoke.config.ts'));
+// Full Web includes PWA update tests which read the Pages output directly.
+if (plan.pages) run(['run', 'build:pages'], legacy);
 if (plan.full || plan.webTests.length) {
   run(['run', 'build'], legacy);
   run(plan.full ? ['run', 'test:e2e', '--', '--reporter=line'] : playwright(...plan.webTests));
 }
 if (plan.pages) {
-  run(['run', 'build:pages'], legacy);
   run(['run', 'test:pages', '--', '--reporter=line']);
 }
 if (plan.android) {

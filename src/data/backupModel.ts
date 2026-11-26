@@ -6,6 +6,7 @@ import { canonicalTime, categoryKey } from './categories';
 import { localId } from './localId';
 import { cloudScope } from './localDatabase';
 import type { PrimaryRecords } from './storageAccess';
+import { validRecoveryEntries, type RecoveryEntry } from './recoveryArchive';
 
 const format = 'cozy-days-backup';
 const databaseVersions = { littleDays: 4, period: 1 } as const;
@@ -13,11 +14,12 @@ export const maxBackupBytes = 20 * 1024 * 1024;
 export type BackupRecords = PrimaryRecords & { period: PeriodData | null };
 export type Backup = {
   format: typeof format;
-  version: 1;
+  version: 1 | 2;
   appVersion: string;
   exportedAt: string;
   databases: typeof databaseVersions;
   records: BackupRecords;
+  recovery?: RecoveryEntry[];
 };
 export type RestoreMode = 'merge' | 'replace';
 
@@ -27,7 +29,8 @@ const text = (value: unknown): value is string => typeof value === 'string';
 const timestamp = (value: unknown): value is number =>
   typeof value === 'number' && Number.isSafeInteger(value) && value >= 0;
 // Account-scoped databases also use randomly generated 52-bit IDs.
-const rowId = (value: unknown): value is number => timestamp(value) && value > 0 && value <= (cloudScope ? 0xfffffffffffff : 0xffffffff);
+const rowId = (value: unknown, allowCloudIds: boolean): value is number =>
+  timestamp(value) && value > 0 && value <= (cloudScope || allowCloudIds ? 0xfffffffffffff : 0xffffffff);
 const optional = (value: unknown, valid: (value: unknown) => boolean) => value === undefined || valid(value);
 
 function validJSON(value: unknown, depth = 0): boolean {
@@ -47,7 +50,7 @@ function canonical(value: unknown): string {
     : item);
 }
 
-function validRecords(value: unknown): value is BackupRecords {
+function validRecords(value: unknown, allowCloudIds = false): value is BackupRecords {
   if (!object(value) || !Array.isArray(value.categories) || !Array.isArray(value.todos) ||
       !Array.isArray(value.anniversaries) || (value.period !== null && !validPeriodData(value.period))) return false;
 
@@ -58,7 +61,7 @@ function validRecords(value: unknown): value is BackupRecords {
       !unique(categories, row => row.id) || !unique(categories, row => row.key)) return false;
 
   const categoryIds = new Set(categories.map(row => row.id));
-  if (!todos.every(row => object(row) && rowId(row.id) && text(row.text) && text(row.date) &&
+  if (!todos.every(row => object(row) && rowId(row.id, allowCloudIds) && text(row.text) && text(row.date) &&
       isDateKey(row.date) && typeof row.completed === 'boolean' && timestamp(row.createdAt) &&
       optional(row.favorite, value => typeof value === 'boolean') &&
       optional(row.categoryId, id => categoryIds.has(id)) &&
@@ -69,7 +72,7 @@ function validRecords(value: unknown): value is BackupRecords {
         return Object.entries(resolved).every(([key, field]) => value[key] === field);
       })) || !unique(todos, row => row.id)) return false;
 
-  if (!anniversaries.every(row => object(row) && rowId(row.id) && text(row.name) && !!row.name.trim() &&
+  if (!anniversaries.every(row => object(row) && rowId(row.id, allowCloudIds) && text(row.name) && !!row.name.trim() &&
       row.name.length <= 60 && text(row.date) && validDate(row.date) && validCalendarFields(row) && themes.some(theme => theme === row.theme) &&
       colors.some(color => color === row.color) && text(row.note) && row.note.length <= 500 &&
       text(row.icon) && row.icon.length <= 16 && typeof row.yearly === 'boolean' &&
@@ -89,11 +92,14 @@ function validRecords(value: unknown): value is BackupRecords {
   return true;
 }
 
-export function makeBackup(records: BackupRecords, appVersion: string): Backup {
-  return { format, version: 1, appVersion, exportedAt: new Date().toISOString(), databases: databaseVersions, records };
+export function makeBackup(records: BackupRecords, appVersion: string, recovery: RecoveryEntry[] = []): Backup {
+  if (!validRecoveryEntries(recovery)) throw new Error('恢复材料含无法无损导出的内容，未生成备份。');
+  return { format, version: recovery.length ? 2 : 1, appVersion, exportedAt: new Date().toISOString(), databases: databaseVersions,
+    records, ...(recovery.length ? { recovery } : {}) };
 }
 
 export function encodeBackup(backup: Backup): string {
+  if (backup.version === 2 && !validRecoveryEntries(backup.recovery)) throw new Error('恢复材料含无法无损导出的内容，未生成备份。');
   const json = JSON.stringify(backup);
   if (new TextEncoder().encode(json).length > maxBackupBytes) throw new Error('当前记录超过 20 MB，无法生成可恢复的备份。');
   decodeBackup(json);
@@ -105,13 +111,15 @@ export function decodeBackup(json: string): Backup {
   try { value = JSON.parse(json); }
   catch { throw new Error('文件不是有效的 JSON，或文件已损坏。'); }
   if (!object(value) || value.format !== format) throw new Error('请选择小饱日常的完整 JSON 备份。');
-  if (value.version !== 1 || !object(value.databases) ||
+  if (![1, 2].includes(value.version as number) || !object(value.databases) ||
       value.databases.littleDays !== databaseVersions.littleDays || value.databases.period !== databaseVersions.period) {
     throw new Error('此备份版本与当前应用不兼容。');
   }
   if (!text(value.appVersion) || !/^\d+\.\d+\.\d+(?:[-+][\w.+-]+)?$/.test(value.appVersion) ||
       !text(value.exportedAt) || !Number.isFinite(Date.parse(value.exportedAt)) ||
-      !validJSON(value.records) || !validRecords(value.records)) throw new Error('备份中的记录结构无效，未读取任何数据。');
+      !validJSON(value.records) || !validRecords(value.records, value.version === 2) ||
+      (value.version === 2 && !validRecoveryEntries(value.recovery)) ||
+      (value.version === 1 && value.recovery !== undefined)) throw new Error('备份中的记录结构无效，未读取任何数据。');
   return value as Backup;
 }
 

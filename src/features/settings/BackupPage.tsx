@@ -3,7 +3,8 @@ import { useEffect, useRef, useState, type ChangeEvent } from 'react';
 import { Download, FileUp } from 'lucide-react';
 import { Button } from '../../components/Button';
 import { SettingsHeader } from './SettingsHeader';
-import { exportBackup, exportPreviousBackup, restoreBackup } from '../../data/backup';
+import { exportBackup, exportPreviousBackup, importRecoveryEvidence, restoreBackup } from '../../data/backup';
+import { decodeQuarantineExport, type RecoveryEntry } from '../../data/recoveryArchive';
 import { cloudScope } from '../../data/localDatabase';
 import { decodeBackup, maxBackupBytes, type Backup, type RestoreMode } from '../../data/backupModel';
 import { canRestore } from '../../data/storageAccess';
@@ -30,6 +31,7 @@ async function download({ backup, json }: { backup: Backup; json: string }, pref
 
 export function BackupPage({ onBack }: { onBack: () => void }) {
   const [selection, setSelection] = useState<{backup: Backup; name: string} | null>(null);
+  const [evidence, setEvidence] = useState<{entry: RecoveryEntry; name: string} | null>(null);
   const candidate = selection?.backup;
   const [mode, setMode] = useState<RestoreMode>('merge');
   const [previous, setPrevious] = useState(false);
@@ -41,9 +43,10 @@ export function BackupPage({ onBack }: { onBack: () => void }) {
   const supported = canRestore();
   function cancelSelection() {
     setSelection(null);
+    setEvidence(null);
     setError('');
   }
-  useAndroidBack('overlay', !!candidate, () => { if (!inFlight.current) cancelSelection(); });
+  useAndroidBack('overlay', !!candidate || !!evidence, () => { if (!inFlight.current) cancelSelection(); });
 
   useEffect(() => {
     let mounted = true;
@@ -68,9 +71,15 @@ export function BackupPage({ onBack }: { onBack: () => void }) {
     if (!file) return;
     void run(async () => {
       setSelection(null);
+      setEvidence(null);
       setMode('merge');
       if (file.size > maxBackupBytes) throw new Error('备份文件超过 20 MB。');
-      setSelection({backup:decodeBackup(await file.text()), name:file.name});
+      const json = await file.text();
+      try { setSelection({backup:decodeBackup(json), name:file.name}); }
+      catch (error) {
+        try { setEvidence({entry:decodeQuarantineExport(json), name:file.name}); }
+        catch { throw error; }
+      }
     });
   }
 
@@ -88,7 +97,7 @@ export function BackupPage({ onBack }: { onBack: () => void }) {
 
   return <section className="settings-page backup-page" aria-label="数据备份与恢复">
     <SettingsHeader title="数据备份与恢复" disabled={busy} onBack={finished ? () => location.reload() : onBack} onAndroidBack={onBack}/>
-    <p className="settings-intro">备份包含已保存的待办、分类、经期记录和纪念日。JSON 只在本机处理，请妥善保管文件。</p>
+    <p className="settings-intro">备份包含已保存的记录和本机同步恢复材料。JSON 只在本机处理，请妥善保管文件。包含恢复材料的备份需要新版应用读取。</p>
     {busy && <p className="settings-notice" role="status">正在处理本地数据…</p>}
     {message && <p className="settings-notice" role="status">{message}</p>}
     {error && <p className="error-message" role="alert">{error}</p>}
@@ -109,10 +118,20 @@ export function BackupPage({ onBack }: { onBack: () => void }) {
           <input type="file" accept=".json,application/json" disabled={busy || !supported} onChange={selectFile}/>
         </label>
         {!supported && <p>请在 HTTPS 或 localhost 页面使用支持 Web Locks 的浏览器恢复数据。</p>}
+        {evidence && <div className="backup-review">
+          <h2>确认保存隔离记录</h2>
+          <p className="backup-filename">{evidence.name}</p>
+          <p>旧版单条隔离文件不含账号来源。记录会作为恢复材料保存并包含在之后的备份中，不会自动同步。</p>
+          <div className="backup-confirm"><Button variant="soft" disabled={busy} onClick={cancelSelection}>取消</Button>
+            <Button disabled={busy} onClick={() => void run(async () => {
+              await importRecoveryEvidence(evidence.entry); setEvidence(null); setMessage('隔离记录已保存，可再次导出完整备份。');
+            })}>保存隔离记录</Button></div>
+        </div>}
         {candidate && selection && <div className="backup-review">
           <h2>确认导入</h2>
           <p className="backup-filename">{selection.name}</p>
           <p>备份自 {new Date(candidate.exportedAt).toLocaleString('zh-CN')} · v{candidate.appVersion}</p>
+          {!!candidate.recovery?.length && <p className="settings-notice">包含 {candidate.recovery.length} 份同步恢复材料。导入后会保留并可再次导出，但不会自动重放待同步操作或覆盖本机队列。</p>}
           <dl>
             <div><dt>待办</dt><dd>{candidate.records.todos.length}</dd></div>
             <div><dt>分类</dt><dd>{candidate.records.categories.length}</dd></div>

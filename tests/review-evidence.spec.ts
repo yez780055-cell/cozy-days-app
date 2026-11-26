@@ -5,7 +5,8 @@ import { mkdirSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 const sizes = [[360, 740], [393, 852], [430, 932]] as const;
-const evidenceDir = resolve(process.env.PLAYWRIGHT_REVIEW_EVIDENCE_DIR ?? 'public/review/evidence');
+// Historical public evidence must not be overwritten by routine test runs.
+const evidenceDir = resolve(process.env.PLAYWRIGHT_REVIEW_EVIDENCE_DIR ?? 'artifacts/review-evidence-tests');
 const screenshotDir = resolve(evidenceDir, 'screenshots');
 const videoDir = resolve(evidenceDir, 'videos');
 mkdirSync(screenshotDir, { recursive: true });

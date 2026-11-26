@@ -78,6 +78,15 @@ test('generated lunar migration does not overflow collection and still requires 
   assert.equal(plan.full, true);
   assert.ok(plan.changedFiles.includes('cloudbase/003_lunar_validation.sql'));
 });
+test('full validation builds Pages before Web tests that consume its output', () => {
+  const result = spawnSync(process.execPath, ['scripts/ci-run.mjs'], {
+    encoding: 'utf8', env: { ...process.env, CI: 'false', CI_DRY_RUN: 'true', CI_TEST_TIER: 'full', CI_CHANGE_BASE: 'HEAD' },
+  });
+  assert.equal(result.status, 0, result.stderr);
+  const pages = result.stdout.indexOf('> npm run build:pages');
+  const web = result.stdout.indexOf('> npm run test:e2e');
+  assert.ok(pages >= 0 && web > pages, result.stdout);
+});
 test('formal releases cannot weaken the complete gate with a small changed scope', () => {
   const p = planTests(['README.md'], { tier: 'formal' });
   assert.equal(p.full, true); assert.equal(p.pages, true); assert.equal(p.cloud, true);

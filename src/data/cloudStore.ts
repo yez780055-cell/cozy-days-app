@@ -2,8 +2,8 @@ import { cloudScope, database, type Todo } from './localDatabase';
 import { readPeriod } from './periodDatabase';
 import { localId } from './localId';
 import { emptyData, sortedPeriods, type CycleSettings, type DailyEntry, type PeriodEntry } from '../features/period/model';
-import type { Anniversary } from '../features/anniversary/model';
-import type { Category } from './categories';
+import { colors, themes, timingModes, validCalendarFields, validDate, type Anniversary } from '../features/anniversary/model';
+import { categoryKey, type Category } from './categories';
 import {
   cloudChanged, cloudKinds, cloudQueued, equalValue, recordKey,
   type CloudKind, type CloudRecord, type CloudValue, type PushResponse, type SyncRecord,
@@ -96,13 +96,77 @@ async function materialize({ kind, id, value }: CloudRecord) {
   await database.state.put({ id: 'local', value: data });
 }
 
+function invalidCalendar(record: CloudRecord) {
+  if (record.kind !== 'anniversary' || record.value === null) return false;
+  if (typeof record.value !== 'object' || Array.isArray(record.value)) return true;
+  const value = record.value as Anniversary;
+  return !Number.isSafeInteger(value.id) || Number(value.id) <= 0 || Number(value.id) > 0xfffffffffffff
+    || String(value.id) !== record.id || typeof value.date !== 'string' || !validDate(value.date)
+    || !validCalendarFields(value) || typeof value.name !== 'string' || !value.name.trim()
+    || typeof value.note !== 'string' || typeof value.icon !== 'string' || typeof value.yearly !== 'boolean'
+    || !themes.includes(value.theme) || !colors.includes(value.color)
+    || (value.timingMode !== undefined && !timingModes.includes(value.timingMode))
+    || typeof value.createdAt !== 'number' || typeof value.updatedAt !== 'number';
+}
+
+// A quarantine entry is keyed by the remote revision, so later malformed versions
+// cannot overwrite earlier evidence. It is committed with the cursor itself.
+async function quarantine(record: CloudRecord, previous: CloudValue) {
+  const operation = `quarantine:${record.kind}:${record.id}:${record.version}`;
+  if (await database.syncConflicts.get(operation)) return;
+  await database.syncConflicts.put({
+    operation,
+    kind: record.kind, recordId: record.id, remoteVersion: record.version, rawRecord: record,
+    attempted: record.value, latest: previous, reason: 'calendar', at: Date.now(),
+  });
+}
+
+// A missing category is not proof of deletion: it may simply be on a later
+// page. Only a known tombstone permits rewriting a reference. Queue each
+// rewrite in the same transaction, retaining any in-flight attempt.
+async function reconcileCategoryReferences(completePageSet = false) {
+  const categories = await database.categories.toArray();
+  const ids = new Set(categories.map(category => category.id));
+  const records = await database.syncRecords.toArray();
+  const deleted = new Set(records.filter(row => row.kind === 'category' && !ids.has(row.id)
+    && (row.value === null || (row.dirty && row.desired === null) || row.seen?.value === null)).map(row => row.id));
+  const todos = await database.todos.toArray();
+  let fallback = categories.find(category => category.key === categoryKey('生活'))
+    ?? categories.sort((a, b) => a.createdAt - b.createdAt || a.id.localeCompare(b.id))[0];
+  if (!fallback && completePageSet && todos.some(todo => todo.categoryId && deleted.has(todo.categoryId))) {
+    // Do not invent a fallback until all pages have been read. Never reuse a tombstoned ID.
+    let id = 'life-recovered';
+    while (deleted.has(id)) id += '-next';
+    fallback = { id, name: '生活', key: categoryKey('生活'), builtin: false, createdAt: 0 };
+    await database.categories.put(fallback);
+    await queueChange({ kind: 'category', id, version: 0, value: null }, fallback);
+  }
+  if (!fallback) return false;
+  let changed = false;
+  for (const todo of todos) {
+    if (!todo.categoryId || !deleted.has(todo.categoryId)) continue;
+    await database.state.put({ id: `cloud:category-reconciliation:${localId()}`,
+      value: { todo: structuredClone(todo), deletedCategoryId: todo.categoryId, fallbackCategoryId: fallback.id } });
+    const updated = { ...todo, categoryId: fallback.id };
+    await database.todos.put(updated);
+    await queueChange({ kind: 'todo', id: String(todo.id), version: 0, value: todo }, updated);
+    changed = true;
+  }
+  return changed;
+}
+
+export async function finishPull() {
+  const changed = await database.transaction('rw', materializationTables(), () => reconcileCategoryReferences(true));
+  if (changed) { notifyCache(cloudChanged); notifyCache(cloudQueued); }
+}
+
 function materializationTables() {
   return [database.todos, database.categories, database.anniversaries, database.state, database.syncRecords];
 }
 
 export async function nextAttempt() {
   return database.transaction('rw', database.syncRecords, async () => {
-    const row = await database.syncRecords.where('dirty').equals(1).first();
+    const row = await database.syncRecords.where('dirty').equals(1).filter(item => !item.blocked).first();
     if (!row) return;
     const attempt = row.attempt ?? { operation: localId(), version: row.version, value: row.desired };
     if (!row.attempt) await database.syncRecords.put({ ...row, attempt });
@@ -117,9 +181,16 @@ export async function acceptPush(kind: CloudKind, id: string, operation: string,
     if (!row?.attempt || row.attempt.operation !== operation) return false;
     const accepted = { kind, id, value: response.value, version: response.version };
     const latest = row.seen && row.seen.version > accepted.version ? row.seen : accepted;
+    if (invalidCalendar(latest)) {
+      await quarantine(latest, row.value);
+      // Keep the entire in-flight operation and successor untouched for recovery.
+      await database.syncRecords.put({ ...row, blocked: true });
+      return true;
+    }
     if (response.status === 'conflict') {
       await database.syncConflicts.put({
         operation, kind, recordId: id, attempted: row.desired, latest: latest.value, reason: response.reason, at: Date.now(),
+        inFlight: row.attempt,
       });
     }
     const hasSuccessor = response.status === 'applied' && !equalValue(row.desired, row.attempt.value);
@@ -129,15 +200,16 @@ export async function acceptPush(kind: CloudKind, id: string, operation: string,
       ...baseline, key, desired, dirty: hasSuccessor ? 1 : 0,
       ...(hasSuccessor && latest.version > baseline.version ? { seen: latest } : {}),
     });
-    if (equalValue(row.desired, desired)) return false;
-    await materialize({ ...latest, value: desired });
-    return true;
+    const materialized = !equalValue(row.desired, desired);
+    if (materialized) await materialize({ ...latest, value: desired });
+    const reconciled = (kind === 'category' || kind === 'todo') && await reconcileCategoryReferences();
+    return reconciled || materialized;
   });
   if (changed) notifyCache(cloudChanged);
 }
 
 export async function applyPull(rows: CloudRecord[]) {
-  const changed = await database.transaction('rw', materializationTables(), async () => {
+  const changed = await database.transaction('rw', [...materializationTables(), database.syncConflicts], async () => {
     let cursor = await readCursor();
     let changed = false;
     for (const record of rows) {
@@ -146,18 +218,25 @@ export async function applyPull(rows: CloudRecord[]) {
       const key = recordKey(record.kind, record.id);
       const row = await database.syncRecords.get(key);
       if (row && record.version <= Math.max(row.version, row.seen?.version ?? 0)) continue;
+      if (invalidCalendar(record)) {
+        await quarantine(record, row?.value ?? null);
+        changed = true;
+        continue;
+      }
       if (row?.dirty) {
-        await database.syncRecords.put({ ...row, seen: record });
+        await database.syncRecords.put({ ...row, seen: record, blocked: false });
         continue;
       }
       await database.syncRecords.put({ ...record, key, desired: record.value, dirty: 0 });
       await materialize(record);
       changed = true;
     }
+    if (rows.some(row => row.kind === 'category' || row.kind === 'todo'))
+      changed = await reconcileCategoryReferences() || changed;
     await database.state.put({ id: cursorKey, value: cursor });
     return changed;
   });
-  if (changed) notifyCache(cloudChanged);
+  if (changed) { notifyCache(cloudChanged); notifyCache(cloudQueued); }
 }
 
 export async function readCursor() {
@@ -182,14 +261,19 @@ export async function resolveSyncConflict(operation: string, reapply: boolean) {
   await database.transaction('rw', [...materializationTables(), database.syncConflicts], async () => {
     const conflict = await database.syncConflicts.get(operation);
     if (!conflict) return;
+    if (conflict.reason === 'calendar') throw new Error('隔离记录不能在此处删除；请先导出并修复原始数据。');
     if (reapply) {
       const key = recordKey(conflict.kind, conflict.recordId);
       const row = await database.syncRecords.get(key);
+      if (invalidCalendar({ kind: conflict.kind, id: conflict.recordId, version: 0, value: conflict.attempted })) {
+        throw new Error('副本中的日期字段不一致，请先导出副本并修复日期。');
+      }
       if (!row || row.dirty || !equalValue(row.value, conflict.latest)) {
         throw new Error('这条记录在冲突发生后又有更改。请先比较当前记录和保留的副本。');
       }
       await queueChange(row, conflict.attempted);
       await materialize({ ...row, value: conflict.attempted });
+      if (conflict.kind === 'category' || conflict.kind === 'todo') await reconcileCategoryReferences();
     }
     await database.syncConflicts.delete(operation);
   });

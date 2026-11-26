@@ -1,7 +1,7 @@
 import { liveQuery } from 'dexie';
 import { CloudError, pullCloud, pushCloud } from './cloudbase';
 import {
-  acceptPush, applyPull, cacheInitialized, markInitialized, nextAttempt, readCursor, syncCounts,
+  acceptPush, applyPull, cacheInitialized, finishPull, markInitialized, nextAttempt, readCursor, syncCounts,
 } from './cloudStore';
 import { cloudKinds, cloudQueued, type CloudScope, type SyncConflict } from './cloudTypes';
 
@@ -16,13 +16,14 @@ async function pull(scope: CloudScope, active = () => true) {
     if (!Array.isArray(rows) || rows.length > pageSize || rows.some((row, index) =>
       !row || !cloudKinds.includes(row.kind) || typeof row.id !== 'string' || !Number.isSafeInteger(row.version)
       || row.version <= (index ? rows[index - 1].version : cursor)
-      || (row.value !== null && (!row.value || typeof row.value !== 'object')))) {
+      || (row.kind !== 'anniversary' && row.value !== null && (!row.value || typeof row.value !== 'object')))) {
       throw new CloudError(502, 'INVALID_SYNC_RESPONSE');
     }
     if (!active()) return;
     await applyPull(rows);
     more = rows.length === pageSize;
   }
+  if (active()) await finishPull();
 }
 
 export async function initializeCloudCache(scope: CloudScope) {
@@ -80,7 +81,7 @@ export function startCloudSync(scope: CloudScope, report: (status: SyncStatus) =
         const result = await pushCloud(scope, kind, id, attempt);
         if (stopped) return;
         if (!result || !['applied', 'conflict'].includes(result.status) || !Number.isSafeInteger(result.version)
-          || result.version < 0 || (result.value !== null && (!result.value || typeof result.value !== 'object'))) {
+          || result.version < 0 || (kind !== 'anniversary' && result.value !== null && (!result.value || typeof result.value !== 'object'))) {
           throw new CloudError(502, 'INVALID_SYNC_RESPONSE');
         }
         await acceptPush(kind, id, attempt.operation, result);

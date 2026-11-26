@@ -10,6 +10,7 @@ export type SyncRecord = CloudRecord & {
   dirty: 0 | 1;
   attempt?: SyncAttempt;
   seen?: CloudRecord;
+  blocked?: boolean;
 };
 export type SyncConflict = {
   operation: string;
@@ -19,6 +20,9 @@ export type SyncConflict = {
   latest: CloudValue;
   reason: string;
   at: number;
+  remoteVersion?: number;
+  rawRecord?: CloudRecord;
+  inFlight?: SyncAttempt;
 };
 export type PushResponse = Pick<CloudRecord, 'version' | 'value'> & (
   { status: 'applied' } | { status: 'conflict'; reason: string }
